@@ -14,26 +14,45 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
+      home: MyHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key? key}) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _number = 10;
+
+  void _incrementNumber() {
+    setState(() {
+      _number++;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('St James Park App'),
+        title: Text('St James Park App'),
       ),
-      body: const Center(
+      body: Center(
         child: Text(
-          'The number is: 10',
+          'The number is: $_number',
           style: TextStyle(fontSize: 24),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementNumber,
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
       ),
     );
   }
 }
+
