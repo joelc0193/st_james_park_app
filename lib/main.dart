@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'admin_page.dart';
 
@@ -29,26 +30,45 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _number = 10;
+  int _number = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNumber();
+  }
+
+  void _loadNumber() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _number = (prefs.getInt('number') ?? 0);
+    });
+  }
 
   void _incrementNumber() {
     setState(() {
       _number++;
     });
+    _saveNumber();
   }
 
-void _updateNumber() async {
-  final result = await Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => AdminPage()),
-  );
-  if (result != null) {
-    setState(() {
-      _number = result;
-    });
+  void _updateNumber() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AdminPage()),
+    );
+    if (result != null) {
+      setState(() {
+        _number = result;
+      });
+      _saveNumber();
+    }
   }
-}
 
+  void _saveNumber() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('number', _number);
+  }
 
   @override
   Widget build(BuildContext context) {
