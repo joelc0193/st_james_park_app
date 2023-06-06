@@ -35,6 +35,39 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _updateNumber() async {
+    TextEditingController controller = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter new number'),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Update'),
+              onPressed: () {
+                setState(() {
+                  _number = int.parse(controller.text);
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,12 +80,22 @@ class _MyHomePageState extends State<MyHomePage> {
           style: TextStyle(fontSize: 24),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementNumber,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          FloatingActionButton(
+            onPressed: _incrementNumber,
+            tooltip: 'Increment',
+            child: Icon(Icons.add),
+          ),
+          SizedBox(height: 10),
+          FloatingActionButton(
+            onPressed: _updateNumber,
+            tooltip: 'Update',
+            child: Icon(Icons.update),
+          ),
+        ],
       ),
     );
   }
 }
-
