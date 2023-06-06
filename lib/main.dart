@@ -57,11 +57,16 @@ class _MyHomePageState extends State<MyHomePage> {
       context,
       MaterialPageRoute(builder: (context) => AdminPage()),
     );
-    if (result != null) {
+    if (result != null && result is int) {
       setState(() {
         _number = result;
       });
       _saveNumber();
+    } else {
+      // Show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a valid number')),
+      );
     }
   }
 
@@ -75,6 +80,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('St James Park App'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.update),
+            onPressed: _updateNumber,
+          ),
+        ],
       ),
       body: Center(
         child: Text(
