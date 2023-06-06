@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-import 'admin_page.dart';
+import './services/firestore_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -13,102 +17,94 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'St James Park App',
+      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _number = 0;
+  final FirestoreService _firestoreService = FirestoreService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadNumber();
-  }
-
-  void _loadNumber() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _number = (prefs.getInt('number') ?? 0);
-    });
-  }
-
-  void _incrementNumber() {
-    setState(() {
-      _number++;
-    });
-    _saveNumber();
-  }
-
-  void _updateNumber() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AdminPage()),
-    );
-    if (result != null && result is int) {
-      setState(() {
-        _number = result;
-      });
-      _saveNumber();
-    } else {
-      // Show an error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter a valid number')),
-      );
-    }
-  }
-
-  void _saveNumber() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('number', _number);
-  }
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('St James Park App'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.update),
-            onPressed: _updateNumber,
-          ),
-        ],
+        title: const Text('Flutter Demo Home Page'),
       ),
-      body: Center(
-        child: Text(
-          'The number is: $_number',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+      body: Column(
         children: <Widget>[
-          FloatingActionButton(
-            onPressed: _incrementNumber,
-            tooltip: 'Increment',
-            child: Icon(Icons.add),
+          TextField(
+            controller: _emailController,
+            decoration: const InputDecoration(labelText: 'Email'),
           ),
-          SizedBox(height: 10),
-          FloatingActionButton(
-            onPressed: _updateNumber,
-            tooltip: 'Update',
-            child: Icon(Icons.update),
+          TextField(
+            controller: _passwordController,
+            decoration: const InputDecoration(labelText: 'Password'),
+            obscureText: true,
+          ),
+          StreamBuilder<DocumentSnapshot>(
+            stream: _firestoreService.getNumber(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return const Text('Something went wrong');
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Text("Loading");
+              }
+
+              return Text(
+                  (snapshot.data?.data() as Map<String, dynamic>)['number']
+                          .toString() ??
+                      '');
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Log In'),
+            onPressed: () async {
+              try {
+                await _auth.signInWithEmailAndPassword(
+                  email: _emailController.text,
+                  password: _passwordController.text,
+                );
+              } on FirebaseAuthException catch (e) {
+                // Handle error
+                print(e.message);
+              }
+            },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await _firestoreService.incrementNumber();
+        },
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
