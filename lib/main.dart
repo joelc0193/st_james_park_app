@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'admin_page.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -35,38 +37,18 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _updateNumber() async {
-    TextEditingController controller = TextEditingController();
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Enter new number'),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Update'),
-              onPressed: () {
-                setState(() {
-                  _number = int.parse(controller.text);
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+void _updateNumber() async {
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => AdminPage()),
+  );
+  if (result != null) {
+    setState(() {
+      _number = result;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
