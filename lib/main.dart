@@ -61,21 +61,19 @@ class _MyHomePageState extends State<MyHomePage> {
             stream: _firestoreService.getNumber(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
+              int currentNumber = 0; // Default value
+
               if (snapshot.hasError) {
-                return const Text('Something went wrong');
+                print('Something went wrong');
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                print("Loading");
+              } else {
+                Map<String, dynamic> data =
+                    snapshot.data!.data() as Map<String, dynamic>;
+                currentNumber = data['currentNumber'];
               }
 
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text("Loading");
-              }
-
-              if (!snapshot.hasData || !snapshot.data!.exists) {
-                return Text('Document does not exist');
-              }
-
-              Map<String, dynamic> data =
-                  snapshot.data!.data() as Map<String, dynamic>;
-              return Text("Data: ${data['currentNumber']}");
+              return Text("Current number: $currentNumber");
             },
           ),
           ElevatedButton(
@@ -114,6 +112,12 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
           ),
+          ElevatedButton(
+            onPressed: () async {
+              await _firestoreService.signOut();
+            },
+            child: Text('Log Out'),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -129,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     _emailController.dispose();
-       _passwordController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 }
