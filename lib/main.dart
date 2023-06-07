@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'St James Park',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -79,6 +79,24 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           ElevatedButton(
+            child: const Text('Sign Up'),
+            onPressed: () async {
+              try {
+                await _auth.createUserWithEmailAndPassword(
+                  email: _emailController.text,
+                  password: _passwordController.text,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Successfully Signed Up')),
+                );
+              } on FirebaseAuthException catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed with ${e.message}')),
+                );
+              }
+            },
+          ),
+          ElevatedButton(
             child: const Text('Log In'),
             onPressed: () async {
               try {
@@ -86,9 +104,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   email: _emailController.text,
                   password: _passwordController.text,
                 );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Successfully Logged In')),
+                );
               } on FirebaseAuthException catch (e) {
-                // Handle error
-                print(e.message);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed with ${e.message}')),
+                );
               }
             },
           ),
@@ -107,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
+       _passwordController.dispose();
     super.dispose();
   }
 }
