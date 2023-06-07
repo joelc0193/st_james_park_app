@@ -69,10 +69,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 return const Text("Loading");
               }
 
-              return Text(
-                  (snapshot.data?.data() as Map<String, dynamic>)['number']
-                          .toString() ??
-                      '');
+              if (!snapshot.hasData || !snapshot.data!.exists) {
+                return Text('Document does not exist');
+              }
+
+              Map<String, dynamic> data =
+                  snapshot.data!.data() as Map<String, dynamic>;
+              return Text("Data: ${data['your_field']}");
             },
           ),
           ElevatedButton(
