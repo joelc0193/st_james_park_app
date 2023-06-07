@@ -13,11 +13,6 @@ void main() {
     late MockFirebaseAuth mockAuth;
 
     setUp(() {
-      TestWidgetsFlutterBinding.ensureInitialized();
-
-      MockFirebaseApp app = MockFirebaseApp();
-      when(Firebase.initializeApp()).thenAnswer((_) => Future.value(app));
-
       mockFirestore = FakeFirebaseFirestore();
       mockAuth = MockFirebaseAuth();
       firestoreService =
