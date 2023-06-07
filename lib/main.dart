@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'St James Park',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -68,14 +68,35 @@ class _MyHomePageState extends State<MyHomePage> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Text("Loading");
               }
-
-              if (!snapshot.hasData || !snapshot.data!.exists) {
-                return Text('Document does not exist');
+              if (snapshot.connectionState == ConnectionState.active) {
+                if (snapshot.data!.exists) {
+                  Map<String, dynamic> data =
+                      snapshot.data!.data() as Map<String, dynamic>;
+                  return Text("Data: ${data['currentNumber']}");
+                } else {
+                  return Text('Document does not exist');
+                }
               }
 
-              Map<String, dynamic> data =
-                  snapshot.data!.data() as Map<String, dynamic>;
-              return Text("Data: ${data['currentNumber']}");
+              return const Text('Unknown state');
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Sign Up'),
+            onPressed: () async {
+              try {
+                await _auth.createUserWithEmailAndPassword(
+                  email: _emailController.text,
+                  password: _passwordController.text,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Successfully Signed Up')),
+                );
+              } on FirebaseAuthException catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed with ${e.message}')),
+                );
+              }
             },
           ),
           ElevatedButton(
@@ -86,11 +107,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   email: _emailController.text,
                   password: _passwordController.text,
                 );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Successfully Logged In')),
+                );
               } on FirebaseAuthException catch (e) {
-                // Handle error
-                print(e.message);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed with ${e.message}')),
+                );
               }
             },
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await _firestoreService.signOut();
+            },
+            child: Text('Log Out'),
           ),
         ],
       ),

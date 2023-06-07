@@ -1,22 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Stream<DocumentSnapshot> getNumber() {
     return _firestore.collection('numbers').doc('currentNumber').snapshots();
   }
 
-  Future<void> incrementNumber() async {
-    DocumentReference numberRef =
-        _firestore.collection('numbers').doc('currentNumber');
-    DocumentSnapshot numberSnap = await numberRef.get();
+  Future<void> signOut() async {
+    await _auth.signOut();
+  }
 
-    if (numberSnap.exists) {
-      int currentNumber = (numberSnap.data() as dynamic)['number'];
-      await numberRef.update({'number': currentNumber + 1});
-    } else {
-      await numberRef.set({'number': 1});
+  Future<void> incrementNumber() async {
+    try {
+      await _firestore.collection('numbers').doc('currentNumber').update({
+        'currentNumber': FieldValue.increment(1),
+      });
+      print('Number incremented successfully');
+    } catch (e) {
+      print('Failed to increment number: $e');
     }
   }
 }
