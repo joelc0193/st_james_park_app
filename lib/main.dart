@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
               Map<String, dynamic> data =
                   snapshot.data!.data() as Map<String, dynamic>;
-              return Text("Data: ${data['your_field']}");
+              return Text("Data: ${data['currentNumber']}");
             },
           ),
           ElevatedButton(
