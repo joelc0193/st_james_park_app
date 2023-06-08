@@ -1,27 +1,50 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mockito/mockito.dart';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:st_james_park_app/main.dart';
+import 'mocks.dart';  // Import the file where you defined your mock classes
 
-class FirebaseInitializer {
-  Future<FirebaseApp> initializeApp() {
-    return Firebase.initializeApp();
+class MockFirestore extends Mock implements FirebaseFirestore {}
+
+class MockFirebaseAuth extends Mock implements FirebaseAuth {}
+
+class TestableMyApp extends StatelessWidget {
+  final FirebaseInitializer initializer;
+
+  TestableMyApp({required this.initializer});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: FutureBuilder(
+        future: initializer.initializeApp(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return const MyHomePage();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+          return const CircularProgressIndicator();
+        },
+      ),
+    );
   }
 }
 
-class MockFirebaseInitializer extends Mock implements FirebaseInitializer {}
-
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    MockFirebaseInitializer mockInitializer = MockFirebaseInitializer();
-    when(mockInitializer.initializeApp()).thenAnswer((_) => Future.value(mockApp));
+    // Create instances of your mock classes
+    MockFirestore mockFirestore = MockFirestore();
+    MockFirebaseAuth mockFirebaseAuth = MockFirebaseAuth();
 
-    // Pass the mockInitializer to MyApp
-    await tester.pumpWidget(MyApp());
-
+    // Use the mock instances in your tests
+    await tester.pumpWidget(MyApp(
+      firestore: mockFirestore,
+      auth: mockFirebaseAuth,
+    ));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
