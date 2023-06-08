@@ -6,9 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 class MockFirebaseApp extends Mock implements FirebaseApp {}
 
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {
-  int getNumber() {
-    return 0;
-  }
 }
 
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
