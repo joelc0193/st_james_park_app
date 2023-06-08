@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -11,17 +12,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final FirestoreService _firestoreService = FirestoreService(
-    firestore: FirebaseFirestore.instance,
-    auth: FirebaseAuth.instance,
-  );
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late FirestoreService _firestoreService;
+  late FirebaseAuth _auth;
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _firestoreService = FirestoreService(
+      firestore: Provider.of<FirebaseFirestore>(context),
+      auth: Provider.of<FirebaseAuth>(context),
+    );
+    _auth = Provider.of<FirebaseAuth>(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
+  final _firestoreService = Provider.of<FirestoreService>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Demo Home Page'),

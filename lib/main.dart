@@ -25,8 +25,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firestore = Provider.of<FirebaseFirestore>(context);
-    final auth = Provider.of<FirebaseAuth>(context);
     return MaterialApp(
       title: 'St James Park',
       theme: ThemeData(
