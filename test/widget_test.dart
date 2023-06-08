@@ -9,11 +9,11 @@ import 'package:mockito/mockito.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MockFirestoreService extends Mock implements FirestoreService {
-  
+  int _number = 0;
+
   @override
-  Future<void> incrementNumber(String path, int number) {
-    // TODO: implement incrementNumber
-    throw UnimplementedError();
+  Future<void> incrementNumber(String path, int number) async {
+    _number += number;
   }
 
   @override
@@ -39,6 +39,8 @@ class MockFirestoreService extends Mock implements FirestoreService {
     // TODO: implement streamData
     throw UnimplementedError();
   }
+
+  int get number => _number;
 }
 
 void main() {
@@ -46,13 +48,12 @@ void main() {
 
   test('incrementNumber increases the number in Firestore', () async {
     // Arrange
-    when(mockFirestoreService.incrementNumber('numbers/currentNumber', 1))
-        .thenAnswer((_) async => null);
+    final mockFirestoreService = MockFirestoreService();
 
     // Act
     await mockFirestoreService.incrementNumber('path', 1);
 
     // Assert
-    verify(mockFirestoreService.incrementNumber('path', 1)).called(1);
+    expect(mockFirestoreService.number, equals(1));
   });
 }
