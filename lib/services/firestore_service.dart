@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class FirestoreService {
+import 'firestore_interface.dart';
+
+class FirestoreService implements FirestoreInterface {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
 
