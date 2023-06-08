@@ -8,4 +8,5 @@ class MockFirebaseApp extends Mock implements FirebaseApp {}
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {
 }
 
+
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
