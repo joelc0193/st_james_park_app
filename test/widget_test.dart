@@ -4,11 +4,9 @@ import 'package:mockito/mockito.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:st_james_park_app/main.dart';
-import 'mocks.dart';  // Import the file where you defined your mock classes
+import 'package:st_james_park_app/home_page.dart';
 
 class MockFirestore extends Mock implements FirebaseFirestore {}
-
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 
 class TestableMyApp extends StatelessWidget {
@@ -41,9 +39,11 @@ void main() {
     MockFirebaseAuth mockFirebaseAuth = MockFirebaseAuth();
 
     // Use the mock instances in your tests
-    await tester.pumpWidget(MyApp(
-      firestore: mockFirestore,
-      auth: mockFirebaseAuth,
+    await tester.pumpWidget(MaterialApp(
+      home: MyHomePage(
+        firestore: mockFirestore,
+        auth: mockFirebaseAuth,
+      ),
     ));
 
     // Verify that our counter starts at 0.
