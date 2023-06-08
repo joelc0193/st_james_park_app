@@ -12,10 +12,12 @@ class FirestoreService implements FirestoreInterface {
       : _firestore = firestore,
         _auth = auth;
 
+  @override
   Stream<DocumentSnapshot> getNumber() {
     return _firestore.collection('numbers').doc('currentNumber').snapshots();
   }
 
+  @override
   Future<void> incrementNumber() async {
     try {
       await _firestore.collection('numbers').doc('currentNumber').update({
