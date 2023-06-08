@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
+import 'package:st_james_park_app/services/auth_service.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -13,6 +14,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _firestoreService = FirestoreService(
     firestore: FirebaseFirestore.instance,
+    auth: FirebaseAuth.instance,
+  );
+  final _authService = AuthService(
     auth: FirebaseAuth.instance,
   );
   String _email = '';
@@ -57,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text('Sign Up'),
             onPressed: () async {
               try {
-                await _firestoreService.signUp(_email, _password);
+                await _authService.signUp(_email, _password);
               } catch (e) {
                 print(e);
               }
@@ -67,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text('Log In'),
             onPressed: () async {
               try {
-                await _firestoreService.logIn(_email, _password);
+                await _authService.logIn(_email, _password);
               } catch (e) {
                 print(e);
               }
@@ -77,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text('Log Out'),
             onPressed: () async {
               try {
-                await _firestoreService.logOut();
+                await _authService.logOut();
               } catch (e) {
                 print(e);
               }
