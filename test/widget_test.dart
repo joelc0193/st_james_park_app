@@ -5,16 +5,23 @@ import 'package:mockito/mockito.dart';
 
 import 'package:st_james_park_app/main.dart';
 
-class MockFirebaseApp extends Mock implements FirebaseApp {
-  void initializeApp() {}
+class FirebaseInitializer {
+  Future<FirebaseApp> initializeApp() {
+    return Firebase.initializeApp();
+  }
 }
+
+class MockFirebaseInitializer extends Mock implements FirebaseInitializer {}
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
-    await tester.pumpWidget(const MyApp());
+    TestWidgetsFlutterBinding.ensureInitialized();
+    MockFirebaseInitializer mockInitializer = MockFirebaseInitializer();
+    when(mockInitializer.initializeApp()).thenAnswer((_) => Future.value(mockApp));
+
+    // Pass the mockInitializer to MyApp
+    await tester.pumpWidget(MyApp());
+
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
