@@ -30,7 +30,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-  final _firestoreService = Provider.of<FirestoreService>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Demo Home Page'),
