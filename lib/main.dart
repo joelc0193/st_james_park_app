@@ -1,30 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import './services/firestore_service.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'St James Park',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(),
-    );
-  }
-}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -38,6 +16,7 @@ class _MyHomePageState extends State<MyHomePage> {
     firestore: FirebaseFirestore.instance,
     auth: FirebaseAuth.instance,
   );
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final _emailController = TextEditingController();
@@ -51,87 +30,16 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: <Widget>[
-          TextField(
-            controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
-          ),
-          TextField(
-            controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'Password'),
-            obscureText: true,
-          ),
-          StreamBuilder<DocumentSnapshot>(
-            stream: _firestoreService.getNumber(),
-            builder: (BuildContext context,
-                AsyncSnapshot<DocumentSnapshot> snapshot) {
-              if (snapshot.hasError) {
-                return const Text('Something went wrong');
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text("Loading");
-              }
-              if (snapshot.connectionState == ConnectionState.active) {
-                if (snapshot.data!.exists) {
-                  Map<String, dynamic> data =
-                      snapshot.data!.data() as Map<String, dynamic>;
-                  return Text("Data: ${data['currentNumber']}");
-                } else {
-                  return Text('Document does not exist');
-                }
-              }
-
-              return const Text('Unknown state');
-            },
-          ),
-          ElevatedButton(
-            child: const Text('Sign Up'),
-            onPressed: () async {
-              try {
-                await _auth.createUserWithEmailAndPassword(
-                  email: _emailController.text,
-                  password: _passwordController.text,
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Successfully Signed Up')),
-                );
-              } on FirebaseAuthException catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Failed with ${e.message}')),
-                );
-              }
-            },
-          ),
-          ElevatedButton(
-            child: const Text('Log In'),
-            onPressed: () async {
-              try {
-                await _auth.signInWithEmailAndPassword(
-                  email: _emailController.text,
-                  password: _passwordController.text,
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Successfully Logged In')),
-                );
-              } on FirebaseAuthException catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Failed with ${e.message}')),
-                );
-              }
-            },
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              await _firestoreService.signOut();
-            },
-            child: Text('Log Out'),
-          ),
+          _buildEmailField(),
+          _buildPasswordField(),
+          _buildNumberStream(),
+          _buildSignUpButton(),
+          _buildLogInButton(),
+          _buildLogOutButton(),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await _firestoreService.incrementNumber();
-        },
+        onPressed: _incrementNumber,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
@@ -143,5 +51,106 @@ class _MyHomePageState extends State<MyHomePage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Widget _buildEmailField() {
+    return TextField(
+      controller: _emailController,
+      decoration: const InputDecoration(labelText: 'Email'),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextField(
+      controller: _passwordController,
+      decoration: const InputDecoration(labelText: 'Password'),
+      obscureText: true,
+    );
+  }
+
+  Widget _buildNumberStream() {
+    return StreamBuilder<DocumentSnapshot>(
+      stream: _firestoreService.getNumber(),
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Something went wrong');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Text("Loading");
+        }
+        if (snapshot.connectionState == ConnectionState.active) {
+          if (snapshot.data!.exists) {
+            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+            return Text("Data: ${data['currentNumber']}");
+          } else {
+            return Text('Document does not exist');
+          }
+        }
+
+        return const Text('Unknown state');
+      },
+    );
+  }
+
+  void _incrementNumber() async {
+    await _firestoreService.incrementNumber();
+  }
+
+  Widget _buildSignUpButton() {
+    return ElevatedButton(
+      child: const Text('Sign Up'),
+      onPressed: _signUp,
+    );
+  }
+
+  Widget _buildLogInButton() {
+    return ElevatedButton(
+      child: const Text('Log In'),
+      onPressed: _logIn,
+    );
+  }
+
+  Widget _buildLogOutButton() {
+    return ElevatedButton(
+      onPressed: _logOut,
+      child: const Text('Log Out'),
+    );
+  }
+
+  void _signUp() async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Successfully Signed Up')),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed with ${e.message}')),
+      );
+    }
+  }
+
+  void _logIn() async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Successfully Logged In')),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed with ${e.message}')),
+      );
+    }
+  }
+
+  void _logOut() async {
+    await _firestoreService.logOut();
   }
 }

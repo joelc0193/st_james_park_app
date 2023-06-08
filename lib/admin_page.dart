@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:st_james_park_app/services/firestore_service.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({Key? key}) : super(key: key);
@@ -8,10 +11,13 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPageState extends State<AdminPage> {
-  final _passwordController = TextEditingController();
-  final _numberController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final String _password = 'your_password';  // Replace with your actual password
+  final _firestoreService = FirestoreService(
+    firestore: FirebaseFirestore.instance,
+    auth: FirebaseAuth.instance,
+  );
+  String _password = '';
+  String _newNumber = '';
 
   @override
   Widget build(BuildContext context) {
@@ -21,45 +27,54 @@ class _AdminPageState extends State<AdminPage> {
       ),
       body: Form(
         key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value != _password) {
-                    return 'Incorrect password';
+        child: Column(
+          children: <Widget>[
+            CustomTextFormField(
+              labelText: 'Password',
+              onChanged: (value) {
+                setState(() {
+                  _password = value;
+                });
+              },
+            ),
+            CustomTextFormField(
+              labelText: 'New Number',
+              onChanged: (value) {
+                setState(() {
+                  _newNumber = value;
+                });
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Update Number'),
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  try {
+                    await _firestoreService.incrementNumber();
+                  } catch (e) {
+                    print(e);
                   }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _numberController,
-                decoration: const InputDecoration(labelText: 'New Number'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a number';
-                  }
-                  return null;
-                },
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // TODO: Update the number
-                    Navigator.pop(context, int.parse(_numberController.text));
-                  }
-                },
-                child: const Text('Update Number'),
-              ),
-            ],
-          ),
+                }
+              },
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class CustomTextFormField extends StatelessWidget {
+  final String labelText;
+  final Function(String) onChanged;
+
+  CustomTextFormField({required this.labelText, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      decoration: InputDecoration(labelText: labelText),
+      onChanged: onChanged,
     );
   }
 }
