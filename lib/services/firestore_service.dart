@@ -12,15 +12,25 @@ class FirestoreService {
   }
 
   Future<void> incrementNumber() async {
-    var ref = firestore.collection('numbers').doc('currentNumber');
-    return firestore.runTransaction((transaction) async {
-      var snapshot = await transaction.get(ref);
-      if (!snapshot.exists) {
-        throw Exception('Document does not exist!');
+    try {
+      var snapshot =
+          await firestore.collection('numbers').doc('currentNumber').get();
+      if (snapshot.exists) {
+        var currentNumber = snapshot.data()?['currentNumber'];
+        if (currentNumber != null) {
+          await firestore.collection('numbers').doc('currentNumber').update({
+            'currentNumber': currentNumber + 1,
+          });
+          print('Number incremented successfully');
+        } else {
+          print('currentNumber field is null');
+        }
+      } else {
+        print('Document does not exist');
       }
-      var newNumber = snapshot.data()['currentNumber'] + 1;
-      transaction.update(ref, {'currentNumber': newNumber});
-    });
+    } catch (e) {
+      print('Failed to increment number: $e');
+    }
   }
 
   Future<void> signOut() async {
