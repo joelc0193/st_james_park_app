@@ -13,15 +13,15 @@ class FirestoreService implements FirestoreInterface {
         _auth = auth;
 
   @override
-  Stream<DocumentSnapshot> getNumber() {
-    return _firestore.collection('numbers').doc('currentNumber').snapshots();
+  Stream<DocumentSnapshot> getNumber(String path) {
+    return _firestore.doc(path).snapshots();
   }
 
   @override
-  Future<void> incrementNumber() async {
+  Future<void> incrementNumber(String path, int number) async {
     try {
-      await _firestore.collection('numbers').doc('currentNumber').update({
-        'currentNumber': FieldValue.increment(1),
+      await _firestore.doc(path).update({
+        'currentNumber': FieldValue.increment(number),
       });
       print('Number incremented successfully');
     } catch (e) {
