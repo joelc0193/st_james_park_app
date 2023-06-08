@@ -4,10 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MockFirebaseApp extends Mock implements FirebaseApp {}
+class MockCollectionReference extends Mock implements CollectionReference {}
 
-class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
-
-class MockCollectionReference extends Mock implements CollectionReference {
+class MockFirebaseFirestore extends Mock implements FirebaseFirestore {
   final MockCollectionReference _collectionReference =
       MockCollectionReference();
 
