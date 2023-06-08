@@ -2,29 +2,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreService {
-  final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
+  final FirebaseFirestore firestore;
+  final FirebaseAuth auth;
 
-  FirestoreService({required FirebaseFirestore firestore, required FirebaseAuth auth})
-      : _firestore = firestore,
-        _auth = auth;
-        
+  FirestoreService({required this.firestore, required this.auth});
+
   Stream<DocumentSnapshot> getNumber() {
-    return _firestore.collection('numbers').doc('currentNumber').snapshots();
-  }
-
-  Future<void> signOut() async {
-    await _auth.signOut();
+    return firestore.collection('numbers').doc('currentNumber').snapshots();
   }
 
   Future<void> incrementNumber() async {
-    try {
-      await _firestore.collection('numbers').doc('currentNumber').update({
-        'currentNumber': FieldValue.increment(1),
-      });
-      print('Number incremented successfully');
-    } catch (e) {
-      print('Failed to increment number: $e');
-    }
+    var ref = firestore.collection('numbers').doc('currentNumber');
+    return firestore.runTransaction((transaction) async {
+      var snapshot = await transaction.get(ref);
+      if (!snapshot.exists) {
+        throw Exception('Document does not exist!');
+      }
+      var newNumber = snapshot.data()['currentNumber'] + 1;
+      transaction.update(ref, {'currentNumber': newNumber});
+    });
+  }
+
+  Future<void> signOut() async {
+    await auth.signOut();
   }
 }

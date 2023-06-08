@@ -1,13 +1,10 @@
-// home_page.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-import './services/firestore_service.dart';
+import 'package:st_james_park_app/services/firestore_service.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -18,7 +15,6 @@ class _MyHomePageState extends State<MyHomePage> {
     firestore: FirebaseFirestore.instance,
     auth: FirebaseAuth.instance,
   );
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final _emailController = TextEditingController();
