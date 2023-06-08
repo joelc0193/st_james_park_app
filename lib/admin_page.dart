@@ -50,7 +50,8 @@ class _AdminPageState extends State<AdminPage> {
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   try {
-                    await _firestoreService.incrementNumber();
+                    await _firestoreService.incrementNumber(
+                        'numbers/currentNumber', 1);
                   } catch (e) {
                     print(e);
                   }
