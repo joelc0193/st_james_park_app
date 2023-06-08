@@ -10,12 +10,6 @@ class MockFirebaseApp extends Mock implements FirebaseApp {
 }
 
 void main() {
-  FirebaseApp app;
-
-  setUpAll(() async {
-    app = MockFirebaseApp();
-    when(Firebase.initializeApp()).thenAnswer((_) => Future.value(app));
-  });
 
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
