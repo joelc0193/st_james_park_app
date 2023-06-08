@@ -12,13 +12,14 @@ void main() {
     late FakeFirebaseFirestore mockFirestore;
     late MockFirebaseAuth mockAuth;
 
-    setUp(() {
+    setUp(() async {
+
       mockFirestore = FakeFirebaseFirestore();
       mockAuth = MockFirebaseAuth();
       firestoreService =
           FirestoreService(firestore: mockFirestore, auth: mockAuth);
 
-      mockFirestore
+      await mockFirestore
           .collection('numbers')
           .doc('currentNumber')
           .set({'currentNumber': 0});
