@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import './services/firestore_service.dart';
+import './services/auth_service.dart';  // Import AuthService
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,26 +17,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = AuthService(auth: FirebaseAuth.instance);  // Create an instance of AuthService
+    final firestoreService = FirestoreService(
+      firestore: FirebaseFirestore.instance,
+      auth: FirebaseAuth.instance,
+    );
+
     return MaterialApp(
       title: 'St James Park',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(
-        firestoreService: FirestoreService(
-          firestore: FirebaseFirestore.instance,
-          auth: FirebaseAuth.instance,
-        ),
+        authService: authService,  // Pass authService to MyHomePage
+        firestoreService: firestoreService,  // Pass firestoreService to MyHomePage
       ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  final AuthService authService;  // Add authService field
   final FirestoreService firestoreService;
 
   const MyHomePage({
     Key? key,
+    required this.authService,  // Add authService to constructor
     required this.firestoreService,
   }) : super(key: key);
 
@@ -50,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'St James Park',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -76,18 +83,18 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  await widget.firestoreService.signUp(
-                    email: _emailController.text,
-                    password: _passwordController.text,
+                  await widget.authService.signUp(
+                    _emailController.text,
+                    _passwordController.text,
                   );
                 },
                 child: Text('Sign Up'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  await widget.firestoreService.logIn(
-                    email: _emailController.text,
-                    password: _passwordController.text,
+                  await widget.authService.logIn(
+                    _emailController.text,
+                    _passwordController.text,
                   );
                 },
                 child: Text('Log In'),
