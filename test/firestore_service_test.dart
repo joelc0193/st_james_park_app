@@ -26,7 +26,7 @@ void main() {
     });
 
     test('incrementNumber increases the number in Firestore', () async {
-      await firestoreService.incrementNumber();
+      await firestoreService.incrementNumber('numbers/currentNumber', 1);
 
       var snapshot =
           await mockFirestore.collection('numbers').doc('currentNumber').get();
