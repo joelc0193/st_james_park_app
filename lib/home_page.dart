@@ -47,8 +47,9 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           StreamBuilder<DocumentSnapshot>(
-            stream: _firestoreService.getNumber(),
-            builder: (context, snapshot) {
+            stream: _firestoreService.getNumber('numbers/currentNumber'),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
                 return Text('Data: ${snapshot.data}');
               } else if (snapshot.hasError) {
