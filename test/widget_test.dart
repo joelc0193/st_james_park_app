@@ -36,11 +36,12 @@ void main() {
       ),
     );
 
-    // Add a delay to allow the widget to update its state
-    await Future.delayed(Duration(seconds: 1));
+    // Let's say your widget displays the value in a Text widget with a Key 'numberText'
+    final numberTextFinder = find.byKey(Key('numberText'));
+    expect(numberTextFinder, findsOneWidget);
 
-    // Pump the widget again
-    await tester.pumpAndSettle();
+    final Text numberTextWidget = tester.widget(numberTextFinder);
+    print('Data from getNumber: ${numberTextWidget.data}');
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
