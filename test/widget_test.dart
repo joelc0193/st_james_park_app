@@ -15,47 +15,58 @@ import 'package:st_james_park_app/mocks.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_goldens/flutter_goldens.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    TestWidgetsFlutterBinding.ensureInitialized();
+  group('Golden Test', () {
+    testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+      TestWidgetsFlutterBinding.ensureInitialized();
 
-    final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
-    final MockFirebaseAuth mockAuth = MockFirebaseAuth();
+      final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
+      final MockFirebaseAuth mockAuth = MockFirebaseAuth();
 
-    // Provide the mock objects using provider
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          Provider<FirebaseFirestore>(create: (_) => mockFirestore),
-          Provider<FirebaseAuth>(create: (_) => mockAuth),
-        ],
-        child: MyApp(),
-      ),
-    );
+      // Provide the mock objects using provider
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            Provider<FirebaseFirestore>(create: (_) => mockFirestore),
+            Provider<FirebaseAuth>(create: (_) => mockAuth),
+          ],
+          child: MyApp(),
+        ),
+      );
 
-    await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
+      
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: UniqueKey(),
+          child: MyApp(),
+        ),
+      );
 
-    // Dump the widget tree.
-    debugDumpApp();
-    
-    // Let's say your widget displays the value in a Text widget with a Key 'numberText'
-    final numberTextFinder = find.byKey(Key('numberText'));
-    expect(numberTextFinder, findsOneWidget);
+      // Dump the widget tree.
+      // debugDumpApp();
 
-    final Text numberTextWidget = tester.widget(numberTextFinder);
-    print('Data from getNumber: ${numberTextWidget.data}');
+      // Let's say your widget displays the value in a Text widget with a Key 'numberText'
+      final numberTextFinder = find.byKey(Key('numberText'));
+      expect(numberTextFinder, findsOneWidget);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      final Text numberTextWidget = tester.widget(numberTextFinder);
+      print('Data from getNumber: ${numberTextWidget.data}');
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      // Verify that our counter starts at 0.
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('1'), findsNothing);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+      // Tap the '+' icon and trigger a frame.
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.pump();
+
+      // Verify that our counter has incremented.
+      expect(find.text('0'), findsNothing);
+      expect(find.text('1'), findsOneWidget);
+    });
   });
 }
