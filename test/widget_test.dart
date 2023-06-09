@@ -49,6 +49,8 @@ void main() {
             as MockDocumentReference)
         .addSnapshot(MockDocumentSnapshot());
 
+    await tester.pumpAndSettle();
+    
     final numberTextFinderPost = find.byKey(Key('testKey'));
     expect(numberTextFinderPost, findsOneWidget);
     final Text textWidgetPost = tester.widget(numberTextFinderPost);
