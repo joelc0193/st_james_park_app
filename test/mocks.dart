@@ -36,6 +36,11 @@ class MockDocumentReference extends Mock
     return MockDocumentSnapshot();
   }
 
+    @override
+  Future<void> update(Map<Object, Object?> data) async {
+    // You can leave this method empty if you don't need to simulate any specific behavior.
+  }
+
   @override
   Stream<DocumentSnapshot<Map<String, dynamic>>> snapshots({
     bool includeMetadataChanges = false,
