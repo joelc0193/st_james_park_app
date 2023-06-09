@@ -62,7 +62,7 @@ void main() {
       print('Data from test Text widget: ${snapshotTextWidget.data}');
 
       // ((mockFirestore.collection('') as MockCollectionReference).doc() as MockDocumentReference).addSnapshot(MockDocumentSnapshot());
-      MockDocumentReference mockDocumentReference = MockDocumentReference();
+      // MockDocumentReference mockDocumentReference = MockDocumentReference();
 
       // Verify that our counter starts at 0.
       expect(find.text('0'), findsOneWidget);
