@@ -20,7 +20,6 @@ void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Create your mock objects
     final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
     final MockFirebaseAuth mockAuth = MockFirebaseAuth();
 
