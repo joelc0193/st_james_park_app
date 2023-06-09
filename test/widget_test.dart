@@ -38,11 +38,17 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-      
+
       await tester.pumpWidget(
-        RepaintBoundary(
-          key: UniqueKey(),
-          child: MyApp(),
+        MultiProvider(
+          providers: [
+            Provider<FirebaseFirestore>(create: (_) => mockFirestore),
+            Provider<FirebaseAuth>(create: (_) => mockAuth),
+          ],
+          child: RepaintBoundary(
+            key: UniqueKey(),
+            child: MyApp(),
+          ),
         ),
       );
 
