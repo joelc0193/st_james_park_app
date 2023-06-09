@@ -25,7 +25,6 @@ void main() {
     final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
     final MockFirebaseAuth mockAuth = MockFirebaseAuth();
 
-
     // Provide the mock objects using provider
     await tester.pumpWidget(
       MultiProvider(
@@ -36,6 +35,13 @@ void main() {
         child: MyApp(),
       ),
     );
+
+    // Add a delay to allow the widget to update its state
+    await Future.delayed(Duration(seconds: 1));
+
+    // Pump the widget again
+    await tester.pumpAndSettle();
+
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
     expect(find.text('1'), findsNothing);
