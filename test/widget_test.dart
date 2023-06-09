@@ -58,7 +58,7 @@ void main() {
 
       await tester.pump(Duration(seconds: 1));
       // Dump the widget tree.
-      debugDumpApp();
+      // debugDumpApp();
       
       final numberTextFinder = find.byKey(Key('test'));
       expect(numberTextFinder, findsOneWidget);
