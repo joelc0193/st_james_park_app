@@ -47,6 +47,7 @@ void main() {
     final numberTextFinderPost = find.byKey(Key('numberText'));
     expect(numberTextFinderPost, findsOneWidget);
     final Text textWidgetPost = tester.widget(numberTextFinderPost);
+
     print('Data from test Text widget: ${textWidgetPost.data}');
 
     // Verify that our counter starts at 0.
@@ -55,7 +56,7 @@ void main() {
 
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
