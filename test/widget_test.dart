@@ -61,7 +61,7 @@ void main() {
       final Text snapshotTextWidget = tester.widget(numberTextFinder);
       print('Data from test Text widget: ${snapshotTextWidget.data}');
 
-      ((mockFirestore.collection('') as MockCollectionReference).doc() as MockDocumentReference).addSnapshot(MockDocumentSnapshot());
+      // ((mockFirestore.collection('') as MockCollectionReference).doc() as MockDocumentReference).addSnapshot(MockDocumentSnapshot());
       MockDocumentReference mockDocumentReference = MockDocumentReference();
 
       // Verify that our counter starts at 0.
