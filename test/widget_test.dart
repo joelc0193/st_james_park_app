@@ -21,7 +21,6 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
 
     // Create your mock objects
-    final MockFirebaseApp mockApp = MockFirebaseApp();
     final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
     final MockFirebaseAuth mockAuth = MockFirebaseAuth();
 
@@ -35,6 +34,8 @@ void main() {
         child: MyApp(),
       ),
     );
+
+    await tester.pumpAndSettle();
 
     // Let's say your widget displays the value in a Text widget with a Key 'numberText'
     final numberTextFinder = find.byKey(Key('numberText'));
