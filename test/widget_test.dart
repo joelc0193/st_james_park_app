@@ -53,7 +53,7 @@ void main() {
       );
       await tester.pump(Duration(seconds: 1));
       // Dump the widget tree.
-      debugDumpApp();
+      // debugDumpApp();
 
       // Let's say your widget displays the value in a Text widget with a Key 'numberText'
       final numberTextFinder = find.byKey(Key('numberText'));
