@@ -49,23 +49,23 @@ class _MyHomePageState extends State<MyHomePage> {
             stream: _firestoreService.getNumber(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
-              if (snapshot.hasError) {
-                return const Text('Something went wrong');
-              }
+              // if (snapshot.hasError) {
+              //   return const Text('Something went wrong');
+              // }
 
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text("Loading");
-              }
-              if (snapshot.connectionState == ConnectionState.active) {
-                if (snapshot.data!.exists) {
-                  Map<String, dynamic> data =
-                      snapshot.data!.data() as Map<String, dynamic>;
-                  return Text("${data['currentNumber']}",
-                      key: Key('numberText'));
-                } else {
-                  return Text('Document does not exist');
-                }
-              }
+              // if (snapshot.connectionState == ConnectionState.waiting) {
+              //   return const Text("Loading");
+              // }
+              // if (snapshot.connectionState == ConnectionState.active) {
+              //   if (snapshot.data!.exists) {
+              //     Map<String, dynamic> data =
+              //         snapshot.data!.data() as Map<String, dynamic>;
+              //     return Text("${data['currentNumber']}",
+              //         key: Key('numberText'));
+              //   } else {
+              //     return Text('Document does not exist');
+              //   }
+              // }
               return Text(
                 '$snapshot',
                 key: Key('testKey'),

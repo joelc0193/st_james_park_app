@@ -21,60 +21,49 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_goldens/flutter_goldens.dart';
 
 void main() {
-  group('Golden Test', () {
-    testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-      TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    TestWidgetsFlutterBinding.ensureInitialized();
 
-      final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
-      final MockFirebaseAuth mockAuth = MockFirebaseAuth();
+    final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
+    final MockFirebaseAuth mockAuth = MockFirebaseAuth();
 
-      // Provide the mock objects using provider
-      await tester.pumpWidget(
-        MultiProvider(
-          providers: [
-            Provider<FirebaseFirestore>(create: (_) => mockFirestore),
-            Provider<FirebaseAuth>(create: (_) => mockAuth),
-          ],
-          child: MyApp(),
-        ),
-      );
+    // Provide the mock objects using provider
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<FirebaseFirestore>(create: (_) => mockFirestore),
+          Provider<FirebaseAuth>(create: (_) => mockAuth),
+        ],
+        child: MyApp(),
+      ),
+    );
 
-      await tester.pumpAndSettle();
+    await tester.pumpAndSettle(); // Add this line
 
-      await tester.pumpWidget(
-        MultiProvider(
-          providers: [
-            Provider<FirebaseFirestore>(create: (_) => mockFirestore),
-            Provider<FirebaseAuth>(create: (_) => mockAuth),
-          ],
-          child: RepaintBoundary(
-            key: UniqueKey(),
-            child: MyApp(),
-          ),
-        ),
-      );
+    final numberTextFinder = find.byKey(Key('testKey'));
+    expect(numberTextFinder, findsOneWidget);
+    final Text textWidget = tester.widget(numberTextFinder);
+    print('Data from test Text widget: ${textWidget.data}');
 
-      await tester.pumpAndSettle(); // Add this line
+    ((mockFirestore.collection('') as MockCollectionReference).doc()
+            as MockDocumentReference)
+        .addSnapshot(MockDocumentSnapshot());
 
-      final numberTextFinder = find.byKey(Key('testKey'));
-      expect(numberTextFinder, findsOneWidget);
-      final Text snapshotTextWidget = tester.widget(numberTextFinder);
-      print('Data from test Text widget: ${snapshotTextWidget.data}');
+    final numberTextFinderPost = find.byKey(Key('testKey'));
+    expect(numberTextFinderPost, findsOneWidget);
+    final Text textWidgetPost = tester.widget(numberTextFinderPost);
+    print('Data from test Text widget: ${textWidgetPost.data}');
 
-      // ((mockFirestore.collection('') as MockCollectionReference).doc() as MockDocumentReference).addSnapshot(MockDocumentSnapshot());
-      // MockDocumentReference mockDocumentReference = MockDocumentReference();
+    // Verify that our counter starts at 0.
+    expect(find.text('0'), findsOneWidget);
+    expect(find.text('1'), findsNothing);
 
-      // Verify that our counter starts at 0.
-      expect(find.text('0'), findsOneWidget);
-      expect(find.text('1'), findsNothing);
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
 
-      // Tap the '+' icon and trigger a frame.
-      await tester.tap(find.byIcon(Icons.add));
-      await tester.pump();
-
-      // Verify that our counter has incremented.
-      expect(find.text('0'), findsNothing);
-      expect(find.text('1'), findsOneWidget);
-    });
+    // Verify that our counter has incremented.
+    expect(find.text('0'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
   });
 }
