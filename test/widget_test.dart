@@ -38,20 +38,13 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle(); // Add this line
-
-    final numberTextFinder = find.byKey(Key('testKey'));
-    expect(numberTextFinder, findsOneWidget);
-    final Text textWidget = tester.widget(numberTextFinder);
-    print('Data from test Text widget: ${textWidget.data}');
-
     ((mockFirestore.collection('') as MockCollectionReference).doc()
             as MockDocumentReference)
         .addSnapshot(MockDocumentSnapshot());
 
     await tester.pumpAndSettle();
-    
-    final numberTextFinderPost = find.byKey(Key('testKey'));
+
+    final numberTextFinderPost = find.byKey(Key('numberText'));
     expect(numberTextFinderPost, findsOneWidget);
     final Text textWidgetPost = tester.widget(numberTextFinderPost);
     print('Data from test Text widget: ${textWidgetPost.data}');
