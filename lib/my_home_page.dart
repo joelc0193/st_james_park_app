@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
             stream: _firestoreService.getNumber(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  return Text('test');
+                  return Text('test')
               if (snapshot.hasError) {
                 return const Text('Something went wrong');
               }
