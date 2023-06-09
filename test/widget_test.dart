@@ -5,6 +5,8 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:io';
+
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -57,9 +59,8 @@ void main() {
       await tester.pump(Duration(seconds: 1));
       // Dump the widget tree.
       // debugDumpApp();
-
-      // Let's say your widget displays the value in a Text widget with a Key 'numberText'
-      final numberTextFinder = find.byKey(Key('numberText'));
+      
+      final numberTextFinder = find.byKey(Key('test'));
       expect(numberTextFinder, findsOneWidget);
 
       final Text numberTextWidget = tester.widget(numberTextFinder);
