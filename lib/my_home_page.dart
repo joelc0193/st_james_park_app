@@ -49,6 +49,10 @@ class _MyHomePageState extends State<MyHomePage> {
             stream: _firestoreService.getNumber(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
+              return Text(
+                '$snapshot',
+                key: Key('testKey'),
+              );
               if (snapshot.hasError) {
                 return const Text('Something went wrong');
               }
@@ -66,10 +70,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   return Text('Document does not exist');
                 }
               }
-              return Text(
-                '$snapshot',
-                key: Key('testKey'),
-              );
               return const Text('Unknown state');
             },
           ),

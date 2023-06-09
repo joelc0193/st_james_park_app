@@ -1,10 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mockito/mockito.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-class MockFirebaseApp extends Mock implements FirebaseApp {}
 
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {
   final MockCollectionReference _collectionReference =
@@ -28,6 +27,9 @@ class MockCollectionReference extends Mock
 
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {
+  final StreamController<DocumentSnapshot<Map<String, dynamic>>> _controller =
+      StreamController<DocumentSnapshot<Map<String, dynamic>>>();
+
   @override
   Future<DocumentSnapshot<Map<String, dynamic>>> get(
       [GetOptions? options]) async {
@@ -38,7 +40,15 @@ class MockDocumentReference extends Mock
   Stream<DocumentSnapshot<Map<String, dynamic>>> snapshots({
     bool includeMetadataChanges = false,
   }) {
-    return Stream.value(MockDocumentSnapshot());
+    return _controller.stream;
+  }
+
+  void addSnapshot(MockDocumentSnapshot snapshot) {
+    _controller.add(snapshot);
+  }
+
+  void finishStream() {
+    _controller.close();
   }
 }
 

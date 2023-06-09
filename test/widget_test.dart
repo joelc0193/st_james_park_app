@@ -60,7 +60,9 @@ void main() {
       expect(numberTextFinder, findsOneWidget);
       final Text snapshotTextWidget = tester.widget(numberTextFinder);
 
-      print('Data from getNumber: ${snapshotTextWidget.data}');
+      print('Data from test Text widget: ${snapshotTextWidget.data}');
+
+      MockDocumentReference mockDocumentReference = MockDocumentReference();
 
       // Verify that our counter starts at 0.
       expect(find.text('0'), findsOneWidget);
