@@ -66,11 +66,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   return Text('Document does not exist');
                 }
               }
-
-              return Text(
-                'test',
-                key: Key('test'),
-              );
               return const Text('Unknown state');
             },
           ),

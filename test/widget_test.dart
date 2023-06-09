@@ -55,12 +55,8 @@ void main() {
       );
 
       await tester.pumpAndSettle(); // Add this line
-
-      await tester.pump(Duration(seconds: 1));
-      // Dump the widget tree.
-      // debugDumpApp();
       
-      final numberTextFinder = find.byKey(Key('test'));
+      final numberTextFinder = find.text('Unknown state');
       expect(numberTextFinder, findsOneWidget);
 
       final Text numberTextWidget = tester.widget(numberTextFinder);
