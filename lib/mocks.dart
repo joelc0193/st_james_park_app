@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:mockito/mockito.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,8 +46,12 @@ class MockDocumentReference extends Mock
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {
   @override
+
+  ConnectionState connectionState = ConnectionState.active;
+  bool hasError = false;
+
   Map<String, dynamic>? data() {
-    return {'currentNumber': '0'};
+    return {'currentNumber': 0};
   }
 }
 
