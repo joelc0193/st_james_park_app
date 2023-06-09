@@ -55,12 +55,12 @@ void main() {
       );
 
       await tester.pumpAndSettle(); // Add this line
-      
-      final numberTextFinder = find.text('Unknown state');
-      expect(numberTextFinder, findsOneWidget);
 
-      final Text numberTextWidget = tester.widget(numberTextFinder);
-      print('Data from getNumber: ${numberTextWidget.data}');
+      final numberTextFinder = find.byKey(Key('testKey'));
+      expect(numberTextFinder, findsOneWidget);
+      final Text snapshotTextWidget = tester.widget(numberTextFinder);
+
+      print('Data from getNumber: ${snapshotTextWidget.data}');
 
       // Verify that our counter starts at 0.
       expect(find.text('0'), findsOneWidget);

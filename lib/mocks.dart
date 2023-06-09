@@ -28,7 +28,6 @@ class MockCollectionReference extends Mock
 
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {
-
   @override
   Future<DocumentSnapshot<Map<String, dynamic>>> get(
       [GetOptions? options]) async {
@@ -46,13 +45,12 @@ class MockDocumentReference extends Mock
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {
   @override
-
-  ConnectionState connectionState = ConnectionState.active;
-  bool hasError = false;
-
   Map<String, dynamic>? data() {
     return {'currentNumber': 0};
   }
+
+  @override
+  bool get exists => true;
 }
 
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
