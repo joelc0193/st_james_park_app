@@ -27,9 +27,17 @@ class MockCollectionReference extends Mock
 
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {
+
   @override
-  Stream<DocumentSnapshot<Map<String, dynamic>>> snapshots(
-      {bool includeMetadataChanges = false}) {
+  Future<DocumentSnapshot<Map<String, dynamic>>> get(
+      [GetOptions? options]) async {
+    return MockDocumentSnapshot();
+  }
+
+  @override
+  Stream<DocumentSnapshot<Map<String, dynamic>>> snapshots({
+    bool includeMetadataChanges = false,
+  }) {
     return Stream.value(MockDocumentSnapshot());
   }
 }
@@ -38,7 +46,7 @@ class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {
   @override
   Map<String, dynamic>? data() {
-    return {'currentNumber': 0};
+    return {'currentNumber': '0'};
   }
 }
 

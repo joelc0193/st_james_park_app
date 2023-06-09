@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (snapshot.data!.exists) {
                   Map<String, dynamic> data =
                       snapshot.data!.data() as Map<String, dynamic>;
-                  return Text("Data: ${data['currentNumber']}");
+                  return Text("${data['currentNumber']}");
                 } else {
                   return Text('Document does not exist');
                 }
