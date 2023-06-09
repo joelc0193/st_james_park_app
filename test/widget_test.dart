@@ -51,6 +51,9 @@ void main() {
           ),
         ),
       );
+
+      await tester.pumpAndSettle(); // Add this line
+
       await tester.pump(Duration(seconds: 1));
       // Dump the widget tree.
       // debugDumpApp();
