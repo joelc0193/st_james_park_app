@@ -38,7 +38,7 @@ class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {
   @override
   Map<String, dynamic>? data() {
-    return {'number': 1}; // return the mock data you want
+    return {'currentNumber': 0};
   }
 }
 
