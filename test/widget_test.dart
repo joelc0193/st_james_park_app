@@ -36,6 +36,9 @@ void main() {
 
     await tester.pumpAndSettle();
 
+    // Dump the widget tree.
+    debugDumpApp();
+    
     // Let's say your widget displays the value in a Text widget with a Key 'numberText'
     final numberTextFinder = find.byKey(Key('numberText'));
     expect(numberTextFinder, findsOneWidget);
