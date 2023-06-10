@@ -29,16 +29,20 @@ class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {
   final StreamController<DocumentSnapshot<Map<String, dynamic>>> _controller =
       StreamController<DocumentSnapshot<Map<String, dynamic>>>();
+  final MockDocumentSnapshot _documentSnapshot = MockDocumentSnapshot();
 
   @override
   Future<DocumentSnapshot<Map<String, dynamic>>> get(
       [GetOptions? options]) async {
-    return MockDocumentSnapshot();
+    return _documentSnapshot;
   }
 
-    @override
+  @override
   Future<void> update(Map<Object, Object?> data) async {
-    // You can leave this method empty if you don't need to simulate any specific behavior.
+    _documentSnapshot.currentNumber = {
+      'currentNumber': _documentSnapshot.currentNumber['currentNumber']! + 1,
+    };
+    print(_documentSnapshot.currentNumber);
   }
 
   @override
@@ -59,9 +63,10 @@ class MockDocumentReference extends Mock
 
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {
+  var currentNumber = {'currentNumber': 0};
   @override
   Map<String, dynamic>? data() {
-    return {'currentNumber': 0};
+    return currentNumber;
   }
 
   @override
