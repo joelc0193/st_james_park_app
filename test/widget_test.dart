@@ -38,10 +38,6 @@ void main() {
       ),
     );
 
-    ((mockFirestore.collection('') as MockCollectionReference).doc()
-            as MockDocumentReference)
-        .addSnapshot(MockDocumentSnapshot());
-
     await tester.pumpAndSettle();
 
     final textFinderBefore = find.byKey(Key('testText'));

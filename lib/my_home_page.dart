@@ -49,14 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
             stream: _firestoreService.getNumber(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
-              return Column(
-                children: [
-                  Text(
-                      '${snapshot.data != null ? snapshot.data!.data() : snapshot}',
-                      key: Key('testText')),
-                  CountWidget(snapshot),
-                ],
-              );
+              return CountWidget(snapshot);
             },
           ),
           ElevatedButton(

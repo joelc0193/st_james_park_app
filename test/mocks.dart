@@ -31,6 +31,10 @@ class MockDocumentReference extends Mock
       StreamController<DocumentSnapshot<Map<String, dynamic>>>();
   final MockDocumentSnapshot _documentSnapshot = MockDocumentSnapshot();
 
+  MockDocumentReference() {
+    _controller.add(_documentSnapshot);
+  }
+
   @override
   Future<DocumentSnapshot<Map<String, dynamic>>> get(
       [GetOptions? options]) async {
@@ -42,7 +46,7 @@ class MockDocumentReference extends Mock
     _documentSnapshot.currentNumber = {
       'currentNumber': _documentSnapshot.currentNumber['currentNumber']! + 1,
     };
-    print(_documentSnapshot.currentNumber);
+    _controller.add(_documentSnapshot);
   }
 
   @override
@@ -50,10 +54,6 @@ class MockDocumentReference extends Mock
     bool includeMetadataChanges = false,
   }) {
     return _controller.stream;
-  }
-
-  void addSnapshot(MockDocumentSnapshot snapshot) {
-    _controller.add(snapshot);
   }
 
   void finishStream() {
