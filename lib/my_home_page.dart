@@ -1,0 +1,143 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:st_james_park_app/services/firestore_service.dart';
+import 'package:provider/provider.dart';
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key}) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  late FirestoreService _firestoreService;
+  late FirebaseAuth _auth;
+
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _firestoreService = FirestoreService(
+      firestore: Provider.of<FirebaseFirestore>(context),
+      auth: Provider.of<FirebaseAuth>(context),
+    );
+    _auth = Provider.of<FirebaseAuth>(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Flutter Demo Home Page'),
+      ),
+      body: Column(
+        children: <Widget>[
+          TextField(
+            controller: _emailController,
+            decoration: const InputDecoration(labelText: 'Email'),
+          ),
+          TextField(
+            controller: _passwordController,
+            decoration: const InputDecoration(labelText: 'Password'),
+            obscureText: true,
+          ),
+          StreamBuilder<DocumentSnapshot>(
+            stream: _firestoreService.getNumber(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
+              return CountWidget(snapshot);
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Sign Up'),
+            onPressed: () async {
+              try {
+                await _auth.createUserWithEmailAndPassword(
+                  email: _emailController.text,
+                  password: _passwordController.text,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Successfully Signed Up')),
+                );
+              } on FirebaseAuthException catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed with ${e.message}')),
+                );
+              }
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Log In'),
+            onPressed: () async {
+              try {
+                await _auth.signInWithEmailAndPassword(
+                  email: _emailController.text,
+                  password: _passwordController.text,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Successfully Logged In')),
+                );
+              } on FirebaseAuthException catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed with ${e.message}')),
+                );
+              }
+            },
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await _firestoreService.signOut();
+            },
+            child: Text('Log Out'),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await _firestoreService.incrementNumber();
+        },
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+}
+
+class CountWidget extends StatelessWidget {
+  final snapshot;
+  CountWidget(
+    AsyncSnapshot<DocumentSnapshot<Object?>> this.snapshot, {
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (snapshot.hasError) {
+      return const Text('Something went wrong', key: Key('numberText'));
+    }
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Text("Loading", key: Key('numberText'));
+    }
+    if (snapshot.connectionState == ConnectionState.active) {
+      if (snapshot.data!.exists) {
+        Map<String, dynamic> data =
+            snapshot.data!.data() as Map<String, dynamic>;
+        return Text("${data['currentNumber']}", key: Key('numberText'));
+      } else {
+        return Text('Document does not exist', key: Key('numberText'));
+      }
+    }
+    return const Text('Unknown state', key: Key('numberText'));
+  }
+}

@@ -5,15 +5,45 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:io';
+
+import 'package:st_james_park_app/services/firestore_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:mockito/mockito.dart';
 import 'package:st_james_park_app/main.dart';
+import 'mocks.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_goldens/flutter_goldens.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    TestWidgetsFlutterBinding.ensureInitialized();
+
+    final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
+    final MockFirebaseAuth mockAuth = MockFirebaseAuth();
+
+    // Provide the mock objects using provider
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<FirebaseFirestore>(create: (_) => mockFirestore),
+          Provider<FirebaseAuth>(create: (_) => mockAuth),
+        ],
+        child: MyApp(),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    final textFinderBefore = find.byKey(Key('testText'));
+    expect(textFinderBefore, findsOneWidget);
+    final Text textWidgetBefore = tester.widget(textFinderBefore);
+    print('Data from test Text widget: ${textWidgetBefore.data}');
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
@@ -21,7 +51,12 @@ void main() {
 
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.pumpAndSettle();
+
+    final textFinderPost = find.byKey(Key('testText'));
+    expect(textFinderPost, findsOneWidget);
+    final Text textWidgetPost = tester.widget(textFinderPost);
+    print('Data from test Text widget: ${textWidgetPost.data}');
 
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
