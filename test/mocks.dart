@@ -29,28 +29,29 @@ class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {
   final StreamController<DocumentSnapshot<Map<String, dynamic>>> _controller =
       StreamController<DocumentSnapshot<Map<String, dynamic>>>();
-  final MockDocumentSnapshot _documentSnapshot = MockDocumentSnapshot();
+  var currentNumber = {'currentNumber': 0};
 
   MockDocumentReference() {
-      print('Emitting first event with currentNumber = 0');
+    print('Emitting first event with currentNumber = 0');
 
-    _controller.add(_documentSnapshot);
+    _controller.add(MockDocumentSnapshot(currentNumber));
   }
 
   @override
   Future<DocumentSnapshot<Map<String, dynamic>>> get(
       [GetOptions? options]) async {
-    return _documentSnapshot;
+    return MockDocumentSnapshot(currentNumber);
   }
 
   @override
   Future<void> update(Map<Object, Object?> data) async {
-    _documentSnapshot.currentNumber = {
+    currentNumber = {
       'currentNumber': data['currentNumber'] as int,
     };
-      print('Emitting second event with currentNumber = ${data['currentNumber']}');
+    print(
+        'Emitting second event with currentNumber = ${data['currentNumber']}');
 
-    _controller.add(_documentSnapshot);
+    _controller.add(MockDocumentSnapshot(currentNumber));
   }
 
   @override
@@ -67,10 +68,13 @@ class MockDocumentReference extends Mock
 
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {
-  var currentNumber = {'currentNumber': 0};
+  final Map<String, dynamic> snapshotData;
+
+  MockDocumentSnapshot(this.snapshotData);
+
   @override
   Map<String, dynamic>? data() {
-    return currentNumber;
+    return snapshotData;
   }
 
   @override

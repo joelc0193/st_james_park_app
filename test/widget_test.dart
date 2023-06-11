@@ -43,7 +43,6 @@ void main() {
     var numberStream = firestoreService.getNumber();
 
     // Assert: Check that the number returned by getNumber() is the number we added to Firestore.
-    await Future.delayed(Duration(seconds: 1)); // Delay of 1 second
     numberStream.take(5).listen((snapshot) {
       print(
           'Received event with currentNumber = ${(snapshot.data() as Map<String, dynamic>)['currentNumber']}');
