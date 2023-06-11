@@ -11,6 +11,7 @@ class AuthService {
 
   Future<void> signInWithEmailAndPassword(
       {required email, required password}) async {
+        print('************about to call _auth.signInWithEmailAndPassword');
     _auth.signInWithEmailAndPassword(
       email: email,
       password: password,

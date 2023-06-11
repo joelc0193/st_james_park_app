@@ -86,8 +86,15 @@ class MockFirebaseAuth extends Mock implements FirebaseAuth {
   }
 
   @override
-  Future<UserCredential> signInWithEmailAndPassword({required String email, required String password}) {
+  Future<UserCredential> signInWithEmailAndPassword(
+      {required String email, required String password}) {
     _currentUser = MockUser();
+    return Future.value(MockUserCredential(_currentUser));
+  }
+
+  @override
+  Future<UserCredential> createUserWithEmailAndPassword(
+      {required String email, required String password}) {
     return Future.value(MockUserCredential(_currentUser));
   }
 
