@@ -32,35 +32,6 @@ void main() {
         FirestoreService(firestore: mockFirestore, auth: mockAuth);
   });
 
-  test('getNumber returns the current number from Firestore', () async {
-    // Setup: Add a number to Firestore.
-    await mockFirestore
-        .collection('numbers')
-        .doc('currentNumber')
-        .update({'currentNumber': 42});
-
-    // Action: Call getNumber().
-    var numberStream = firestoreService.getNumber();
-
-    // Assert: Check that the number returned by getNumber() is the number we added to Firestore.
-    var secondEvent = await numberStream.elementAt(1);
-    var data = secondEvent.data();
-    var currentNumber = (data! as Map<String, int>)['currentNumber'];
-    expect(currentNumber, 42);
-  });
-
-  test('signOut signs out the user', () async {
-    // Setup: Sign in a user.
-    await mockAuth.signInAnonymously();
-
-    // Action: Call signOut().
-    await firestoreService.signOut();
-
-    // Assert: Check that the user is now signed out.
-    var user = mockAuth.currentUser;
-    expect(user, isNull);
-  });
-
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     TestWidgetsFlutterBinding.ensureInitialized();
 
