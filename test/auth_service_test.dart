@@ -31,11 +31,6 @@ void main() {
     });
 
     test('signInWithEmailAndPassword signs in the user', () async {
-      // Setup: Mock the signInWithEmailAndPassword method.
-      when(mockAuth.signInWithEmailAndPassword(
-        email: 'test@test.com', password: 'password123',
-      )).thenAnswer((_) => Future.value(MockUserCredential(MockUser())));
-
       // Action: Call signInWithEmailAndPassword().
       await authService.signInWithEmailAndPassword(
           email: 'test@test.com', password: 'password123');
@@ -48,12 +43,6 @@ void main() {
     });
 
     test('createUserWithEmailAndPassword creates a user', () async {
-      // Setup: Mock the createUserWithEmailAndPassword method.
-      when(mockAuth.createUserWithEmailAndPassword(
-        email: 'test@test.com',
-        password: 'password123',
-      )).thenAnswer((_) => Future.value(MockUserCredential(MockUser())));
-
       // Action: Call createUserWithEmailAndPassword().
       await authService.createUserWithEmailAndPassword(
           email: 'test@test.com', password: 'password123');

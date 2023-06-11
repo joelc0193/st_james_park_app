@@ -9,18 +9,17 @@ class AuthService {
     await _auth.signOut();
   }
 
-  Future<void> signInWithEmailAndPassword(
-      {required email, required password}) async {
-        print('************about to call _auth.signInWithEmailAndPassword');
-    _auth.signInWithEmailAndPassword(
+  Future<UserCredential> signInWithEmailAndPassword(
+      {required String email, required String password}) async {
+    return _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
   }
 
-  Future<void> createUserWithEmailAndPassword(
-      {required email, required password}) async {
-    _auth.createUserWithEmailAndPassword(
+  Future<UserCredential> createUserWithEmailAndPassword(
+      {required String email, required String password}) async {
+    return _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
