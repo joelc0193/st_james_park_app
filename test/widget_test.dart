@@ -43,7 +43,7 @@ void main() {
     var numberStream = firestoreService.getNumber();
 
     // Assert: Check that the number returned by getNumber() is the number we added to Firestore.
-    numberStream.listen(expectAsync1((snapshot) {
+    numberStream.take(1).listen(expectAsync1((snapshot) {
       expect(snapshot.data(), isNotNull);
       expect((snapshot.data() as Map<String, dynamic>)['currentNumber'], 42);
     }));
