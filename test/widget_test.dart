@@ -43,13 +43,10 @@ void main() {
     var numberStream = firestoreService.getNumber();
 
     // Assert: Check that the number returned by getNumber() is the number we added to Firestore.
-    numberStream.take(5).listen((snapshot) {
-      print(
-          'Received event with currentNumber = ${(snapshot.data() as Map<String, dynamic>)['currentNumber']}');
-
-      expect(snapshot.data(), isNotNull);
-      expect((snapshot.data() as Map<String, dynamic>)['currentNumber'], 42);
-    });
+    var secondEvent = await numberStream.elementAt(1);
+    var data = secondEvent.data();
+    var currentNumber = (data! as Map<String, int>)['currentNumber'];
+    expect(currentNumber, 42);
   });
 
   // test('signOut signs out the user', () async {
