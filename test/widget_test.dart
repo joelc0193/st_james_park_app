@@ -49,17 +49,17 @@ void main() {
     expect(currentNumber, 42);
   });
 
-  // test('signOut signs out the user', () async {
-  //   // Setup: Sign in a user.
-  //   await mockAuth.signInAnonymously();
+  test('signOut signs out the user', () async {
+    // Setup: Sign in a user.
+    await mockAuth.signInAnonymously();
 
-  //   // Action: Call signOut().
-  //   await firestoreService.signOut();
+    // Action: Call signOut().
+    await firestoreService.signOut();
 
-  //   // Assert: Check that the user is now signed out.
-  //   var user = mockAuth.currentUser;
-  //   expect(user, isNull);
-  // });
+    // Assert: Check that the user is now signed out.
+    var user = mockAuth.currentUser;
+    expect(user, isNull);
+  });
 
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     TestWidgetsFlutterBinding.ensureInitialized();
