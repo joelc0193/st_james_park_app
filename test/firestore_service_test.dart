@@ -11,14 +11,12 @@ import 'mocks.dart';
 void main() {
   group('FirestoreService', () {
     late MockFirebaseFirestore mockFirestore;
-    late MockFirebaseAuth mockAuth;
     late FirestoreService firestoreService;
 
     setUp(() {
       mockFirestore = MockFirebaseFirestore();
-      mockAuth = MockFirebaseAuth();
       firestoreService =
-          FirestoreService(firestore: mockFirestore, auth: mockAuth);
+          FirestoreService(firestore: mockFirestore);
     });
 
     test('incrementNumber increases the number in Firestore', () async {
@@ -45,18 +43,6 @@ void main() {
       var data = secondEvent.data();
       var currentNumber = (data! as Map<String, int>)['currentNumber'];
       expect(currentNumber, 42);
-    });
-
-    test('signOut signs out the user', () async {
-      // Setup: Sign in a user.
-      await mockAuth.signInAnonymously();
-
-      // Action: Call signOut().
-      await firestoreService.signOut();
-
-      // Assert: Check that the user is now signed out.
-      var user = mockAuth.currentUser;
-      expect(user, isNull);
     });
   });
 }

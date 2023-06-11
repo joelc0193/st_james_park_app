@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreService {
   final FirebaseFirestore firestore;
-  final FirebaseAuth auth;
 
-  FirestoreService({required this.firestore, required this.auth});
+  FirestoreService({required this.firestore});
 
   Stream<DocumentSnapshot> getNumber() {
     return firestore.collection('numbers').doc('currentNumber').snapshots();
@@ -31,9 +29,5 @@ class FirestoreService {
     } catch (e) {
       print('Failed to increment number: $e');
     }
-  }
-
-  Future<void> signOut() async {
-    await auth.signOut();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +14,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late FirestoreService _firestoreService;
-  late FirebaseAuth _auth;
+  late AuthService _authService;
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -23,9 +24,11 @@ class _MyHomePageState extends State<MyHomePage> {
     super.didChangeDependencies();
     _firestoreService = FirestoreService(
       firestore: Provider.of<FirebaseFirestore>(context),
+    );
+
+    _authService = AuthService(
       auth: Provider.of<FirebaseAuth>(context),
     );
-    _auth = Provider.of<FirebaseAuth>(context);
   }
 
   @override
@@ -56,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text('Sign Up'),
             onPressed: () async {
               try {
-                await _auth.createUserWithEmailAndPassword(
+                await _authService.createUserWithEmailAndPassword(
                   email: _emailController.text,
                   password: _passwordController.text,
                 );
@@ -74,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text('Log In'),
             onPressed: () async {
               try {
-                await _auth.signInWithEmailAndPassword(
+                await _authService.signInWithEmailAndPassword(
                   email: _emailController.text,
                   password: _passwordController.text,
                 );
@@ -90,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           ElevatedButton(
             onPressed: () async {
-              await _firestoreService.signOut();
+              await _authService.signOut();
             },
             child: Text('Log Out'),
           ),

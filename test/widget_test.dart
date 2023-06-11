@@ -29,7 +29,7 @@ void main() {
     mockFirestore = MockFirebaseFirestore();
     mockAuth = MockFirebaseAuth();
     firestoreService =
-        FirestoreService(firestore: mockFirestore, auth: mockAuth);
+        FirestoreService(firestore: mockFirestore);
   });
 
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
