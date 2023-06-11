@@ -33,8 +33,7 @@ void main() {
     test('signInWithEmailAndPassword signs in the user', () async {
       // Setup: Mock the signInWithEmailAndPassword method.
       when(mockAuth.signInWithEmailAndPassword(
-        email: 'test@test.com',
-        password: 'password123',
+        email: 'test@test.com', password: 'password123',
       )).thenAnswer((_) => Future.value(MockUserCredential(MockUser())));
 
       // Action: Call signInWithEmailAndPassword().
