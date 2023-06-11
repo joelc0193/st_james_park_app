@@ -16,8 +16,7 @@ void main() {
 
     setUp(() {
       mockAuth = MockFirebaseAuth();
-      authService =
-          AuthService(auth: mockAuth);
+      authService = AuthService(auth: mockAuth);
     });
     test('signOut signs out the user', () async {
       // Setup: Sign in a user.
@@ -29,6 +28,42 @@ void main() {
       // Assert: Check that the user is now signed out.
       var user = mockAuth.currentUser;
       expect(user, isNull);
+    });
+
+    test('signInWithEmailAndPassword signs in the user', () async {
+      // Setup: Mock the signInWithEmailAndPassword method.
+      when(mockAuth.signInWithEmailAndPassword(
+        email: 'test@test.com',
+        password: 'password123',
+      )).thenAnswer((_) => Future.value(MockUserCredential(MockUser())));
+
+      // Action: Call signInWithEmailAndPassword().
+      await authService.signInWithEmailAndPassword(
+          email: 'test@test.com', password: 'password123');
+
+      // Assert: Check that signInWithEmailAndPassword was called.
+      verify(mockAuth.signInWithEmailAndPassword(
+        email: 'test@test.com',
+        password: 'password123',
+      )).called(1);
+    });
+
+    test('createUserWithEmailAndPassword creates a user', () async {
+      // Setup: Mock the createUserWithEmailAndPassword method.
+      when(mockAuth.createUserWithEmailAndPassword(
+        email: 'test@test.com',
+        password: 'password123',
+      )).thenAnswer((_) => Future.value(MockUserCredential(MockUser())));
+
+      // Action: Call createUserWithEmailAndPassword().
+      await authService.createUserWithEmailAndPassword(
+          email: 'test@test.com', password: 'password123');
+
+      // Assert: Check that createUserWithEmailAndPassword was called.
+      verify(mockAuth.createUserWithEmailAndPassword(
+        email: 'test@test.com',
+        password: 'password123',
+      )).called(1);
     });
   });
 }
