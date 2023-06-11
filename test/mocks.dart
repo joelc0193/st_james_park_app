@@ -32,6 +32,8 @@ class MockDocumentReference extends Mock
   final MockDocumentSnapshot _documentSnapshot = MockDocumentSnapshot();
 
   MockDocumentReference() {
+      print('Emitting first event with currentNumber = 0');
+
     _controller.add(_documentSnapshot);
   }
 
@@ -46,6 +48,8 @@ class MockDocumentReference extends Mock
     _documentSnapshot.currentNumber = {
       'currentNumber': data['currentNumber'] as int,
     };
+      print('Emitting second event with currentNumber = ${data['currentNumber']}');
+
     _controller.add(_documentSnapshot);
   }
 
