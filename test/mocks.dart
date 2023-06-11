@@ -81,6 +81,11 @@ class MockFirebaseAuth extends Mock implements FirebaseAuth {
   Future<UserCredential> signInAnonymously() {
     return Future.value(MockUserCredential());
   }
+
+  @override
+  Future<void> signOut() async {
+    
+  }
 }
 
 class MockUserCredential extends Mock implements UserCredential {
