@@ -76,4 +76,16 @@ class MockDocumentSnapshot extends Mock
   bool get exists => true;
 }
 
-class MockFirebaseAuth extends Mock implements FirebaseAuth {}
+class MockFirebaseAuth extends Mock implements FirebaseAuth {
+  @override
+  Future<UserCredential> signInAnonymously() {
+    return Future.value(MockUserCredential());
+  }
+}
+
+class MockUserCredential extends Mock implements UserCredential {
+  @override
+  User get user => MockUser();
+}
+
+class MockUser extends Mock implements User {}
