@@ -44,7 +44,7 @@ class MockDocumentReference extends Mock
   @override
   Future<void> update(Map<Object, Object?> data) async {
     _documentSnapshot.currentNumber = {
-      'currentNumber': _documentSnapshot.currentNumber['currentNumber']! + 1,
+      'currentNumber': data['currentNumber'] as int,
     };
     _controller.add(_documentSnapshot);
   }
