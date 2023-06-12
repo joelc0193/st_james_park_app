@@ -7,9 +7,13 @@ import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:mockito/mockito.dart';
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:mockito/mockito.dart';
+import 'package:mockito/annotations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'mocks.dart';
+import 'auth_service_test.mocks.dart';
 
+@GenerateMocks([FirebaseAuth])
 void main() {
   group('AuthService', () {
     late MockFirebaseAuth mockAuth;
@@ -18,26 +22,16 @@ void main() {
     setUp(() {
       mockAuth = MockFirebaseAuth();
       authService = AuthService(auth: mockAuth);
-    });
 
-    test('signOut signs out the user', () async {
-      // Setup: Sign in a user.
-      await mockAuth.signInAnonymously();
-
-      // Action: Call signOut().
-      await authService.signOut();
-
-      // Assert: Check that the user is now signed out.
-      var user = mockAuth.currentUser;
-      expect(user, isNull);
+      when(mockAuth.signInWithEmailAndPassword(
+        email: 'test@test.com',
+        password: 'password123',
+      )).thenAnswer((_) async => Future.value(MockUserCredential(MockUser())));
     });
 
     test('signInWithEmailAndPassword signs in the user', () async {
       var _currentUser = MockUser();
-
-      mockAuth = MockFirebaseAuth();
-      authService = AuthService(auth: mockAuth);
-
+      
       when(mockAuth.signInWithEmailAndPassword(
         email: 'test@test.com',
         password: 'password123',

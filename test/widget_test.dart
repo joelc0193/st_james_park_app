@@ -19,7 +19,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_goldens/flutter_goldens.dart';
+import 'package:mockito/annotations.dart';
 
+import 'widget_test.mocks.dart';
+
+@GenerateMocks([FirebaseAuth])
 void main() {
   late MockFirebaseFirestore mockFirestore;
   late MockFirebaseAuth mockAuth;
@@ -28,8 +32,7 @@ void main() {
   setUp(() {
     mockFirestore = MockFirebaseFirestore();
     mockAuth = MockFirebaseAuth();
-    firestoreService =
-        FirestoreService(firestore: mockFirestore);
+    firestoreService = FirestoreService(firestore: mockFirestore);
   });
 
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
