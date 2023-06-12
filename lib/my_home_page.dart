@@ -22,9 +22,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _firestoreService = FirestoreService(
-      firestore: Provider.of<FirebaseFirestore>(context),
-    );
+    _firestoreService = Provider.of<FirestoreService>(context);
 
     _authService = AuthService(
       auth: Provider.of<FirebaseAuth>(context),
@@ -141,6 +139,6 @@ class CountWidget extends StatelessWidget {
         return Text('Document does not exist', key: Key('numberText'));
       }
     }
-    return const Text('Unknown state', key: Key('numberText'));
+    return Text('$snapshot', key: Key('numberText'));
   }
 }
