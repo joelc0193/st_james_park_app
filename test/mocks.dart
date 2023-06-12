@@ -76,16 +76,7 @@ class MockDocumentSnapshot extends Mock
   bool get exists => true;
 }
 
-// class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 
-
-class MockUserCredential extends Mock implements UserCredential {
-  User? _user;
-
-  MockUserCredential(this._user);
-
-  @override
-  User get user => _user!;
-}
+class MockUserCredential extends Mock implements UserCredential {}
 
 class MockUser extends Mock implements User {}

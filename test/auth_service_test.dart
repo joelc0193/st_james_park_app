@@ -26,17 +26,16 @@ void main() {
       when(mockAuth.signInWithEmailAndPassword(
         email: 'test@test.com',
         password: 'password123',
-      )).thenAnswer((_) async => Future.value(MockUserCredential(MockUser())));
+      )).thenAnswer((_) async => Future.value(MockUserCredential()));
     });
 
     test('signInWithEmailAndPassword signs in the user', () async {
-      var _currentUser = MockUser();
       
       when(mockAuth.signInWithEmailAndPassword(
         email: 'test@test.com',
         password: 'password123',
       )).thenAnswer(
-          (_) async => Future.value(MockUserCredential(_currentUser)));
+          (_) async => Future.value(MockUserCredential()));
 
       // Action: Call signInWithEmailAndPassword().
       await authService.signInWithEmailAndPassword(
@@ -50,13 +49,12 @@ void main() {
     });
 
     test('createUserWithEmailAndPassword creates a user', () async {
-      var _currentUser = MockUser();
 
       when(mockAuth.createUserWithEmailAndPassword(
         email: 'test@test.com',
         password: 'password123',
       )).thenAnswer(
-          (_) async => Future.value(MockUserCredential(_currentUser)));
+          (_) async => Future.value(MockUserCredential()));
 
       // Action: Call createUserWithEmailAndPassword().
       await authService.createUserWithEmailAndPassword(
