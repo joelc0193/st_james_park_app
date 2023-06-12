@@ -18,6 +18,7 @@ void main() {
       mockAuth = MockFirebaseAuth();
       authService = AuthService(auth: mockAuth);
     });
+    
     test('signOut signs out the user', () async {
       // Setup: Sign in a user.
       await mockAuth.signInAnonymously();
