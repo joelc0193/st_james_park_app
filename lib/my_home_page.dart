@@ -37,15 +37,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: <Widget>[
-          TextField(
-            controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
-          ),
-          TextField(
-            controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'Password'),
-            obscureText: true,
-          ),
+          CustomTextField(controller: _emailController, hintText: 'Email'),
+          CustomTextField(
+              controller: _passwordController, hintText: 'Password'),
           StreamBuilder<DocumentSnapshot>(
             stream: _firestoreService.getNumber(),
             builder: (BuildContext context,
@@ -53,8 +47,8 @@ class _MyHomePageState extends State<MyHomePage> {
               return CountWidget(snapshot);
             },
           ),
-          ElevatedButton(
-            child: const Text('Sign Up'),
+          CustomButton(
+            title: 'Sign Up',
             onPressed: () async {
               try {
                 await _authService.createUserWithEmailAndPassword(
@@ -71,8 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
           ),
-          ElevatedButton(
-            child: const Text('Log In'),
+          CustomButton(
+            title: 'Log In',
             onPressed: () async {
               try {
                 await _authService.signInWithEmailAndPassword(
@@ -89,11 +83,20 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
           ),
-          ElevatedButton(
+          CustomButton(
+            title: 'Sign Out',
             onPressed: () async {
-              await _authService.signOut();
+              try {
+                await _authService.signOut();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Successfully Logged Out')),
+                );
+              } on FirebaseAuthException catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed with ${e.message}')),
+                );
+              }
             },
-            child: Text('Log Out'),
           ),
         ],
       ),
@@ -140,5 +143,41 @@ class CountWidget extends StatelessWidget {
       }
     }
     return Text('$snapshot', key: Key('numberText'));
+  }
+}
+
+class CustomTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+
+  CustomTextField({required this.controller, required this.hintText});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        hintText: hintText,
+      ),
+    );
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  final String title;
+  final VoidCallback onPressed;
+
+  CustomButton({required this.title, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        child: Text(title),
+      ),
+    );
   }
 }
