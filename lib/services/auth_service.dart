@@ -11,6 +11,8 @@ class AuthService {
 
   Future<UserCredential> signInWithEmailAndPassword(
       {required String email, required String password}) async {
+        print(email);
+        print(password);
     return _auth.signInWithEmailAndPassword(
       email: email,
       password: password,

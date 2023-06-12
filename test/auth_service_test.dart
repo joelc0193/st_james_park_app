@@ -6,6 +6,7 @@ import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:mockito/mockito.dart';
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
+import 'package:mockito/mockito.dart';
 
 import 'mocks.dart';
 
@@ -18,7 +19,7 @@ void main() {
       mockAuth = MockFirebaseAuth();
       authService = AuthService(auth: mockAuth);
     });
-    
+
     test('signOut signs out the user', () async {
       // Setup: Sign in a user.
       await mockAuth.signInAnonymously();
@@ -32,6 +33,17 @@ void main() {
     });
 
     test('signInWithEmailAndPassword signs in the user', () async {
+      var _currentUser = MockUser();
+
+      mockAuth = MockFirebaseAuth();
+      authService = AuthService(auth: mockAuth);
+
+      when(mockAuth.signInWithEmailAndPassword(
+        email: 'test@test.com',
+        password: 'password123',
+      )).thenAnswer(
+          (_) async => Future.value(MockUserCredential(_currentUser)));
+
       // Action: Call signInWithEmailAndPassword().
       await authService.signInWithEmailAndPassword(
           email: 'test@test.com', password: 'password123');
@@ -44,6 +56,14 @@ void main() {
     });
 
     test('createUserWithEmailAndPassword creates a user', () async {
+      var _currentUser = MockUser();
+
+      when(mockAuth.createUserWithEmailAndPassword(
+        email: 'test@test.com',
+        password: 'password123',
+      )).thenAnswer(
+          (_) async => Future.value(MockUserCredential(_currentUser)));
+
       // Action: Call createUserWithEmailAndPassword().
       await authService.createUserWithEmailAndPassword(
           email: 'test@test.com', password: 'password123');
