@@ -17,6 +17,9 @@ void main() async {
     Provider<FirebaseAuth>(
       create: (_) => FirebaseAuth.instance,
     ),
+    ProxyProvider<FirebaseFirestore, FirestoreService>(
+      update: (_, firestore, __) => FirestoreService(firestore: firestore),
+    ),
   ], child: const MyApp()));
 }
 

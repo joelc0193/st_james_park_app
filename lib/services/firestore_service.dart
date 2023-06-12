@@ -13,6 +13,7 @@ class FirestoreService {
     try {
       var snapshot =
           await firestore.collection('numbers').doc('currentNumber').get();
+          print(snapshot);
       if (snapshot.exists) {
         var currentNumber = snapshot.data()?['currentNumber'];
         if (currentNumber != null) {

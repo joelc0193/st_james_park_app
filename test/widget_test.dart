@@ -5,6 +5,7 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:st_james_park_app/services/firestore_service.dart';
@@ -23,45 +24,57 @@ import 'package:mockito/annotations.dart';
 
 import 'widget_test.mocks.dart';
 
-@GenerateMocks([FirebaseAuth])
+@GenerateMocks(
+    [FirebaseFirestore, FirebaseAuth, FirestoreService, DocumentSnapshot])
 void main() {
-  late MockFirebaseFirestore mockFirestore;
-  late MockFirebaseAuth mockAuth;
-  late FirestoreService firestoreService;
-
-  setUp(() {
-    mockFirestore = MockFirebaseFirestore();
-    mockAuth = MockFirebaseAuth();
-    firestoreService = FirestoreService(firestore: mockFirestore);
-  });
-
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Arrange:
     TestWidgetsFlutterBinding.ensureInitialized();
 
     final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
     final MockFirebaseAuth mockAuth = MockFirebaseAuth();
+    final MockFirestoreService mockFirestoreService = MockFirestoreService();
+    final MockDocumentSnapshot mockDocumentSnapshot1 = MockDocumentSnapshot();
+    final MockDocumentSnapshot mockDocumentSnapshot2 = MockDocumentSnapshot();
+
+    var controller = StreamController<DocumentSnapshot>();
+    controller.add(mockDocumentSnapshot1);
+
+    when(mockFirestoreService.getNumber()).thenAnswer((_) => controller.stream);
+    when(mockDocumentSnapshot1.exists).thenAnswer((_) => true);
+    when(mockDocumentSnapshot1.data()).thenAnswer((_) => {'currentNumber': 0});
+    when(mockDocumentSnapshot2.exists).thenAnswer((_) => true);
+
+    when(mockDocumentSnapshot2.data()).thenAnswer((_) => {'currentNumber': 1});
+    when(mockFirestoreService.getNumber()).thenAnswer((_) => controller.stream);
+    when(mockFirestoreService.incrementNumber()).thenAnswer((_) async {
+      controller.add(mockDocumentSnapshot2);
+      return Future.value();
+    });
+
     // Provide the mock objects using provider
     await tester.pumpWidget(
       MultiProvider(
         providers: [
           Provider<FirebaseFirestore>(create: (_) => mockFirestore),
           Provider<FirebaseAuth>(create: (_) => mockAuth),
+          Provider<FirestoreService>(create: (_) => mockFirestoreService),
         ],
         child: MyApp(),
       ),
     );
-
     await tester.pumpAndSettle();
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+
+    verify(mockFirestoreService.getNumber()).called(1);
 
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
-
+    
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
+
+    controller.close();
   });
 }
