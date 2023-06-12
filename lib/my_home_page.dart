@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:provider/provider.dart';
+import 'package:st_james_park_app/admin_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -34,6 +35,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('St James Park Home Page'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.admin_panel_settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AdminPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: <Widget>[

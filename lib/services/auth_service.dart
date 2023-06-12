@@ -24,4 +24,8 @@ class AuthService {
       password: password,
     );
   }
+
+  bool isUserSignedIn() {
+    return _auth.currentUser != null;
+  }
 }
