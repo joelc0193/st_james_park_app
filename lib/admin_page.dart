@@ -32,6 +32,20 @@ class _AdminPageState extends State<AdminPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Admin Page'),
+        actions: _authService.isUserSignedIn()
+            ? <Widget>[
+                IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () async {
+                    await _authService.signOut();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Successfully Logged Out')),
+                    );
+                    setState(() {}); // Update the UI after successful logout
+                  },
+                ),
+              ]
+            : null,
       ),
       body:
           _authService.isUserSignedIn() ? _buildAdminForm() : _buildLoginForm(),
@@ -82,7 +96,7 @@ class _AdminPageState extends State<AdminPage> {
               _buildNumberField('Tennis Courts'),
               _buildNumberField('Soccer Field'),
               _buildNumberField('Playground'),
-              _buildNumberField('Handball Court'),
+              _buildNumberField('Handball Courts'),
               _buildNumberField('Other'),
               ElevatedButton(
                 onPressed: _submitForm,
@@ -131,7 +145,6 @@ class _AdminPageState extends State<AdminPage> {
             ),
           );
         }
-        print(_formData);
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

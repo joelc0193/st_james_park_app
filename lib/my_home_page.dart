@@ -20,6 +20,20 @@ class _MyHomePageState extends State<MyHomePage> {
     _firestoreService = Provider.of<FirestoreService>(context);
   }
 
+  Duration calculateTimeDifference(Timestamp lastUpdated) {
+    return DateTime.now().difference(lastUpdated.toDate());
+  }
+
+  String formatTimeDifference(Duration timeDifference) {
+    if (timeDifference.inMinutes < 60) {
+      return 'Last Update: ${timeDifference.inMinutes} minutes ago';
+    } else if (timeDifference.inHours < 2) {
+      return 'Last Update: ${timeDifference.inHours} hours and ${timeDifference.inMinutes % 60} minutes ago';
+    } else {
+      return 'Last Update: ${timeDifference.inHours} hours ago';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,13 +64,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Tennis Courts',
                 'Soccer Field',
                 'Playground',
-                'Handball Court',
+                'Handball Courts',
                 'Other'
               ];
               int sum = 0;
               data.values.forEach((value) {
-                sum += int.parse(value);
+                value is String ? sum += int.parse(value) : sum = sum;
               });
+              Duration timeDifference =
+                  calculateTimeDifference(data['Last Update']);
               return Expanded(
                 child: Column(
                   children: [
@@ -85,12 +101,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     Expanded(
                       child: ListView(
-                        children: orderedKeys.map((key) {
-                          return ListTile(
-                            title: Text(key),
-                            trailing: Text('${data[key]}'),
-                          );
-                        }).toList(),
+                        children: [
+                          ...orderedKeys.map((key) {
+                            return ListTile(
+                              title: Text(key),
+                              trailing: Text('${data[key]}'),
+                            );
+                          }).toList(),
+                          Center(
+                            child: Text(
+                              formatTimeDifference(timeDifference),
+                              style: TextStyle(fontSize: 17),
+                            ),
+                          )
+                        ],
                       ),
                     ),
                   ],
