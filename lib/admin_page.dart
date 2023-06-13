@@ -12,7 +12,7 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   final _formKey = GlobalKey<FormState>();
   final _loginFormKey = GlobalKey<FormState>();
-  final Map<String, String> _formData = {};
+  final Map<String, int> _formData = {};
   late AuthService _authService;
   late FirestoreService _firestoreService;
   final _emailController = TextEditingController();
@@ -120,7 +120,7 @@ class _AdminPageState extends State<AdminPage> {
         return null;
       },
       onSaved: (value) {
-        _formData[label] = value!;
+        _formData[label] = int.parse(value!);
       },
     );
   }

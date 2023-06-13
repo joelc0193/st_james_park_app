@@ -40,12 +40,15 @@ void main() {
     var controller = StreamController<DocumentSnapshot>();
     controller.add(mockDocumentSnapshot1);
 
+    var controller1 = StreamController<DocumentSnapshot>();
+
     when(mockFirestoreService.getNumber()).thenAnswer((_) => controller.stream);
     when(mockDocumentSnapshot1.exists).thenAnswer((_) => true);
     when(mockDocumentSnapshot1.data()).thenAnswer((_) => {'currentNumber': 0});
     when(mockDocumentSnapshot2.exists).thenAnswer((_) => true);
 
     when(mockDocumentSnapshot2.data()).thenAnswer((_) => {'currentNumber': 1});
+    when(mockFirestoreService.getAdminNumbers()).thenAnswer((_) => controller1.stream);
     when(mockFirestoreService.getNumber()).thenAnswer((_) => controller.stream);
     when(mockFirestoreService.incrementNumber()).thenAnswer((_) async {
       controller.add(mockDocumentSnapshot2);
@@ -65,15 +68,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    verify(mockFirestoreService.getNumber()).called(1);
-
     // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.tap(find.byIcon(Icons.admin_panel_settings));
     await tester.pumpAndSettle();
-    
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
 
     controller.close();
   });

@@ -167,9 +167,19 @@ class _FakeFirebaseFirestore_12 extends _i1.SmartFake
         );
 }
 
-class _FakeSnapshotMetadata_13 extends _i1.SmartFake
+class _FakeFieldValue_13 extends _i1.SmartFake implements _i4.FieldValue {
+  _FakeFieldValue_13(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeSnapshotMetadata_14 extends _i1.SmartFake
     implements _i4.SnapshotMetadata {
-  _FakeSnapshotMetadata_13(
+  _FakeSnapshotMetadata_14(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -1020,9 +1030,32 @@ class MockFirestoreService extends _i1.Mock implements _i10.FirestoreService {
         ),
       ) as _i4.FirebaseFirestore);
   @override
+  _i4.FieldValue getServerTimestamp() => (super.noSuchMethod(
+        Invocation.method(
+          #getServerTimestamp,
+          [],
+        ),
+        returnValue: _FakeFieldValue_13(
+          this,
+          Invocation.method(
+            #getServerTimestamp,
+            [],
+          ),
+        ),
+      ) as _i4.FieldValue);
+  @override
   _i5.Stream<_i4.DocumentSnapshot<Object?>> getNumber() => (super.noSuchMethod(
         Invocation.method(
           #getNumber,
+          [],
+        ),
+        returnValue: _i5.Stream<_i4.DocumentSnapshot<Object?>>.empty(),
+      ) as _i5.Stream<_i4.DocumentSnapshot<Object?>>);
+  @override
+  _i5.Stream<_i4.DocumentSnapshot<Object?>> getAdminNumbers() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getAdminNumbers,
           [],
         ),
         returnValue: _i5.Stream<_i4.DocumentSnapshot<Object?>>.empty(),
@@ -1032,6 +1065,16 @@ class MockFirestoreService extends _i1.Mock implements _i10.FirestoreService {
         Invocation.method(
           #incrementNumber,
           [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+  @override
+  _i5.Future<void> updateAdminNumbers(Map<String, int>? numbers) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateAdminNumbers,
+          [numbers],
         ),
         returnValue: _i5.Future<void>.value(),
         returnValueForMissingStub: _i5.Future<void>.value(),
@@ -1063,7 +1106,7 @@ class MockDocumentSnapshot<T extends Object?> extends _i1.Mock
   @override
   _i4.SnapshotMetadata get metadata => (super.noSuchMethod(
         Invocation.getter(#metadata),
-        returnValue: _FakeSnapshotMetadata_13(
+        returnValue: _FakeSnapshotMetadata_14(
           this,
           Invocation.getter(#metadata),
         ),

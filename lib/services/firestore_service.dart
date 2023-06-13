@@ -5,6 +5,10 @@ class FirestoreService {
 
   FirestoreService({required this.firestore});
 
+  FieldValue getServerTimestamp() {
+    return FieldValue.serverTimestamp();
+  }
+
   Stream<DocumentSnapshot> getNumber() {
     return firestore.collection('numbers').doc('currentNumber').snapshots();
   }
@@ -36,11 +40,12 @@ class FirestoreService {
     }
   }
 
-  Future<void> updateAdminNumbers(Map<String, String> numbers) async {
+  Future<void> updateAdminNumbers(Map<String, int> numbers) async {
+    print({...numbers, 'Last Update': FieldValue.serverTimestamp()});
     try {
       await firestore.collection('numbers').doc('adminNumbers').set({
         ...numbers,
-        'Last Update': FieldValue.serverTimestamp(),
+        'Last Update': getServerTimestamp(),
       });
       print('Numbers updated successfully');
     } catch (e) {

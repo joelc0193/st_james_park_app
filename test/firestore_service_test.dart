@@ -55,6 +55,22 @@ void main() {
       verify(mockDocumentReference.snapshots()).called(1);
     });
 
+    test('getAdminNumbers returns the admin numbers from Firestore', () async {
+      // Setup:
+      when(mockFirestore.collection('numbers'))
+          .thenReturn(mockCollectionReference);
+      when(mockCollectionReference.doc('adminNumbers'))
+          .thenReturn(mockDocumentReference);
+      when(mockDocumentReference.snapshots())
+          .thenAnswer((_) => controller.stream);
+
+      // Action: Call getNumber().
+      firestoreService.getAdminNumbers();
+
+      // Assert: Correct Firestore call was made
+      verify(mockDocumentReference.snapshots()).called(1);
+    });
+
     test('incrementNumber increases the number in Firestore', () async {
       // Setup:
       when(mockFirestore.collection('numbers')).thenAnswer((_) =>
@@ -76,5 +92,49 @@ void main() {
       // Assert: Correct Firestore call was made.
       verify(mockDocumentReference.update({'currentNumber': 1})).called(1);
     });
+
+    test('updateAdminNumbers updates the admin numbers in Firestore', () async {
+      // Setup:
+      DateTime now = DateTime.now();
+      when(mockFirestore.collection('numbers')).thenAnswer((_) =>
+          mockCollectionReference as CollectionReference<Map<String, dynamic>>);
+      when(mockCollectionReference.doc('adminNumbers'))
+          .thenAnswer((_) => mockDocumentReference);
+      when(mockDocumentReference.snapshots())
+          .thenAnswer((_) => controller.stream);
+      var newAdminNumbers = {
+        'Basketball Courts': 1,
+        'Handball Courts': 1,
+        'Tennis Courts': 1,
+        'Playground': 1,
+        'Soccer Field': 1,
+        'Other': 0,
+      };
+      when(mockDocumentReference.set(newAdminNumbers))
+          .thenAnswer((_) => Future.value());
+
+      // Action: Call incrementNumber().
+      await firestoreService.updateAdminNumbers(newAdminNumbers);
+
+      // Assert: Correct Firestore call was made.
+      verify(mockDocumentReference.set(
+        argThat(
+          isA<Map>().having(
+            (m) => m..remove('Last Update'),
+            'map without Last Update',
+            {
+              'Basketball Courts': 1,
+              'Handball Courts': 1,
+              'Tennis Courts': 1,
+              'Playground': 1,
+              'Soccer Field': 1,
+              'Other': 0,
+            },
+          ),
+        ),
+      )).called(1);
+    });
+
+    tearDown(() => {controller.close()});
   });
 }

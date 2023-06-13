@@ -133,13 +133,6 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
       ]),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await _firestoreService.incrementNumber();
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
