@@ -59,7 +59,10 @@ class _AdminPageState extends State<AdminPage> {
         children: [
           CustomTextField(controller: _emailController, hintText: 'Email'),
           CustomTextField(
-              controller: _passwordController, hintText: 'Password'),
+            controller: _passwordController,
+            hintText: 'Password',
+            obscureText: true,
+          ),
           CustomButton(
             title: 'Sign In',
             onPressed: () async {
@@ -175,8 +178,13 @@ class CustomButton extends StatelessWidget {
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
+  final bool obscureText;
 
-  CustomTextField({required this.controller, required this.hintText});
+  CustomTextField({
+    required this.controller,
+    required this.hintText,
+    this.obscureText = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -186,6 +194,7 @@ class CustomTextField extends StatelessWidget {
         border: OutlineInputBorder(),
         hintText: hintText,
       ),
+      obscureText: obscureText,
     );
   }
 }

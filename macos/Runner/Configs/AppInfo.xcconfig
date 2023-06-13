@@ -8,7 +8,7 @@
 PRODUCT_NAME = st_james_park_app
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.stJamesParkApp
+PRODUCT_BUNDLE_IDENTIFIER = com.gmail.joelc0193.stJamesParkApp
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2023 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2023 com.gmail.joelc0193. All rights reserved.
