@@ -9,11 +9,15 @@ class FirestoreService {
     return firestore.collection('numbers').doc('currentNumber').snapshots();
   }
 
+  Stream<DocumentSnapshot> getAdminNumbers() {
+    return firestore.collection('numbers').doc('adminNumbers').snapshots();
+  }
+
   Future<void> incrementNumber() async {
     try {
       var snapshot =
           await firestore.collection('numbers').doc('currentNumber').get();
-          print(snapshot);
+      print(snapshot);
       if (snapshot.exists) {
         var currentNumber = snapshot.data()?['currentNumber'];
         if (currentNumber != null) {
@@ -29,6 +33,15 @@ class FirestoreService {
       }
     } catch (e) {
       print('Failed to increment number: $e');
+    }
+  }
+
+  Future<void> updateAdminNumbers(Map<String, String> numbers) async {
+    try {
+      await firestore.collection('numbers').doc('adminNumbers').set(numbers);
+      print('Numbers updated successfully');
+    } catch (e) {
+      print('Failed to update numbers: $e');
     }
   }
 }
