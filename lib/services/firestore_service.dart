@@ -14,14 +14,9 @@ class FirestoreService {
   }
 
   Future<void> updateAdminNumbers(Map<String, int> numbers) async {
-    try {
-      await firestore.collection('numbers').doc('adminNumbers').set({
-        ...numbers,
-        'Last Update': getServerTimestamp(),
-      });
-      print('Numbers updated successfully');
-    } catch (e) {
-      print('Failed to update numbers: $e');
-    }
+    await firestore.collection('numbers').doc('adminNumbers').set({
+      ...numbers,
+      'Last Update': getServerTimestamp(),
+    });
   }
 }

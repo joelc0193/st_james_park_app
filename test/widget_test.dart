@@ -139,9 +139,7 @@ void main() {
             Provider<FirebaseAuth>(create: (_) => mockAuth),
             Provider<FirestoreService>(create: (_) => mockFirestoreService),
           ],
-          child: MaterialApp(
-            home: MyHomePage(),
-          ),
+          child: MyApp(),
         ),
       );
 
