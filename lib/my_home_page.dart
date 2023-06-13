@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('St James Park Home Page'),
+        title: const Text('St James Park Count'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.admin_panel_settings),
@@ -77,13 +77,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: const EdgeInsets.all(40.0),
                       child: Column(
                         children: [
                           Text(
                             '$sum',
                             style: TextStyle(
-                              fontSize: 55,
+                              fontSize: 75,
                               fontWeight: FontWeight.bold,
                             ),
                             textAlign: TextAlign.center,
@@ -103,9 +103,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: ListView(
                         children: [
                           ...orderedKeys.map((key) {
+                            print(key);
                             return ListTile(
                               title: Text(key),
-                              trailing: Text('${data[key]}'),
+                              trailing: Text('${data[key]}', key: Key(key)),
                             );
                           }).toList(),
                           Center(

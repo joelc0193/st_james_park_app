@@ -8,6 +8,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:st_james_park_app/admin_page.dart';
+import 'package:st_james_park_app/my_home_page.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +27,139 @@ import 'package:mockito/annotations.dart';
 import 'widget_test.mocks.dart';
 
 @GenerateMocks(
-    [FirebaseFirestore, FirebaseAuth, FirestoreService, DocumentSnapshot])
+    [FirebaseFirestore, FirebaseAuth, FirestoreService, DocumentSnapshot, User])
 void main() {
+  group('AdminPage', () {
+    testWidgets('updates numbers in Firestore when submitted',
+        (WidgetTester tester) async {
+      // Arrange:
+      TestWidgetsFlutterBinding.ensureInitialized();
+
+      final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
+      final MockFirebaseAuth mockAuth = MockFirebaseAuth();
+      final MockFirestoreService mockFirestoreService = MockFirestoreService();
+      final MockDocumentSnapshot mockDocumentSnapshot1 = MockDocumentSnapshot();
+      final MockDocumentSnapshot mockDocumentSnapshot2 = MockDocumentSnapshot();
+      final MockUser mockUser = MockUser();
+
+      var controller = StreamController<DocumentSnapshot>();
+      controller.add(mockDocumentSnapshot1);
+
+      var controller1 = StreamController<DocumentSnapshot>();
+
+      when(mockFirestoreService.getNumber())
+          .thenAnswer((_) => controller.stream);
+      when(mockDocumentSnapshot1.exists).thenAnswer((_) => true);
+      when(mockDocumentSnapshot1.data())
+          .thenAnswer((_) => {'currentNumber': 0});
+      when(mockDocumentSnapshot2.exists).thenAnswer((_) => true);
+
+      when(mockDocumentSnapshot2.data())
+          .thenAnswer((_) => {'currentNumber': 1});
+      when(mockFirestoreService.getAdminNumbers())
+          .thenAnswer((_) => controller1.stream);
+      when(mockFirestoreService.getNumber())
+          .thenAnswer((_) => controller.stream);
+      when(mockFirestoreService.incrementNumber()).thenAnswer((_) async {
+        controller.add(mockDocumentSnapshot2);
+        return Future.value();
+      });
+      when(mockAuth.currentUser).thenAnswer((_) => mockUser);
+
+      // Provide the mock objects using provider
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            Provider<FirebaseFirestore>(create: (_) => mockFirestore),
+            Provider<FirebaseAuth>(create: (_) => mockAuth),
+            Provider<FirestoreService>(create: (_) => mockFirestoreService),
+          ],
+          child: MaterialApp(
+            // Add MaterialApp here
+            home: AdminPage(),
+          ),
+        ),
+      );
+
+      // Simulate entering numbers into the text fields
+      await tester.enterText(find.byKey(Key('Basketball Courts')), '1');
+      await tester.enterText(find.byKey(Key('Tennis Courts')), '2');
+      await tester.enterText(find.byKey(Key('Soccer Field')), '3');
+      await tester.enterText(find.byKey(Key('Playground')), '4');
+      await tester.enterText(find.byKey(Key('Handball Courts')), '5');
+      await tester.enterText(find.byKey(Key('Other')), '6');
+
+      // Simulate tapping the submit button
+      await tester.tap(find.byKey(Key('Submit')));
+      await tester.pumpAndSettle();
+
+      // Verify that the updateAdminNumbers method was called with the correct arguments
+      verify(mockFirestoreService.updateAdminNumbers({
+        'Basketball Courts': 1,
+        'Tennis Courts': 2,
+        'Soccer Field': 3,
+        'Playground': 4,
+        'Handball Courts': 5,
+        'Other': 6
+      })).called(1);
+    });
+  });
+
+  group('MyHomePage', () {
+    testWidgets('displays the updated numbers', (WidgetTester tester) async {
+      // Arrange:
+      TestWidgetsFlutterBinding.ensureInitialized();
+
+      final MockFirebaseFirestore mockFirestore = MockFirebaseFirestore();
+      final MockFirebaseAuth mockAuth = MockFirebaseAuth();
+      final MockFirestoreService mockFirestoreService = MockFirestoreService();
+      final MockDocumentSnapshot mockDocumentSnapshot1 = MockDocumentSnapshot();
+      final MockDocumentSnapshot mockDocumentSnapshot2 = MockDocumentSnapshot();
+      final MockUser mockUser = MockUser();
+
+      var controller = StreamController<DocumentSnapshot>();
+      controller.add(mockDocumentSnapshot1);
+
+      var controller1 = StreamController<DocumentSnapshot>();
+
+      when(mockFirestoreService.getNumber())
+          .thenAnswer((_) => controller.stream);
+      when(mockDocumentSnapshot1.exists).thenAnswer((_) => true);
+      when(mockDocumentSnapshot1.data())
+          .thenAnswer((_) => {'currentNumber': 0});
+      when(mockDocumentSnapshot2.exists).thenAnswer((_) => true);
+
+      when(mockDocumentSnapshot2.data())
+          .thenAnswer((_) => {'currentNumber': 1});
+      when(mockFirestoreService.getAdminNumbers())
+          .thenAnswer((_) => controller1.stream);
+      when(mockFirestoreService.getNumber())
+          .thenAnswer((_) => controller.stream);
+      when(mockFirestoreService.incrementNumber()).thenAnswer((_) async {
+        controller.add(mockDocumentSnapshot2);
+        return Future.value();
+      });
+      when(mockAuth.currentUser).thenAnswer((_) => mockUser);
+
+      // Provide the mock objects using provider
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            Provider<FirebaseFirestore>(create: (_) => mockFirestore),
+            Provider<FirebaseAuth>(create: (_) => mockAuth),
+            Provider<FirestoreService>(create: (_) => mockFirestoreService),
+          ],
+          child: MaterialApp(
+            // Add MaterialApp here
+            home: MyHomePage(),
+          ),
+        ),
+      );
+      
+      expect(find.byKey(Key('Basketball Courts')), findsOneWidget);
+    });
+  });
+
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Arrange:
     TestWidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +181,8 @@ void main() {
     when(mockDocumentSnapshot2.exists).thenAnswer((_) => true);
 
     when(mockDocumentSnapshot2.data()).thenAnswer((_) => {'currentNumber': 1});
-    when(mockFirestoreService.getAdminNumbers()).thenAnswer((_) => controller1.stream);
+    when(mockFirestoreService.getAdminNumbers())
+        .thenAnswer((_) => controller1.stream);
     when(mockFirestoreService.getNumber()).thenAnswer((_) => controller.stream);
     when(mockFirestoreService.incrementNumber()).thenAnswer((_) async {
       controller.add(mockDocumentSnapshot2);
