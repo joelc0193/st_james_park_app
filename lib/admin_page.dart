@@ -128,16 +128,12 @@ class _AdminPageState extends State<AdminPage> {
 
   void _submitForm() async {
     if (_authService.isUserSignedIn()) {
-      print('user singed in');
       if (_formKey.currentState!.validate()) {
-        print('form valid');
         _formKey.currentState!.save();
         // Save the data to Firestore
         try {
-          print('calling updateAdminNumbers() with: $_formData');
           await Provider.of<FirestoreService>(context, listen: false)
               .updateAdminNumbers(_formData);
-          print('called updateAdminNumbers()');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Numbers updated successfully'),

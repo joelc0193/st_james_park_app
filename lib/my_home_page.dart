@@ -68,8 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Other'
               ];
               int sum = 0;
-              data.values.forEach((value) {
-                value is String ? sum += int.parse(value) : sum = sum;
+              orderedKeys.forEach((key) {
+                sum += data[key] as int;
               });
               Duration timeDifference =
                   calculateTimeDifference(data['Last Update']);
@@ -87,6 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               fontWeight: FontWeight.bold,
                             ),
                             textAlign: TextAlign.center,
+                            key: Key('Total'),
                           ),
                           Text(
                             'Total',
@@ -103,7 +104,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: ListView(
                         children: [
                           ...orderedKeys.map((key) {
-                            print(key);
                             return ListTile(
                               title: Text(key),
                               trailing: Text('${data[key]}', key: Key(key)),
@@ -124,13 +124,6 @@ class _MyHomePageState extends State<MyHomePage> {
             } else {
               return Text('No data');
             }
-          },
-        ),
-        StreamBuilder<DocumentSnapshot>(
-          stream: _firestoreService.getNumber(),
-          builder:
-              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            return CountWidget(snapshot);
           },
         ),
       ]),

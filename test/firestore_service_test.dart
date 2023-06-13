@@ -39,22 +39,6 @@ void main() {
       controller.add(mockDocumentSnapshot);
     });
 
-    test('getNumber returns the current number from Firestore', () async {
-      // Setup:
-      when(mockFirestore.collection('numbers'))
-          .thenReturn(mockCollectionReference);
-      when(mockCollectionReference.doc('currentNumber'))
-          .thenReturn(mockDocumentReference);
-      when(mockDocumentReference.snapshots())
-          .thenAnswer((_) => controller.stream);
-
-      // Action: Call getNumber().
-      firestoreService.getNumber();
-
-      // Assert: Correct Firestore call was made
-      verify(mockDocumentReference.snapshots()).called(1);
-    });
-
     test('getAdminNumbers returns the admin numbers from Firestore', () async {
       // Setup:
       when(mockFirestore.collection('numbers'))
@@ -71,31 +55,8 @@ void main() {
       verify(mockDocumentReference.snapshots()).called(1);
     });
 
-    test('incrementNumber increases the number in Firestore', () async {
-      // Setup:
-      when(mockFirestore.collection('numbers')).thenAnswer((_) =>
-          mockCollectionReference as CollectionReference<Map<String, dynamic>>);
-      when(mockCollectionReference.doc('currentNumber'))
-          .thenAnswer((_) => mockDocumentReference);
-      when(mockDocumentReference.snapshots())
-          .thenAnswer((_) => controller.stream);
-      when(mockDocumentReference.get())
-          .thenAnswer((_) => Future.value(mockDocumentSnapshot));
-      when(mockDocumentSnapshot.exists).thenAnswer((_) => true);
-      when(mockDocumentSnapshot.data()).thenAnswer((_) => {'currentNumber': 0});
-      when(mockDocumentReference.update({'currentNumber': 1}))
-          .thenAnswer((_) => Future.value());
-
-      // Action: Call incrementNumber().
-      await firestoreService.incrementNumber();
-
-      // Assert: Correct Firestore call was made.
-      verify(mockDocumentReference.update({'currentNumber': 1})).called(1);
-    });
-
     test('updateAdminNumbers updates the admin numbers in Firestore', () async {
       // Setup:
-      DateTime now = DateTime.now();
       when(mockFirestore.collection('numbers')).thenAnswer((_) =>
           mockCollectionReference as CollectionReference<Map<String, dynamic>>);
       when(mockCollectionReference.doc('adminNumbers'))
