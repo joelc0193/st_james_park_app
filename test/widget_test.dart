@@ -6,22 +6,16 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:st_james_park_app/admin_page.dart';
-import 'package:st_james_park_app/my_home_page.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:st_james_park_app/main.dart';
-import 'mocks.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_goldens/flutter_goldens.dart';
 import 'package:mockito/annotations.dart';
 
 import 'widget_test.mocks.dart';

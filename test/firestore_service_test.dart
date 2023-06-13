@@ -1,16 +1,11 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:mockito/mockito.dart';
-import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:mockito/annotations.dart';
 
-import 'mocks.dart';
 import 'firestore_service_test.mocks.dart';
 
 @GenerateMocks([
