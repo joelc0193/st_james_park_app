@@ -1,3 +1,6 @@
+import 'package:flutter_map/flutter_map.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,19 +30,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String formatTimeDifference(Duration timeDifference) {
     if (timeDifference.inMinutes < 60) {
-      return 'Last Update: ${timeDifference.inMinutes} minutes ago';
+      return '⌚ Updated ${timeDifference.inMinutes} minutes ago';
     } else if (timeDifference.inHours < 2) {
-      return 'Last Update: ${timeDifference.inHours} hours and ${timeDifference.inMinutes % 60} minutes ago';
+      return '⌚ Updated ${timeDifference.inHours} hours and ${timeDifference.inMinutes % 60} minutes ago';
     } else {
-      return 'Last Update: ${timeDifference.inHours} hours ago';
+      return '⌚ Updated ${timeDifference.inHours} hours ago';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green,
       appBar: AppBar(
-        title: const Text('St James Park People Count'),
+        title: const Text('St James Park People Counter'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.admin_panel_settings),
@@ -68,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Handball Courts',
                 'Other'
               ];
+              List<String> emojis = ['🏀', '🎾', '⚽', '🛝', '🔵', '🌳'];
               int sum = 0;
               orderedKeys.forEach((key) {
                 sum += data[key] as int;
@@ -104,10 +109,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           ? Center(
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(maxWidth: 600),
-                                child: _buildListView(orderedKeys, data),
+                                child:
+                                    _buildListView(orderedKeys, data, emojis),
                               ),
                             )
-                          : _buildListView(orderedKeys, data),
+                          : _buildListView(orderedKeys, data, emojis),
                     ),
                   ],
                 ),
@@ -121,55 +127,43 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildListView(List<String> orderedKeys, Map<String, dynamic> data) {
-    Duration timeDifference = calculateTimeDifference(data['Last Update']);
+  Widget _buildListView(
+    List<String> orderedKeys,
+    Map<String, dynamic> data,
+    List<String> emojis,
+  ) {
+    Duration timeDifference = calculateTimeDifference(data['Updated']);
     return ListView.separated(
       itemCount: orderedKeys.length + 1,
-      separatorBuilder: (BuildContext context, int index) => Divider(),
+      separatorBuilder: (BuildContext context, int index) =>
+          Divider(color: Colors.white),
       itemBuilder: (context, index) {
         if (index < orderedKeys.length) {
           var key = orderedKeys[index];
+          var emoji = emojis[index];
           return ListTile(
-            title: Text(key),
-            trailing: Text('${data[key]}', key: Key(key)),
+            title: Text('${emoji} $key'),
+            trailing: Text(
+              '${data[key]}',
+              key: Key(key),
+              style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins'),
+            ),
           );
         } else {
-          return Center(
-            child: Text(
-              formatTimeDifference(timeDifference),
-              style: TextStyle(fontSize: 17),
+          return Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Center(
+              child: Text(
+                formatTimeDifference(timeDifference),
+                style: TextStyle(fontSize: 17),
+              ),
             ),
           );
         }
       },
     );
-  }
-}
-
-class CountWidget extends StatelessWidget {
-  final snapshot;
-  CountWidget(
-    AsyncSnapshot<DocumentSnapshot<Object?>> this.snapshot, {
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (snapshot.hasError) {
-      return const Text('Something went wrong', key: Key('numberText'));
-    }
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Text("Loading", key: Key('numberText'));
-    }
-    if (snapshot.connectionState == ConnectionState.active) {
-      if (snapshot.data!.exists) {
-        Map<String, dynamic> data =
-            snapshot.data!.data() as Map<String, dynamic>;
-        return Text("${data['currentNumber']}", key: Key('numberText'));
-      } else {
-        return Text('Document does not exist', key: Key('numberText'));
-      }
-    }
-    return Text('$snapshot', key: Key('numberText'));
   }
 }

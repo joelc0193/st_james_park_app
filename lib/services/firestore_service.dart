@@ -16,7 +16,7 @@ class FirestoreService {
   Future<void> updateAdminNumbers(Map<String, int> numbers) async {
     await firestore.collection('numbers').doc('adminNumbers').set({
       ...numbers,
-      'Last Update': getServerTimestamp(),
+      'Updated': getServerTimestamp(),
     });
   }
 }

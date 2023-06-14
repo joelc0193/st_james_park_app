@@ -76,8 +76,8 @@ void main() {
       verify(mockDocumentReference.set(
         argThat(
           isA<Map>().having(
-            (m) => m..remove('Last Update'),
-            'map without Last Update',
+            (m) => m..remove('Updated'),
+            'map without Updated',
             {
               'Basketball Courts': 1,
               'Handball Courts': 1,

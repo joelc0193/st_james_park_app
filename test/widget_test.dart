@@ -120,7 +120,7 @@ void main() {
             'Playground': 4,
             'Handball Courts': 5,
             'Other': 6,
-            'Last Update': Timestamp.now(),
+            'Updated': Timestamp.now(),
           });
       when(mockFirestoreService.getAdminNumbers())
           .thenAnswer((_) => controller.stream);

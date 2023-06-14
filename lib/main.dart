@@ -36,6 +36,24 @@ class MyApp extends StatelessWidget {
       title: 'St James Park',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        textTheme: Typography.material2018(platform: TargetPlatform.android)
+            .white
+            .apply(
+              bodyColor: Colors.white,
+              displayColor: Colors.white,
+            ),
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: Colors.white,
+          selectionColor: Colors.white,
+          selectionHandleColor: Colors.white,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          hintStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: Colors.white),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(primary: Colors.white),
+        ),
       ),
       home: const MyHomePage(),
     );

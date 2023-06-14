@@ -30,6 +30,7 @@ class _AdminPageState extends State<AdminPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green,
       appBar: AppBar(
         title: Text('Admin Page'),
         actions: _authService.isUserSignedIn()
@@ -41,7 +42,7 @@ class _AdminPageState extends State<AdminPage> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Successfully Logged Out')),
                     );
-                    setState(() {}); // Update the UI after successful logout
+                    setState(() {});
                   },
                 ),
               ]
@@ -116,7 +117,21 @@ class _AdminPageState extends State<AdminPage> {
     return TextFormField(
       key: Key(label),
       keyboardType: TextInputType.number,
-      decoration: InputDecoration(labelText: label),
+      decoration: InputDecoration(
+        labelText: label,
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors
+                .white, // this color will be used while the field is enabled
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors
+                .white, // this color will be used while the field is being focused
+          ),
+        ),
+      ),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter a number';
