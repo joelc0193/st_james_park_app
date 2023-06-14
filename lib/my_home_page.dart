@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
@@ -71,8 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
               orderedKeys.forEach((key) {
                 sum += data[key] as int;
               });
-              Duration timeDifference =
-                  calculateTimeDifference(data['Last Update']);
               return Expanded(
                 child: Column(
                   children: [
@@ -101,22 +100,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     Expanded(
-                      child: ListView(
-                        children: [
-                          ...orderedKeys.map((key) {
-                            return ListTile(
-                              title: Text(key),
-                              trailing: Text('${data[key]}', key: Key(key)),
-                            );
-                          }).toList(),
-                          Center(
-                            child: Text(
-                              formatTimeDifference(timeDifference),
-                              style: TextStyle(fontSize: 17),
-                            ),
-                          )
-                        ],
-                      ),
+                      child: kIsWeb
+                          ? Center(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(maxWidth: 600),
+                                child: _buildListView(orderedKeys, data),
+                              ),
+                            )
+                          : _buildListView(orderedKeys, data),
                     ),
                   ],
                 ),
@@ -127,6 +118,30 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
       ]),
+    );
+  }
+
+  Widget _buildListView(List<String> orderedKeys, Map<String, dynamic> data) {
+    Duration timeDifference = calculateTimeDifference(data['Last Update']);
+    return ListView.separated(
+      itemCount: orderedKeys.length + 1,
+      separatorBuilder: (BuildContext context, int index) => Divider(),
+      itemBuilder: (context, index) {
+        if (index < orderedKeys.length) {
+          var key = orderedKeys[index];
+          return ListTile(
+            title: Text(key),
+            trailing: Text('${data[key]}', key: Key(key)),
+          );
+        } else {
+          return Center(
+            child: Text(
+              formatTimeDifference(timeDifference),
+              style: TextStyle(fontSize: 17),
+            ),
+          );
+        }
+      },
     );
   }
 }
