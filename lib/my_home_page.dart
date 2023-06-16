@@ -53,6 +53,25 @@ class MyHomePage extends StatelessWidget {
     );
   }
 
+  // void _uploadImage(
+  //     FirestoreService firestoreService, BuildContext context) async {
+  //   final picker =
+  //       ImagePicker(); // This will use image_picker_for_web on the web platform and image_picker on other platforms
+  //   final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+  //   if (pickedFile != null) {
+  //     final File imageFile = File(pickedFile.path);
+  //     await firestoreService.uploadImage(imageFile);
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Image uploaded successfully'),
+  //       ),
+  //     );
+  //   } else {
+  //     print('No image selected.');
+  //   }
+  // }
+
   void _uploadImage(
       FirestoreService firestoreService, BuildContext context) async {
     final picker =
@@ -60,8 +79,7 @@ class MyHomePage extends StatelessWidget {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      final File imageFile = File(pickedFile.path);
-      await firestoreService.uploadImage(imageFile);
+      await firestoreService.uploadImage(pickedFile);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Image uploaded successfully'),
@@ -81,21 +99,71 @@ class MyHomePage extends StatelessWidget {
         } else {
           String? imageUrl = snapshot.data;
           return Container(
-            height: 200, // adjust the height as needed
-            color: Colors.blue, // adjust the color as needed
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Featured Member',
-                    style: TextStyle(color: Colors.white, fontSize: 24)),
-                if (imageUrl != null)
-                  Image.network(imageUrl)
-                else
-                  Text('No featured image',
-                      style: TextStyle(color: Colors.white)),
-                Text('Some text about the featured member',
-                    style: TextStyle(color: Colors.white)),
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(10), // Rounded corners
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 2,
+                  offset: Offset(0, 1), // Shadow position
+                ),
               ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0), // Padding
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Featured Member',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10), // Space between text and image
+                  if (imageUrl != null)
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Colors.white, width: 2), // Image border
+                        borderRadius:
+                            BorderRadius.circular(10), // Rounded corners
+                      ),
+                      child: Container(
+                        height: 100, // adjust the height as needed
+                        width: 100, // adjust the width as needed
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Colors.white, width: 2), // Image border
+                          borderRadius:
+                              BorderRadius.circular(10), // Rounded corners
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit
+                                .cover, // This will make the image cover the entire box
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Text(
+                      'No featured image',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  SizedBox(height: 10), // Space between image and text
+                  Text(
+                    'Some text about the featured member',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
             ),
           );
         }
