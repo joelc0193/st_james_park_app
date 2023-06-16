@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker_for_web/image_picker_for_web.dart';
 
 class FirestoreService {
   final FirebaseFirestore firestore;
@@ -41,5 +42,12 @@ class FirestoreService {
       print(e);
       throw e;
     }
+  }
+
+  Future<String?> getFeaturedImageUrl() async {
+    DocumentSnapshot doc =
+        await firestore.collection('featured_member').doc('image').get();
+    Map<String, dynamic>? data = doc.data()! as Map<String, dynamic>?;
+    return data?['url'] as String?;
   }
 }
