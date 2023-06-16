@@ -38,90 +38,108 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
-      appBar: AppBar(
-        title: const Text('St James Park People Counter'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.admin_panel_settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AdminPage()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Column(children: [
-        StreamBuilder<DocumentSnapshot>(
-          stream: _firestoreService.getAdminNumbers(),
-          builder:
-              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            if (snapshot.hasData && snapshot.data!.exists) {
-              Map<String, dynamic> data =
-                  snapshot.data!.data() as Map<String, dynamic>;
-              List<String> orderedKeys = [
-                'Basketball Courts',
-                'Tennis Courts',
-                'Soccer Field',
-                'Playground',
-                'Handball Courts',
-                'Other'
-              ];
-              List<String> emojis = ['🏀', '🎾', '⚽', '🛝', '🔵', '🌳'];
-              int sum = 0;
-              for (var key in orderedKeys) {
-                sum += data[key] as int;
-              }
-              return Expanded(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(40.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            '$sum',
-                            style: const TextStyle(
-                              fontSize: 75,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                            key: const Key('Total'),
-                          ),
-                          const Text(
-                            'Total',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: kIsWeb
-                          ? Center(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 600),
-                                child:
-                                    _buildListView(orderedKeys, data, emojis),
-                              ),
-                            )
-                          : _buildListView(orderedKeys, data, emojis),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return const Text('No data');
-            }
-          },
+        backgroundColor: Colors.green,
+        appBar: AppBar(
+          title: const Text('St James Park People Counter'),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.admin_panel_settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminPage()),
+                );
+              },
+            ),
+          ],
         ),
-      ]),
-    );
+        body: Column(children: [
+          Container(
+            height: 200, // adjust the height as needed
+            color: Colors.blue, // adjust the color as needed
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Featured Member',
+                    style: TextStyle(color: Colors.white, fontSize: 24)),
+                // add the image here
+                // Image.network('url_of_the_image')
+                Text('Some text about the featured member',
+                    style: TextStyle(color: Colors.white)),
+              ],
+            ),
+          ),
+          Expanded(
+              child: Column(children: [
+            StreamBuilder<DocumentSnapshot>(
+              stream: _firestoreService.getAdminNumbers(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                if (snapshot.hasData && snapshot.data!.exists) {
+                  Map<String, dynamic> data =
+                      snapshot.data!.data() as Map<String, dynamic>;
+                  List<String> orderedKeys = [
+                    'Basketball Courts',
+                    'Tennis Courts',
+                    'Soccer Field',
+                    'Playground',
+                    'Handball Courts',
+                    'Other'
+                  ];
+                  List<String> emojis = ['🏀', '🎾', '⚽', '🛝', '🔵', '🌳'];
+                  int sum = 0;
+                  for (var key in orderedKeys) {
+                    sum += data[key] as int;
+                  }
+                  return Expanded(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(40.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                '$sum',
+                                style: const TextStyle(
+                                  fontSize: 75,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                                key: const Key('Total'),
+                              ),
+                              const Text(
+                                'Total',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: kIsWeb
+                              ? Center(
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 600),
+                                    child: _buildListView(
+                                        orderedKeys, data, emojis),
+                                  ),
+                                )
+                              : _buildListView(orderedKeys, data, emojis),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const Text('No data');
+                }
+              },
+            ),
+          ]))
+        ]));
   }
 
   Widget _buildListView(
