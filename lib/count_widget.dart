@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class CountWidget extends StatelessWidget {
   final snapshot;
-  CountWidget(
+  const CountWidget(
     AsyncSnapshot<DocumentSnapshot<Object?>> this.snapshot, {
     super.key,
   });
@@ -21,11 +21,11 @@ class CountWidget extends StatelessWidget {
       if (snapshot.data!.exists) {
         Map<String, dynamic> data =
             snapshot.data!.data() as Map<String, dynamic>;
-        return Text("${data['currentNumber']}", key: Key('numberText'));
+        return Text("${data['currentNumber']}", key: const Key('numberText'));
       } else {
-        return Text('Document does not exist', key: Key('numberText'));
+        return const Text('Document does not exist', key: Key('numberText'));
       }
     }
-    return Text('$snapshot', key: Key('numberText'));
+    return Text('$snapshot', key: const Key('numberText'));
   }
 }

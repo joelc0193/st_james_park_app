@@ -42,17 +42,17 @@ class MyApp extends StatelessWidget {
               bodyColor: Colors.white,
               displayColor: Colors.white,
             ),
-        textSelectionTheme: TextSelectionThemeData(
+        textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Colors.white,
           selectionColor: Colors.white,
           selectionHandleColor: Colors.white,
         ),
-        inputDecorationTheme: InputDecorationTheme(
+        inputDecorationTheme: const InputDecorationTheme(
           hintStyle: TextStyle(color: Colors.white),
           labelStyle: TextStyle(color: Colors.white),
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: Colors.white),
+          style: TextButton.styleFrom(foregroundColor: Colors.white),
         ),
       ),
       home: const MyHomePage(),

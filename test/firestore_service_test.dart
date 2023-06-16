@@ -53,7 +53,7 @@ void main() {
     test('updateAdminNumbers updates the admin numbers in Firestore', () async {
       // Setup:
       when(mockFirestore.collection('numbers')).thenAnswer((_) =>
-          mockCollectionReference as CollectionReference<Map<String, dynamic>>);
+          mockCollectionReference);
       when(mockCollectionReference.doc('adminNumbers'))
           .thenAnswer((_) => mockDocumentReference);
       when(mockDocumentReference.snapshots())

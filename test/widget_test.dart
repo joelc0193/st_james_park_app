@@ -68,7 +68,7 @@ void main() {
             Provider<FirebaseAuth>(create: (_) => mockAuth),
             Provider<FirestoreService>(create: (_) => mockFirestoreService),
           ],
-          child: MaterialApp(
+          child: const MaterialApp(
             // Add MaterialApp here
             home: AdminPage(),
           ),
@@ -76,15 +76,15 @@ void main() {
       );
 
       // Simulate entering numbers into the text fields
-      await tester.enterText(find.byKey(Key('Basketball Courts')), '1');
-      await tester.enterText(find.byKey(Key('Tennis Courts')), '2');
-      await tester.enterText(find.byKey(Key('Soccer Field')), '3');
-      await tester.enterText(find.byKey(Key('Playground')), '4');
-      await tester.enterText(find.byKey(Key('Handball Courts')), '5');
-      await tester.enterText(find.byKey(Key('Other')), '6');
+      await tester.enterText(find.byKey(const Key('Basketball Courts')), '1');
+      await tester.enterText(find.byKey(const Key('Tennis Courts')), '2');
+      await tester.enterText(find.byKey(const Key('Soccer Field')), '3');
+      await tester.enterText(find.byKey(const Key('Playground')), '4');
+      await tester.enterText(find.byKey(const Key('Handball Courts')), '5');
+      await tester.enterText(find.byKey(const Key('Other')), '6');
 
       // Simulate tapping the submit button
-      await tester.tap(find.byKey(Key('Submit')));
+      await tester.tap(find.byKey(const Key('Submit')));
       await tester.pumpAndSettle();
 
       // Verify that the updateAdminNumbers method was called with the correct arguments
@@ -133,43 +133,43 @@ void main() {
             Provider<FirebaseAuth>(create: (_) => mockAuth),
             Provider<FirestoreService>(create: (_) => mockFirestoreService),
           ],
-          child: MyApp(),
+          child: const MyApp(),
         ),
       );
 
       await tester.pumpAndSettle();
 
-      final finder1 = find.byKey(Key('Basketball Courts'));
+      final finder1 = find.byKey(const Key('Basketball Courts'));
       expect(finder1, findsOneWidget);
       final Text textWidget1 = tester.widget(finder1);
       expect(textWidget1.data, '1');
 
-      final finder2 = find.byKey(Key('Tennis Courts'));
+      final finder2 = find.byKey(const Key('Tennis Courts'));
       expect(finder2, findsOneWidget);
       final Text textWidget2 = tester.widget(finder2);
       expect(textWidget2.data, '2');
 
-      final finder3 = find.byKey(Key('Soccer Field'));
+      final finder3 = find.byKey(const Key('Soccer Field'));
       expect(finder3, findsOneWidget);
       final Text textWidget3 = tester.widget(finder3);
       expect(textWidget3.data, '3');
 
-      final finder4 = find.byKey(Key('Playground'));
+      final finder4 = find.byKey(const Key('Playground'));
       expect(finder4, findsOneWidget);
       final Text textWidget4 = tester.widget(finder4);
       expect(textWidget4.data, '4');
 
-      final finder5 = find.byKey(Key('Handball Courts'));
+      final finder5 = find.byKey(const Key('Handball Courts'));
       expect(finder5, findsOneWidget);
       final Text textWidget5 = tester.widget(finder5);
       expect(textWidget5.data, '5');
 
-      final finder6 = find.byKey(Key('Other'));
+      final finder6 = find.byKey(const Key('Other'));
       expect(finder6, findsOneWidget);
       final Text textWidget6 = tester.widget(finder6);
       expect(textWidget6.data, '6');
 
-      final finder7 = find.byKey(Key('Total'));
+      final finder7 = find.byKey(const Key('Total'));
       expect(finder7, findsOneWidget);
       final Text textWidget7 = tester.widget(finder7);
       expect(textWidget7.data, '21');

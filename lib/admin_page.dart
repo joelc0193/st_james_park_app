@@ -5,6 +5,8 @@ import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 
 class AdminPage extends StatefulWidget {
+  const AdminPage({super.key});
+
   @override
   _AdminPageState createState() => _AdminPageState();
 }
@@ -32,11 +34,11 @@ class _AdminPageState extends State<AdminPage> {
     return Scaffold(
       backgroundColor: Colors.green,
       appBar: AppBar(
-        title: Text('Admin Page'),
+        title: const Text('Admin Page'),
         actions: _authService.isUserSignedIn()
             ? <Widget>[
                 IconButton(
-                  icon: Icon(Icons.logout),
+                  icon: const Icon(Icons.logout),
                   onPressed: () async {
                     await _authService.signOut();
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -104,8 +106,8 @@ class _AdminPageState extends State<AdminPage> {
               _buildNumberField('Other'),
               ElevatedButton(
                   onPressed: _submitForm,
-                  child: Text('Submit'),
-                  key: Key('Submit')),
+                  key: const Key('Submit'),
+                  child: const Text('Submit')),
             ],
           ),
         ),
@@ -119,13 +121,13 @@ class _AdminPageState extends State<AdminPage> {
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
         labelText: label,
-        enabledBorder: UnderlineInputBorder(
+        enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(
             color: Colors
                 .white, // this color will be used while the field is enabled
           ),
         ),
-        focusedBorder: UnderlineInputBorder(
+        focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(
             color: Colors
                 .white, // this color will be used while the field is being focused
@@ -153,7 +155,7 @@ class _AdminPageState extends State<AdminPage> {
           await Provider.of<FirestoreService>(context, listen: false)
               .updateAdminNumbers(_formData);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Numbers updated successfully'),
             ),
           );
@@ -167,7 +169,7 @@ class _AdminPageState extends State<AdminPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('You must be signed in to submit data'),
         ),
       );
@@ -179,7 +181,7 @@ class CustomButton extends StatelessWidget {
   final String title;
   final VoidCallback onPressed;
 
-  CustomButton({required this.title, required this.onPressed});
+  const CustomButton({super.key, required this.title, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +197,7 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final bool obscureText;
 
-  CustomTextField({
+  const CustomTextField({super.key, 
     required this.controller,
     required this.hintText,
     this.obscureText = false,
@@ -206,7 +208,7 @@ class CustomTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
         hintText: hintText,
       ),
       obscureText: obscureText,

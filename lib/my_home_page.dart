@@ -1,6 +1,3 @@
-import 'package:flutter_map/flutter_map.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -46,11 +43,11 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text('St James Park People Counter'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.admin_panel_settings),
+            icon: const Icon(Icons.admin_panel_settings),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AdminPage()),
+                MaterialPageRoute(builder: (context) => const AdminPage()),
               );
             },
           ),
@@ -74,9 +71,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ];
               List<String> emojis = ['🏀', '🎾', '⚽', '🛝', '🔵', '🌳'];
               int sum = 0;
-              orderedKeys.forEach((key) {
+              for (var key in orderedKeys) {
                 sum += data[key] as int;
-              });
+              }
               return Expanded(
                 child: Column(
                   children: [
@@ -86,14 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Text(
                             '$sum',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 75,
                               fontWeight: FontWeight.bold,
                             ),
                             textAlign: TextAlign.center,
-                            key: Key('Total'),
+                            key: const Key('Total'),
                           ),
-                          Text(
+                          const Text(
                             'Total',
                             style: TextStyle(
                               fontSize: 16,
@@ -108,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: kIsWeb
                           ? Center(
                               child: ConstrainedBox(
-                                constraints: BoxConstraints(maxWidth: 600),
+                                constraints: const BoxConstraints(maxWidth: 600),
                                 child:
                                     _buildListView(orderedKeys, data, emojis),
                               ),
@@ -119,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             } else {
-              return Text('No data');
+              return const Text('No data');
             }
           },
         ),
@@ -136,17 +133,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return ListView.separated(
       itemCount: orderedKeys.length + 1,
       separatorBuilder: (BuildContext context, int index) =>
-          Divider(color: Colors.white),
+          const Divider(color: Colors.white),
       itemBuilder: (context, index) {
         if (index < orderedKeys.length) {
           var key = orderedKeys[index];
           var emoji = emojis[index];
           return ListTile(
-            title: Text('${emoji} $key'),
+            title: Text('$emoji $key'),
             trailing: Text(
               '${data[key]}',
               key: Key(key),
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Poppins'),
@@ -158,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Center(
               child: Text(
                 formatTimeDifference(timeDifference),
-                style: TextStyle(fontSize: 17),
+                style: const TextStyle(fontSize: 17),
               ),
             ),
           );
