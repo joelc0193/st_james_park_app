@@ -108,20 +108,21 @@ void main() {
       final MockFirebaseAuth mockAuth = MockFirebaseAuth();
       final MockFirestoreService mockFirestoreService = MockFirestoreService();
       final MockDocumentSnapshot mockDocumentSnapshot1 = MockDocumentSnapshot();
+      final data = {
+        'Basketball Courts': 1,
+        'Tennis Courts': 2,
+        'Soccer Field': 3,
+        'Playground': 4,
+        'Handball Courts': 5,
+        'Other': 6,
+        'Updated': Timestamp.now(),
+      };
 
       var controller = StreamController<DocumentSnapshot>();
       controller.add(mockDocumentSnapshot1);
 
       when(mockDocumentSnapshot1.exists).thenAnswer((_) => true);
-      when(mockDocumentSnapshot1.data()).thenAnswer((_) => {
-            'Basketball Courts': 1,
-            'Tennis Courts': 2,
-            'Soccer Field': 3,
-            'Playground': 4,
-            'Handball Courts': 5,
-            'Other': 6,
-            'Updated': Timestamp.now(),
-          });
+      when(mockDocumentSnapshot1.data()).thenAnswer((_) => data);
       when(mockFirestoreService.getAdminNumbers())
           .thenAnswer((_) => controller.stream);
 
@@ -138,42 +139,34 @@ void main() {
       );
 
       await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-      final finder1 = find.byKey(const Key('Basketball Courts'));
-      expect(finder1, findsOneWidget);
-      final Text textWidget1 = tester.widget(finder1);
-      expect(textWidget1.data, '1');
+      List<String> orderedKeys = [
+        'Basketball Courts',
+        'Tennis Courts',
+        'Soccer Field',
+        'Playground',
+        'Handball Courts',
+        'Other'
+      ];
 
-      final finder2 = find.byKey(const Key('Tennis Courts'));
-      expect(finder2, findsOneWidget);
-      final Text textWidget2 = tester.widget(finder2);
-      expect(textWidget2.data, '2');
+      for (var key in orderedKeys) {
+        // Scroll until the item with Key(key) is visible.
+        await tester.ensureVisible(find.byKey(Key(key)));
+        await tester.pumpAndSettle();
 
-      final finder3 = find.byKey(const Key('Soccer Field'));
-      expect(finder3, findsOneWidget);
-      final Text textWidget3 = tester.widget(finder3);
-      expect(textWidget3.data, '3');
-
-      final finder4 = find.byKey(const Key('Playground'));
-      expect(finder4, findsOneWidget);
-      final Text textWidget4 = tester.widget(finder4);
-      expect(textWidget4.data, '4');
-
-      final finder5 = find.byKey(const Key('Handball Courts'));
-      expect(finder5, findsOneWidget);
-      final Text textWidget5 = tester.widget(finder5);
-      expect(textWidget5.data, '5');
-
-      final finder6 = find.byKey(const Key('Other'));
-      expect(finder6, findsOneWidget);
-      final Text textWidget6 = tester.widget(finder6);
-      expect(textWidget6.data, '6');
+        // Now the item should be findable.
+        final finder = find.byKey(Key(key));
+        expect(finder, findsOneWidget);
+        final Text textWidget = tester.widget<Text>(finder);
+        final data = mockDocumentSnapshot1.data() as Map<String, dynamic>;
+        expect(textWidget.data, (data[key] as int).toString());
+      }
 
       final finder7 = find.byKey(const Key('Total'));
       expect(finder7, findsOneWidget);
       final Text textWidget7 = tester.widget(finder7);
       expect(textWidget7.data, '21');
-
     });
   });
 }

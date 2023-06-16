@@ -38,7 +38,7 @@ void main() {
       // Setup:
       when(mockFirestore.collection('numbers'))
           .thenReturn(mockCollectionReference);
-      when(mockCollectionReference.doc('adminNumbers'))
+      when(mockCollectionReference.doc('numbers'))
           .thenReturn(mockDocumentReference);
       when(mockDocumentReference.snapshots())
           .thenAnswer((_) => controller.stream);
@@ -54,7 +54,7 @@ void main() {
       // Setup:
       when(mockFirestore.collection('numbers')).thenAnswer((_) =>
           mockCollectionReference);
-      when(mockCollectionReference.doc('adminNumbers'))
+      when(mockCollectionReference.doc('numbers'))
           .thenAnswer((_) => mockDocumentReference);
       when(mockDocumentReference.snapshots())
           .thenAnswer((_) => controller.stream);
