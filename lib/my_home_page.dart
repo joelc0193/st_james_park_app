@@ -56,7 +56,7 @@ class MyHomePage extends StatelessWidget {
             position.coords!.latitude?.toDouble() ?? 0.0,
             position.coords!.longitude?.toDouble() ?? 0.0,
           );
-          return distanceInMeters >
+          return distanceInMeters <
               174; // Check if the user is within 174 meters of the park
         } else {
           throw Exception('Unable to get location coordinates');
@@ -95,21 +95,21 @@ class MyHomePage extends StatelessWidget {
       backgroundColor: Colors.green,
       appBar: _buildAppBar(context),
       body: _buildBody(context, firestoreService),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          if (await _isInPark()) {
-            _navigateToUserUploadPage(context);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('You are not in the park'),
-              ),
-            );
-          }
-        },
-        tooltip: 'Upload Image',
-        child: Icon(Icons.add_a_photo),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     if (await _isInPark()) {
+      //       _navigateToUserUploadPage(context);
+      //     } else {
+      //       ScaffoldMessenger.of(context).showSnackBar(
+      //         SnackBar(
+      //           content: Text('You are not in the park'),
+      //         ),
+      //       );
+      //     }
+      //   },
+      //   tooltip: 'Upload Image',
+      //   child: Icon(Icons.add_a_photo),
+      // ),
     );
   }
 
