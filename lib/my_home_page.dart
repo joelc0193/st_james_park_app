@@ -113,11 +113,19 @@ class MyHomePage extends StatelessWidget {
     );
   }
 
-  void _navigateToUserUploadPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => UserUploadPage()),
-    );
+  void _navigateToUserUploadPage(BuildContext context) async {
+    if (await _isInPark()) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => UserUploadPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You are not in the park'),
+        ),
+      );
+    }
   }
 
   AppBar _buildAppBar(BuildContext context) {
@@ -166,24 +174,6 @@ class MyHomePage extends StatelessWidget {
   //     print('No image selected.');
   //   }
   // }
-
-  void _uploadImage(
-      FirestoreService firestoreService, BuildContext context) async {
-    final picker =
-        ImagePicker(); // This will use image_picker_for_web on the web platform and image_picker on other platforms
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      await firestoreService.uploadImage(pickedFile);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Image uploaded successfully'),
-        ),
-      );
-    } else {
-      print('No image selected.');
-    }
-  }
 
   Widget _buildHeader(FirestoreService firestoreService) {
     return FutureBuilder<String?>(
@@ -267,8 +257,7 @@ class MyHomePage extends StatelessWidget {
                           String? uploadedText = snapshot.data;
                           return Text(
                             uploadedText ?? 'No message uploaded',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 16),
+                            style: TextStyle(color: Colors.white, fontSize: 16),
                           );
                         }
                       }
@@ -364,11 +353,28 @@ class MyHomePage extends StatelessWidget {
         } else {
           return Padding(
             padding: const EdgeInsets.all(30.0),
-            child: Center(
-              child: Text(
-                formatTimeDifference(timeDifference),
-                style: const TextStyle(fontSize: 17),
-              ),
+            child: Column(
+              children: [
+                Text(
+                  formatTimeDifference(timeDifference),
+                  style: const TextStyle(fontSize: 17),
+                ),
+                SizedBox(height: 10), // Add a bit of space
+                Text(
+                  'Numbers too old?',
+                  style: TextStyle(color: Colors.white),
+                ),
+                TextButton(
+                  onPressed: () => _navigateToUserUploadPage(context),
+                  child: TextButton(
+                    onPressed: () => _navigateToUserUploadPage(context),
+                    child: Text(
+                      'Click here to update and be featured in the "Featured Member" section',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -45,13 +46,16 @@ class FirestoreService {
   //     throw e;
   //   }
   // }
-  Future<String> uploadImage(PickedFile? pickedFile) async {
-    if (pickedFile != null) {
-      Uint8List bytes = await pickedFile.readAsBytes();
-      String fileName = pickedFile.path.split('/').last;
+
+  Future<String> uploadImage(String? imageDataUrl) async {
+    if (imageDataUrl != null) {
+      // Convert the data URL to bytes
+      final imageData = base64Decode(imageDataUrl.split(',').last);
+      String fileName =
+          'uploads/${DateTime.now().toIso8601String()}'; // Generate a unique file name
       Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child('uploads/$fileName');
-      UploadTask uploadTask = firebaseStorageRef.putData(bytes);
+          FirebaseStorage.instance.ref().child(fileName);
+      UploadTask uploadTask = firebaseStorageRef.putData(imageData);
       TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
       final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
 

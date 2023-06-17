@@ -1,3 +1,6 @@
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:html' as html;
+import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
@@ -14,8 +17,12 @@ class UserUploadPage extends StatefulWidget {
 
 class _UserUploadPageState extends State<UserUploadPage> {
   final _formKey = GlobalKey<FormState>();
-  PickedFile? _image;
+  String? _imageDataUrl; // Add this line
   late String _text;
+  bool _isPrivacyPolicyAccepted = false;
+  bool _isImageOrTextSubmitted = false;
+  bool _isUserOldEnough = false; // Add this line
+
   Map<String, TextEditingController> controllers = {
     'Basketball Courts': TextEditingController(),
     'Tennis Courts': TextEditingController(),
@@ -44,6 +51,48 @@ class _UserUploadPageState extends State<UserUploadPage> {
         }
       });
     });
+  }
+
+  void _launchURL() async {
+    const url =
+        'https://docs.google.com/document/d/e/2PACX-1vQoIiIH_3_pA3XXDmA7EENTL-ZUH41hKkVcVraaVucWzcW9ybLloUnyuAe_JwfEMJyh1G3ez0cHemGO/pub';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void captureImage() {
+    html.InputElement input =
+        html.document.createElement('input') as html.InputElement;
+    input
+      ..type = 'file'
+      ..accept = 'image/*'
+      ..setAttribute('capture', 'environment'); // indicates capture from camera
+
+    input.onChange.listen((e) {
+      if (input.files!.isNotEmpty) {
+        final file = input.files![0];
+        final reader = html.FileReader();
+        reader.readAsDataUrl(file);
+        reader.onLoadEnd.listen((event) {
+          // You can use reader.result as the image data url
+          print(reader.result);
+          // Convert the data URL to a PickedFile and set _image
+          setState(() {
+            _imageDataUrl = reader.result.toString();
+            _isImageOrTextSubmitted = true;
+          });
+        });
+      } else {
+        setState(() {
+          _isImageOrTextSubmitted = false;
+        });
+      }
+    });
+
+    input.click();
   }
 
   Future<Uint8List> _readImageData(PickedFile image) async {
@@ -143,27 +192,11 @@ class _UserUploadPageState extends State<UserUploadPage> {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white),
                   ),
-                  child: _image == null
+                  child: _imageDataUrl == null
                       ? Center(child: Text('Your image here (Optional)'))
-                      : FutureBuilder<Uint8List>(
-                          future: _readImageData(_image!),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<Uint8List> snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('Error: ${snapshot.error}'));
-                              } else {
-                                return Image.memory(
-                                  snapshot.data!,
-                                  fit: BoxFit.cover,
-                                );
-                              }
-                            } else {
-                              return CircularProgressIndicator();
-                            }
-                          },
+                      : Image.network(
+                          _imageDataUrl!,
+                          fit: BoxFit.cover,
                         ),
                 ),
               ),
@@ -172,27 +205,19 @@ class _UserUploadPageState extends State<UserUploadPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    child: Text(_image == null
-                        ? 'Pick Image (Optional)'
-                        : 'Change Image'),
-                    onPressed: () async {
-                      final picker = ImagePicker();
-                      final pickedFile =
-                          await picker.getImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
-                        setState(() {
-                          _image = pickedFile;
-                        });
-                      }
-                    },
+                    child: Text(_imageDataUrl == null
+                        ? 'Take Picture (Optional)'
+                        : 'Change Picture'),
+                    onPressed: captureImage,
                   ),
-                  if (_image != null) ...[
+                  if (_imageDataUrl != null) ...[
                     SizedBox(width: 10),
                     ElevatedButton(
                       child: Text('Clear Image'),
                       onPressed: () {
                         setState(() {
-                          _image = null;
+                          _imageDataUrl = null;
+                          _isImageOrTextSubmitted = _text.isNotEmpty;
                         });
                       },
                     ),
@@ -201,6 +226,13 @@ class _UserUploadPageState extends State<UserUploadPage> {
               ),
               SizedBox(height: 10),
               TextFormField(
+                onChanged: (value) {
+                  setState(() {
+                    _text = value;
+                    _isImageOrTextSubmitted =
+                        value.isNotEmpty || _imageDataUrl != null;
+                  });
+                },
                 maxLength: 250,
                 buildCounter: (BuildContext context,
                     {required int currentLength,
@@ -227,35 +259,80 @@ class _UserUploadPageState extends State<UserUploadPage> {
                   });
                 },
               ),
+              if (_isImageOrTextSubmitted) ...[
+                Center(
+                  child: Container(
+                    width: 450, // Adjust this value as needed
+                    child: CheckboxListTile(
+                      title: Text(
+                        "I accept the Terms of Service and Privacy Policy",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      value: _isPrivacyPolicyAccepted,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _isPrivacyPolicyAccepted = newValue!;
+                        });
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Container(
+                    width: 450, // Adjust this value as needed
+                    child: CheckboxListTile(
+                      title: Text(
+                        "I confirm that I am 13 years old or older",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      value: _isUserOldEnough,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _isUserOldEnough = newValue!;
+                        });
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                  ),
+                ),
+              ],
               SizedBox(height: 10),
               Center(
                 child: ElevatedButton(
                   child: Text('Submit'),
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      Map<String, int> numbers = {};
-                      controllers.forEach((key, controller) {
-                        numbers[key] = int.parse(controller.text);
-                      });
-                      try {
-                        await firestoreService.updateAdminNumbers(numbers);
-                        await firestoreService.uploadImage(_image);
-                        await firestoreService.uploadText(_text);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Upload successful'),
-                          ),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Upload failed: $e'),
-                          ),
-                        );
-                      }
-                    }
-                  },
+                  onPressed: (!_isImageOrTextSubmitted ||
+                          (_isPrivacyPolicyAccepted && _isUserOldEnough))
+                      ? () async {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            Map<String, int> numbers = {};
+                            controllers.forEach((key, controller) {
+                              numbers[key] = int.parse(controller.text);
+                            });
+                            try {
+                              await firestoreService
+                                  .updateAdminNumbers(numbers);
+                              if (_imageDataUrl != null) {
+                                await firestoreService.uploadImage(
+                                    _imageDataUrl); // Update this line
+                              }
+                              await firestoreService.uploadText(_text);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Upload successful'),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Upload failed: $e'),
+                                ),
+                              );
+                            }
+                          }
+                        }
+                      : null,
                 ),
               ),
             ],
