@@ -44,12 +44,13 @@ class MyHomePage extends StatelessWidget {
         40.86512716517621; // Replace with the actual latitude
     final double parkLongitude =
         -73.89779740874255; // Replace with the actual longitude
-    print('html.window.navigator.geolocation: ${html.window.navigator.geolocation}');
+    print(
+        'html.window.navigator.geolocation: ${html.window.navigator.geolocation}');
     if (html.window.navigator.geolocation != null) {
       try {
         html.Geoposition position =
             await html.window.navigator.geolocation.getCurrentPosition();
-            print('position.coords: ${position.coords}');
+        print('position.coords: ${position.coords}');
         if (position.coords != null) {
           double distanceInMeters = _calculateDistanceInMeters(
             parkLatitude,
@@ -57,8 +58,10 @@ class MyHomePage extends StatelessWidget {
             position.coords!.latitude?.toDouble() ?? 0.0,
             position.coords!.longitude?.toDouble() ?? 0.0,
           );
-          print('position.coords!.latitude: ${position.coords!.latitude?.toDouble()}');
-          print('position.coords!.longitude: ${position.coords!.longitude?.toDouble()}');
+          print(
+              'position.coords!.latitude: ${position.coords!.latitude?.toDouble()}');
+          print(
+              'position.coords!.longitude: ${position.coords!.longitude?.toDouble()}');
           print('distanceInMeters: ${distanceInMeters}');
           return distanceInMeters < 174;
         } else {
@@ -180,7 +183,7 @@ class MyHomePage extends StatelessWidget {
 
   Widget _buildHeader(FirestoreService firestoreService) {
     return FutureBuilder<String?>(
-      future: firestoreService.getFeaturedImageUrl(),
+      future: firestoreService.getSpotlightImageUrl(),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
@@ -207,7 +210,7 @@ class MyHomePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Featured Member',
+                    'Spotlight',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -243,7 +246,7 @@ class MyHomePage extends StatelessWidget {
                     )
                   else
                     Text(
-                      'No featured image',
+                      'No Spotlight image',
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   SizedBox(height: 10), // Space between image and text
@@ -372,7 +375,7 @@ class MyHomePage extends StatelessWidget {
                   child: TextButton(
                     onPressed: () => _navigateToUserUploadPage(context),
                     child: Text(
-                      'Click here to update and be featured in the "Featured Member" section',
+                      'Click here to update and share something for our "Spotlight" section',
                       style: TextStyle(color: Colors.blue),
                     ),
                   ),

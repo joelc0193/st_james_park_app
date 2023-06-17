@@ -17,20 +17,14 @@ class UserUploadPage extends StatefulWidget {
 
 class _UserUploadPageState extends State<UserUploadPage> {
   final _formKey = GlobalKey<FormState>();
-  String? _imageDataUrl; // Add this line
+  String? _imageDataUrl;
   late String _text;
   bool _isPrivacyPolicyAccepted = false;
   bool _isImageOrTextSubmitted = false;
-  bool _isUserOldEnough = false; // Add this line
+  bool _isUserOldEnough = false;
 
-  Map<String, TextEditingController> controllers = {
-    'Basketball Courts': TextEditingController(),
-    'Tennis Courts': TextEditingController(),
-    'Soccer Field': TextEditingController(),
-    'Playground': TextEditingController(),
-    'Handball Courts': TextEditingController(),
-    'Other': TextEditingController(),
-  };
+  Map<String, TextEditingController> controllers = {};
+
   Map<String, FocusNode> focusNodes = {
     'Basketball Courts': FocusNode(),
     'Tennis Courts': FocusNode(),
@@ -114,11 +108,32 @@ class _UserUploadPageState extends State<UserUploadPage> {
           if (snapshot.hasData && snapshot.data!.exists) {
             Map<String, dynamic> data =
                 snapshot.data!.data() as Map<String, dynamic>;
-            controllers.forEach((key, controller) {
-              defaultValues[key] =
-                  data[key].toString(); // Store the default value
-              controller.text = defaultValues[key]!;
-            });
+
+            // Initialize controllers and defaultValues only if they are empty
+            if (controllers.isEmpty) {
+              controllers = {
+                'Basketball Courts': TextEditingController(
+                    text: data['Basketball Courts'].toString()),
+                'Tennis Courts': TextEditingController(
+                    text: data['Tennis Courts'].toString()),
+                'Soccer Field': TextEditingController(
+                    text: data['Soccer Field'].toString()),
+                'Playground':
+                    TextEditingController(text: data['Playground'].toString()),
+                'Handball Courts': TextEditingController(
+                    text: data['Handball Courts'].toString()),
+                'Other': TextEditingController(text: data['Other'].toString()),
+              };
+              defaultValues = {
+                'Basketball Courts': data['Basketball Courts'].toString(),
+                'Tennis Courts': data['Tennis Courts'].toString(),
+                'Soccer Field': data['Soccer Field'].toString(),
+                'Playground': data['Playground'].toString(),
+                'Handball Courts': data['Handball Courts'].toString(),
+                'Other': data['Other'].toString(),
+              };
+            }
+
             return _buildForm(firestoreService);
           } else {
             return CircularProgressIndicator();
@@ -340,5 +355,11 @@ class _UserUploadPageState extends State<UserUploadPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    controllers.values.forEach((controller) => controller.dispose());
+    super.dispose();
   }
 }

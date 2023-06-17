@@ -37,7 +37,7 @@ class FirestoreService {
   //     TaskSnapshot storageTaskSnapshot = await uploadTask;
 
   //     var imageUrl = await storageTaskSnapshot.ref.getDownloadURL();
-  //     await firestore.collection('featured_member').doc('image').set({
+  //     await firestore.collection('spotlight').doc('image').set({
   //       'url': imageUrl,
   //     });
   //     return imageUrl;
@@ -61,8 +61,8 @@ class FirestoreService {
 
       // Update Firestore with the new image URL
       await firestore
-          .collection('featured_member')
-          .doc('featured_member')
+          .collection('spotlight')
+          .doc('spotlight')
           .update({
         'image_url': downloadUrl,
       });
@@ -71,8 +71,8 @@ class FirestoreService {
     } else {
       // Update Firestore with an empty string if no image is selected
       await firestore
-          .collection('featured_member')
-          .doc('featured_member')
+          .collection('spotlight')
+          .doc('spotlight')
           .update({
         'image_url': '',
       });
@@ -84,8 +84,8 @@ class FirestoreService {
   Future<void> uploadText(String text) async {
     try {
       await firestore
-          .collection('featured_member')
-          .doc('featured_member')
+          .collection('spotlight')
+          .doc('spotlight')
           .update({
         'message': text,
       });
@@ -97,17 +97,17 @@ class FirestoreService {
 
   Future<String?> getUploadedText() async {
     DocumentSnapshot doc = await firestore
-        .collection('featured_member')
-        .doc('featured_member')
+        .collection('spotlight')
+        .doc('spotlight')
         .get();
     Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
     return data?['message'] as String?;
   }
 
-  Future<String?> getFeaturedImageUrl() async {
+  Future<String?> getSpotlightImageUrl() async {
     DocumentSnapshot doc = await firestore
-        .collection('featured_member')
-        .doc('featured_member')
+        .collection('spotlight')
+        .doc('spotlight')
         .get();
     Map<String, dynamic>? data = doc.data()! as Map<String, dynamic>?;
     return data?['image_url'] as String?;
