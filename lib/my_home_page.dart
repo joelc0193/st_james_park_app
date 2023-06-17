@@ -6,6 +6,7 @@ import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:provider/provider.dart';
 import 'package:st_james_park_app/admin_page.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:st_james_park_app/user_upload_page.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -18,10 +19,17 @@ class MyHomePage extends StatelessWidget {
       appBar: _buildAppBar(context),
       body: _buildBody(context, firestoreService),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _uploadImage(firestoreService, context),
+        onPressed: () => _navigateToUserUploadPage(context),
         tooltip: 'Upload Image',
         child: Icon(Icons.add_a_photo),
       ),
+    );
+  }
+
+  void _navigateToUserUploadPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UserUploadPage()),
     );
   }
 
@@ -158,10 +166,25 @@ class MyHomePage extends StatelessWidget {
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   SizedBox(height: 10), // Space between image and text
-                  Text(
-                    'Some text about the featured member',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
+                  FutureBuilder<String?>(
+                    future: firestoreService.getUploadedText(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<String?> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else {
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          String? uploadedText = snapshot.data;
+                          return Text(
+                            uploadedText ?? 'No message uploaded',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          );
+                        }
+                      }
+                    },
+                  )
                 ],
               ),
             ),

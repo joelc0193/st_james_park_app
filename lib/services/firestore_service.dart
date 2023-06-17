@@ -45,7 +45,6 @@ class FirestoreService {
   //     throw e;
   //   }
   // }
-
   Future<String> uploadImage(PickedFile pickedFile) async {
     Uint8List bytes = await pickedFile.readAsBytes();
     String fileName = pickedFile.path.split('/').last;
@@ -56,11 +55,37 @@ class FirestoreService {
     final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
 
     // Update Firestore with the new image URL
-    await firestore.collection('featured_member').doc('featured_member').set({
+    await firestore
+        .collection('featured_member')
+        .doc('featured_member')
+        .update({
       'image_url': downloadUrl,
     });
 
     return downloadUrl;
+  }
+
+  Future<void> uploadText(String text) async {
+    try {
+      await firestore
+          .collection('featured_member')
+          .doc('featured_member')
+          .update({
+        'message': text,
+      });
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<String?> getUploadedText() async {
+    DocumentSnapshot doc = await firestore
+        .collection('featured_member')
+        .doc('featured_member')
+        .get();
+    Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+    return data?['message'] as String?;
   }
 
   Future<String?> getFeaturedImageUrl() async {
