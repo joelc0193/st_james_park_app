@@ -190,7 +190,7 @@ class MyHomePage extends StatelessWidget {
         } else {
           String? imageUrl = snapshot.data;
           return Container(
-            height: 400, // Increase the height here
+            height: 350,
             width: 300,
             decoration: BoxDecoration(
               color: Colors.blue,
@@ -216,7 +216,7 @@ class MyHomePage extends StatelessWidget {
                         fontSize: 24,
                         fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 10), // Space between text and image
+                  SizedBox(height: 10),
                   if (imageUrl != null)
                     Container(
                       decoration: BoxDecoration(
@@ -264,6 +264,7 @@ class MyHomePage extends StatelessWidget {
                           return Text(
                             uploadedText ?? 'No message uploaded',
                             style: TextStyle(color: Colors.white, fontSize: 16),
+                            textAlign: TextAlign.center,
                           );
                         }
                       }
