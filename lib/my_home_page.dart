@@ -1,4 +1,8 @@
-import 'dart:io';
+import 'dart:html' as html;
+import 'dart:html';
+import 'dart:math' as math;
+import 'dart:math' show cos, sqrt, asin, pi;
+import 'package:location_web/location_web.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,7 +13,80 @@ import 'package:image_picker/image_picker.dart';
 import 'package:st_james_park_app/user_upload_page.dart';
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  MyHomePage({Key? key}) : super(key: key);
+
+  final double parkLatitude =
+      40.86512716517621; // Replace with the actual latitude
+  final double parkLongitude =
+      -73.89779740874255; // Replace with the actual longitude
+
+  void getLocation() {
+    if (html.window.navigator.geolocation != null) {
+      html.window.navigator.geolocation
+          .getCurrentPosition()
+          .then((Geoposition position) {
+        if (position.coords != null) {
+          print(
+              'Latitude: ${position.coords!.latitude}, Longitude: ${position.coords!.longitude}');
+        } else {
+          print('Unable to get location coordinates');
+        }
+      }).catchError((error) {
+        print('Error getting location: $error');
+      });
+    } else {
+      print('Geolocation is not available');
+    }
+  }
+
+  Future<bool> _isInPark() async {
+    final double parkLatitude =
+        40.86512716517621; // Replace with the actual latitude
+    final double parkLongitude =
+        -73.89779740874255; // Replace with the actual longitude
+
+    if (html.window.navigator.geolocation != null) {
+      try {
+        html.Geoposition position =
+            await html.window.navigator.geolocation.getCurrentPosition();
+        if (position.coords != null) {
+          double distanceInMeters = _calculateDistanceInMeters(
+            parkLatitude,
+            parkLongitude,
+            position.coords!.latitude?.toDouble() ?? 0.0,
+            position.coords!.longitude?.toDouble() ?? 0.0,
+          );
+          return distanceInMeters >
+              174; // Check if the user is within 174 meters of the park
+        } else {
+          throw Exception('Unable to get location coordinates');
+        }
+      } catch (e) {
+        throw Exception('Error getting location: $e');
+      }
+    } else {
+      throw Exception('Geolocation is not available');
+    }
+  }
+
+  double _calculateDistanceInMeters(
+      double lat1, double lon1, double lat2, double lon2) {
+    var p = 0.017453292519943295;
+    var c = math.cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * math.asin(math.sqrt(a)) * 1000; // 2 * R; R = 6371 km
+  }
+
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +96,17 @@ class MyHomePage extends StatelessWidget {
       appBar: _buildAppBar(context),
       body: _buildBody(context, firestoreService),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToUserUploadPage(context),
+        onPressed: () async {
+          if (await _isInPark()) {
+            _navigateToUserUploadPage(context);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('You are not in the park'),
+              ),
+            );
+          }
+        },
         tooltip: 'Upload Image',
         child: Icon(Icons.add_a_photo),
       ),
@@ -107,7 +194,8 @@ class MyHomePage extends StatelessWidget {
         } else {
           String? imageUrl = snapshot.data;
           return Container(
-            height: 200,
+            height: 400, // Increase the height here
+            width: 300,
             decoration: BoxDecoration(
               color: Colors.blue,
               borderRadius: BorderRadius.circular(10), // Rounded corners
@@ -142,8 +230,8 @@ class MyHomePage extends StatelessWidget {
                             BorderRadius.circular(10), // Rounded corners
                       ),
                       child: Container(
-                        height: 100, // adjust the height as needed
-                        width: 100, // adjust the width as needed
+                        height: 200, // adjust the height as needed
+                        width: 200, // adjust the width as needed
                         decoration: BoxDecoration(
                           border: Border.all(
                               color: Colors.white, width: 2), // Image border
@@ -179,7 +267,8 @@ class MyHomePage extends StatelessWidget {
                           String? uploadedText = snapshot.data;
                           return Text(
                             uploadedText ?? 'No message uploaded',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 16),
                           );
                         }
                       }
@@ -226,6 +315,14 @@ class MyHomePage extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
                 key: const Key('Total'),
+              ),
+              Text(
+                '🌍 Total',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
               Expanded(
                   child: _buildListView(context, orderedKeys, data, emojis)),

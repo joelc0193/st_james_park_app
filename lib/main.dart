@@ -1,8 +1,8 @@
+import 'package:location_web/location_web.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart'
     if (dart.library.html) 'package:image_picker/image_picker.dart';
-
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
           style: TextButton.styleFrom(foregroundColor: Colors.white),
         ),
       ),
-      home: const MyHomePage(),
+      home: MyHomePage(),
     );
   }
 }

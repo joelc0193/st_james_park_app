@@ -201,6 +201,16 @@ class _UserUploadPageState extends State<UserUploadPage> {
               ),
               SizedBox(height: 10),
               TextFormField(
+                maxLength: 250,
+                buildCounter: (BuildContext context,
+                    {required int currentLength,
+                    required bool isFocused,
+                    int? maxLength}) {
+                  return Text(
+                    '${maxLength! - currentLength} characters left',
+                    style: TextStyle(color: Colors.white),
+                  );
+                },
                 decoration: InputDecoration(
                   labelText: 'Add a message (Optional)',
                   hintText: 'Come to St. James!',
@@ -230,9 +240,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
                       });
                       try {
                         await firestoreService.updateAdminNumbers(numbers);
-                        if (_image != null) {
-                          await firestoreService.uploadImage(_image!);
-                        }
+                        await firestoreService.uploadImage(_image);
                         await firestoreService.uploadText(_text);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

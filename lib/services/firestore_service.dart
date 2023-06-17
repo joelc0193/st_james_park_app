@@ -45,24 +45,36 @@ class FirestoreService {
   //     throw e;
   //   }
   // }
-  Future<String> uploadImage(PickedFile pickedFile) async {
-    Uint8List bytes = await pickedFile.readAsBytes();
-    String fileName = pickedFile.path.split('/').last;
-    Reference firebaseStorageRef =
-        FirebaseStorage.instance.ref().child('uploads/$fileName');
-    UploadTask uploadTask = firebaseStorageRef.putData(bytes);
-    TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
-    final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+  Future<String> uploadImage(PickedFile? pickedFile) async {
+    if (pickedFile != null) {
+      Uint8List bytes = await pickedFile.readAsBytes();
+      String fileName = pickedFile.path.split('/').last;
+      Reference firebaseStorageRef =
+          FirebaseStorage.instance.ref().child('uploads/$fileName');
+      UploadTask uploadTask = firebaseStorageRef.putData(bytes);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+      final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
 
-    // Update Firestore with the new image URL
-    await firestore
-        .collection('featured_member')
-        .doc('featured_member')
-        .update({
-      'image_url': downloadUrl,
-    });
+      // Update Firestore with the new image URL
+      await firestore
+          .collection('featured_member')
+          .doc('featured_member')
+          .update({
+        'image_url': downloadUrl,
+      });
 
-    return downloadUrl;
+      return downloadUrl;
+    } else {
+      // Update Firestore with an empty string if no image is selected
+      await firestore
+          .collection('featured_member')
+          .doc('featured_member')
+          .update({
+        'image_url': '',
+      });
+
+      return '';
+    }
   }
 
   Future<void> uploadText(String text) async {
