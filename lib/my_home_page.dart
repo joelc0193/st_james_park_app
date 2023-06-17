@@ -44,11 +44,12 @@ class MyHomePage extends StatelessWidget {
         40.86512716517621; // Replace with the actual latitude
     final double parkLongitude =
         -73.89779740874255; // Replace with the actual longitude
-
+    print('html.window.navigator.geolocation: ${html.window.navigator.geolocation}');
     if (html.window.navigator.geolocation != null) {
       try {
         html.Geoposition position =
             await html.window.navigator.geolocation.getCurrentPosition();
+            print('position.coords: ${position.coords}');
         if (position.coords != null) {
           double distanceInMeters = _calculateDistanceInMeters(
             parkLatitude,
@@ -56,8 +57,10 @@ class MyHomePage extends StatelessWidget {
             position.coords!.latitude?.toDouble() ?? 0.0,
             position.coords!.longitude?.toDouble() ?? 0.0,
           );
-          return distanceInMeters <
-              174; // Check if the user is within 174 meters of the park
+          print('position.coords!.latitude: ${position.coords!.latitude?.toDouble()}');
+          print('position.coords!.longitude: ${position.coords!.longitude?.toDouble()}');
+          print('distanceInMeters: ${distanceInMeters}');
+          return distanceInMeters < 174;
         } else {
           throw Exception('Unable to get location coordinates');
         }
