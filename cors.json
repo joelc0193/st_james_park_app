@@ -1,9 +1,7 @@
 [
-    {
-      "origin": ["http://localhost:*"],
-      "method": ["GET", "POST", "PUT", "DELETE"],
-      "responseHeader": ["Content-Type", "Authorization"],
-      "maxAgeSeconds": 3600
-    }
-  ]
-  
+  {
+    "origin": ["*"],
+    "method": ["GET"],
+    "maxAgeSeconds": 3600
+  }
+]
