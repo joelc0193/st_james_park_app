@@ -2,6 +2,7 @@ import 'dart:html' as html;
 import 'dart:html';
 import 'dart:math' as math;
 import 'dart:math' show cos, sqrt, asin, pi;
+import 'package:flutter/gestures.dart';
 import 'package:location_web/location_web.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -154,11 +155,32 @@ class MyHomePage extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, FirestoreService firestoreService) {
-    return Column(
-      children: [
-        _buildHeader(firestoreService),
-        Expanded(child: _buildContent(context, firestoreService)),
-      ],
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints viewportConstraints) {
+        return Scrollbar(
+          isAlwaysShown: true,
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: viewportConstraints.maxHeight,
+              ),
+              child: IntrinsicHeight(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: Column(
+                      children: [
+                        _buildHeader(firestoreService),
+                        _buildContent(context, firestoreService),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -204,74 +226,82 @@ class MyHomePage extends StatelessWidget {
                 ),
               ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0), // Padding
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Spotlight',
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: 25),
+                RichText(
+                  text: TextSpan(
+                    text: 'Spotlight',
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.yellow, // Changed color to yellow
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(2.0, 2.0),
+                          blurRadius: 3.0,
+                          color: Color.fromARGB(255, 0, 0, 0),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 10),
-                  if (imageUrl != null)
-                    Container(
+                ),
+                SizedBox(height: 20),
+                if (imageUrl != null)
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: Colors.yellow, width: 2), // Image border
+                      borderRadius:
+                          BorderRadius.circular(10), // Rounded corners
+                    ),
+                    child: Container(
+                      height: 200, // adjust the height as needed
+                      width: 200, // adjust the width as needed
                       decoration: BoxDecoration(
                         border: Border.all(
-                            color: Colors.white, width: 2), // Image border
+                            color: Colors.yellow, width: 2), // Image border
                         borderRadius:
                             BorderRadius.circular(10), // Rounded corners
                       ),
-                      child: Container(
-                        height: 200, // adjust the height as needed
-                        width: 200, // adjust the width as needed
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Colors.white, width: 2), // Image border
-                          borderRadius:
-                              BorderRadius.circular(10), // Rounded corners
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            imageUrl,
-                            fit: BoxFit
-                                .cover, // This will make the image cover the entire box
-                          ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit
+                              .cover, // This will make the image cover the entire box
                         ),
                       ),
-                    )
-                  else
-                    Text(
-                      'No Spotlight image',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
-                  SizedBox(height: 10), // Space between image and text
-                  FutureBuilder<String?>(
-                    future: firestoreService.getUploadedText(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<String?> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else {
-                        if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else {
-                          String? uploadedText = snapshot.data;
-                          return Text(
-                            uploadedText ?? 'No message uploaded',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                            textAlign: TextAlign.center,
-                          );
-                        }
-                      }
-                    },
                   )
-                ],
-              ),
+                else
+                  Text(
+                    'No Spotlight image',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                SizedBox(height: 10), // Space between image and text
+                FutureBuilder<String?>(
+                  future: firestoreService.getUploadedText(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<String?> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else {
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        String? uploadedText = snapshot.data;
+                        return Text(
+                          uploadedText ?? 'No message uploaded',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          textAlign: TextAlign.center,
+                        );
+                      }
+                    }
+                  },
+                )
+              ],
             ),
           );
         }
@@ -320,8 +350,10 @@ class MyHomePage extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              Expanded(
-                  child: _buildListView(context, orderedKeys, data, emojis)),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: _buildListView(context, orderedKeys, data, emojis),
+              )
             ],
           );
         } else {
@@ -338,54 +370,93 @@ class MyHomePage extends StatelessWidget {
     List<String> emojis,
   ) {
     Duration timeDifference = calculateTimeDifference(data['Updated']);
-    return ListView.separated(
-      itemCount: orderedKeys.length + 1,
-      separatorBuilder: (BuildContext context, int index) =>
-          const Divider(color: Colors.white),
-      itemBuilder: (context, index) {
-        if (index < orderedKeys.length) {
-          var key = orderedKeys[index];
-          var emoji = emojis[index];
-          return ListTile(
-            title: Text('$emoji $key'),
-            trailing: Text(
-              '${data[key]}',
-              key: Key(key),
-              style: const TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins'),
-            ),
-          );
-        } else {
-          return Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Column(
-              children: [
-                Text(
-                  formatTimeDifference(timeDifference),
-                  style: const TextStyle(fontSize: 17),
-                ),
-                SizedBox(height: 10), // Add a bit of space
-                Text(
-                  'Numbers too old?',
-                  style: TextStyle(color: Colors.white),
-                ),
-                TextButton(
-                  onPressed: () => _navigateToUserUploadPage(context),
-                  child: TextButton(
-                    onPressed: () => _navigateToUserUploadPage(context),
-                    child: Text(
-                      'Click here to update and share something for our "Spotlight" section',
-                      style: TextStyle(color: Colors.blue),
-                    ),
+    return Column(
+      children: List.generate(
+        orderedKeys.length * 2 + 1,
+        (index) {
+          if (index % 2 == 0 && index / 2 < orderedKeys.length) {
+            var key = orderedKeys[index ~/ 2];
+            var emoji = emojis[index ~/ 2];
+            return ListTile(
+              title: Text('$emoji $key'),
+              trailing: Text(
+                '${data[key]}',
+                key: Key(key),
+                style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins'),
+              ),
+            );
+          } else if (index == orderedKeys.length * 2) {
+            return Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: Column(
+                children: [
+                  Text(
+                    formatTimeDifference(timeDifference),
+                    style: const TextStyle(fontSize: 17),
                   ),
-                ),
-              ],
-            ),
-          );
-        }
-      },
+                  SizedBox(height: 10), // Add a bit of space
+                  Divider(
+                    color: Colors.white,
+                    thickness: 1.0,
+                    height: 20.0,
+                  ),
+                  Text(
+                    'Numbers too old?',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Column(
+                    children: [
+                      TextButton(
+                        onPressed: () => _navigateToUserUploadPage(context),
+                        child: Text(
+                          'Click here to update',
+                          style: TextStyle(
+                            color: Colors.blue, // Change the color as needed
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: DefaultTextStyle.of(context).style,
+                          children: <TextSpan>[
+                            TextSpan(text: 'And share something in our '),
+                            TextSpan(
+                              text: 'Spotlight',
+                              style: TextStyle(
+                                color: Colors.yellow, // Changed color to yellow
+                                fontWeight: FontWeight.bold,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(2.0, 2.0),
+                                    blurRadius: 3.0,
+                                    color: Color.fromARGB(255, 0, 0, 0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            TextSpan(text: ' section'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return Divider(
+              color: Colors.white,
+              thickness: 1.0,
+              height: 20.0,
+            );
+          }
+        },
+      ),
     );
   }
 
