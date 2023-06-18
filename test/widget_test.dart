@@ -41,8 +41,6 @@ void main() {
 
       var controller1 = StreamController<DocumentSnapshot>();
 
-      when(mockFirestoreService.getNumber())
-          .thenAnswer((_) => controller.stream);
       when(mockDocumentSnapshot1.exists).thenAnswer((_) => true);
       when(mockDocumentSnapshot1.data())
           .thenAnswer((_) => {'currentNumber': 0});
@@ -52,12 +50,6 @@ void main() {
           .thenAnswer((_) => {'currentNumber': 1});
       when(mockFirestoreService.getAdminNumbers())
           .thenAnswer((_) => controller1.stream);
-      when(mockFirestoreService.getNumber())
-          .thenAnswer((_) => controller.stream);
-      when(mockFirestoreService.incrementNumber()).thenAnswer((_) async {
-        controller.add(mockDocumentSnapshot2);
-        return Future.value();
-      });
       when(mockAuth.currentUser).thenAnswer((_) => mockUser);
 
       // Provide the mock objects using provider

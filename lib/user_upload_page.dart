@@ -152,207 +152,246 @@ class _UserUploadPageState extends State<UserUploadPage> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
             children: <Widget>[
-              ...controllers.keys.map(
-                (key) => TextFormField(
-                  controller: controllers[key],
-                  decoration: InputDecoration(
-                    labelText: key,
-                    hintText: controllers[key]!.text,
-                    hintStyle: TextStyle(color: Colors.white54),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a number';
-                    }
-                    return null;
-                  },
-                  onTap: () {
-                    if (controllers[key]!.text == defaultValues[key]) {
-                      controllers[key]!.clear();
-                    }
-                  },
-                  focusNode: focusNodes[key],
-                  onSaved: (value) {
-                    setState(() {
-                      controllers[key]!.text = value!;
-                    });
-                  },
-                ),
-              ),
+              ...controllers.keys
+                  .map((key) => _buildTextFormField(key))
+                  .toList(),
               SizedBox(height: 10),
-              Text(
-                'Optional: Add an image and a message',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              _buildImageAndMessageFields(),
               SizedBox(height: 10),
-              SizedBox(height: 10),
-              Center(
-                child: Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
-                  ),
-                  child: _imageDataUrl == null
-                      ? Center(child: Text('Your image here (Optional)'))
-                      : Image.network(
-                          _imageDataUrl!,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    child: Text(_imageDataUrl == null
-                        ? 'Take Picture (Optional)'
-                        : 'Change Picture'),
-                    onPressed: captureImage,
-                  ),
-                  if (_imageDataUrl != null) ...[
-                    SizedBox(width: 10),
-                    ElevatedButton(
-                      child: Text('Clear Image'),
-                      onPressed: () {
-                        setState(() {
-                          _imageDataUrl = null;
-                          _isImageOrTextSubmitted = _text.isNotEmpty;
-                        });
-                      },
-                    ),
-                  ],
-                ],
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                onChanged: (value) {
-                  setState(() {
-                    _text = value;
-                    _isImageOrTextSubmitted =
-                        value.isNotEmpty || _imageDataUrl != null;
-                  });
-                },
-                maxLength: 250,
-                buildCounter: (BuildContext context,
-                    {required int currentLength,
-                    required bool isFocused,
-                    int? maxLength}) {
-                  return Text(
-                    '${maxLength! - currentLength} characters left',
-                    style: TextStyle(color: Colors.white),
-                  );
-                },
-                decoration: InputDecoration(
-                  labelText: 'Add a message (Optional)',
-                  hintText: 'Come to St. James!',
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                ),
-                onSaved: (value) {
-                  setState(() {
-                    _text = value!;
-                  });
-                },
-              ),
               if (_isImageOrTextSubmitted) ...[
-                Center(
-                  child: Container(
-                    width: 450, // Adjust this value as needed
-                    child: CheckboxListTile(
-                      title: Text(
-                        "I accept the Terms of Service and Privacy Policy",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      value: _isPrivacyPolicyAccepted,
-                      onChanged: (newValue) {
-                        setState(() {
-                          _isPrivacyPolicyAccepted = newValue!;
-                        });
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
-                  ),
-                ),
-                Center(
-                  child: Container(
-                    width: 450, // Adjust this value as needed
-                    child: CheckboxListTile(
-                      title: Text(
-                        "I confirm that I am 13 years old or older",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      value: _isUserOldEnough,
-                      onChanged: (newValue) {
-                        setState(() {
-                          _isUserOldEnough = newValue!;
-                        });
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
-                  ),
-                ),
+                _buildPrivacyPolicyCheckbox(),
+                _buildAgeConfirmationCheckbox(),
               ],
               SizedBox(height: 10),
-              Center(
-                child: ElevatedButton(
-                  child: Text('Submit'),
-                  onPressed: (!_isImageOrTextSubmitted ||
-                          (_isPrivacyPolicyAccepted && _isUserOldEnough))
-                      ? () async {
-                          if (_formKey.currentState!.validate()) {
-                            _formKey.currentState!.save();
-                            Map<String, int> numbers = {};
-                            controllers.forEach((key, controller) {
-                              numbers[key] = int.parse(controller.text);
-                            });
-                            try {
-                              await firestoreService
-                                  .updateAdminNumbers(numbers);
-                              if (_imageDataUrl != null) {
-                                await firestoreService.uploadImage(
-                                    _imageDataUrl); // Update this line
-                              }
-                              await firestoreService.uploadText(_text);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Upload successful'),
-                                ),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Upload failed: $e'),
-                                ),
-                              );
-                            }
-                          }
-                        }
-                      : null,
-                ),
-              ),
+              _buildSubmitButton(firestoreService),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextFormField(String key) {
+    return TextFormField(
+      controller: controllers[key],
+      decoration: InputDecoration(
+        labelText: key,
+        hintText: controllers[key]!.text,
+        hintStyle: TextStyle(color: Colors.white54),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a number';
+        }
+        return null;
+      },
+      onTap: () {
+        if (controllers[key]!.text == defaultValues[key]) {
+          controllers[key]!.clear();
+        }
+      },
+      focusNode: focusNodes[key],
+      onSaved: (value) {
+        setState(() {
+          controllers[key]!.text = value!;
+        });
+      },
+    );
+  }
+
+  Widget _buildImageAndMessageFields() {
+    return Column(
+      children: [
+        _buildOptionalText(),
+        SizedBox(height: 10),
+        _buildImageWidget(),
+        SizedBox(height: 10),
+        _buildButtonsRow(),
+        SizedBox(height: 10),
+        _buildMessageField(),
+      ],
+    );
+  }
+
+  Widget _buildOptionalText() {
+    return Text(
+      'Optional: Add an image and a message',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildImageWidget() {
+    return Center(
+      child: Container(
+        width: 300,
+        height: 300,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white),
+        ),
+        child: _imageDataUrl == null
+            ? Center(child: Text('Your image here (Optional)'))
+            : Image.network(
+                _imageDataUrl!,
+                fit: BoxFit.cover,
+              ),
+      ),
+    );
+  }
+
+  Widget _buildButtonsRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          child: Text(
+            _imageDataUrl == null
+                ? 'Take Picture (Optional)'
+                : 'Change Picture',
+          ),
+          onPressed: captureImage,
+        ),
+        if (_imageDataUrl != null) ...[
+          SizedBox(width: 10),
+          ElevatedButton(
+            child: Text('Clear Image'),
+            onPressed: () {
+              setState(() {
+                _imageDataUrl = null;
+                _isImageOrTextSubmitted = _text.isNotEmpty;
+              });
+            },
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildMessageField() {
+    return TextFormField(
+      onChanged: (value) {
+        setState(() {
+          _text = value;
+          _isImageOrTextSubmitted = value.isNotEmpty || _imageDataUrl != null;
+        });
+      },
+      maxLength: 250,
+      buildCounter: (BuildContext context,
+          {required int currentLength,
+          required bool isFocused,
+          int? maxLength}) {
+        return Text(
+          '${maxLength! - currentLength} characters left',
+          style: TextStyle(color: Colors.white),
+        );
+      },
+      decoration: InputDecoration(
+        labelText: 'Add a message (Optional)',
+        hintText: 'Come to St. James!',
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+      ),
+      onSaved: (value) {
+        setState(() {
+          _text = value!;
+        });
+      },
+    );
+  }
+
+  Widget _buildPrivacyPolicyCheckbox() {
+    return Center(
+      child: Container(
+        width: 450, // Adjust this value as needed
+        child: CheckboxListTile(
+          title: Text(
+            "I accept the Terms of Service and Privacy Policy",
+            style: TextStyle(color: Colors.white),
+          ),
+          value: _isPrivacyPolicyAccepted,
+          onChanged: (newValue) {
+            setState(() {
+              _isPrivacyPolicyAccepted = newValue!;
+            });
+          },
+          controlAffinity: ListTileControlAffinity.leading,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAgeConfirmationCheckbox() {
+    return Center(
+      child: Container(
+        width: 450, // Adjust this value as needed
+        child: CheckboxListTile(
+          title: Text(
+            "I confirm that I am 13 years old or older",
+            style: TextStyle(color: Colors.white),
+          ),
+          value: _isUserOldEnough,
+          onChanged: (newValue) {
+            setState(() {
+              _isUserOldEnough = newValue!;
+            });
+          },
+          controlAffinity: ListTileControlAffinity.leading,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton(FirestoreService firestoreService) {
+    return Center(
+      child: ElevatedButton(
+        child: Text('Submit'),
+        onPressed: (!_isImageOrTextSubmitted ||
+                (_isPrivacyPolicyAccepted && _isUserOldEnough))
+            ? () async {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  Map<String, int> numbers = {};
+                  controllers.forEach((key, controller) {
+                    numbers[key] = int.parse(controller.text);
+                  });
+                  try {
+                    await firestoreService.updateAdminNumbers(numbers);
+                    if (_imageDataUrl != null) {
+                      await firestoreService.uploadImage(_imageDataUrl);
+                    }
+                    await firestoreService.uploadText(_text);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Upload successful'),
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Upload failed: $e'),
+                      ),
+                    );
+                  }
+                }
+              }
+            : null,
       ),
     );
   }
