@@ -1,17 +1,14 @@
+import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
-import 'dart:html' as html;
-import 'dart:html';
 import 'dart:math' as math;
 import 'dart:math' show cos, sqrt, asin, pi;
 import 'package:flutter/gestures.dart';
-import 'package:location_web/location_web.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:provider/provider.dart';
 import 'package:st_james_park_app/admin_page.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:st_james_park_app/user_upload_page.dart';
 
 class MyHomePage extends StatelessWidget {
@@ -21,22 +18,28 @@ class MyHomePage extends StatelessWidget {
       40.86512716517621; // Replace with the actual latitude
   final double parkLongitude =
       -73.89779740874255; // Replace with the actual longitude
-  Future<bool> _isInPark() async {
-    final double parkLatitude = 40.86512716517621;
-    final double parkLongitude = -73.89779740874255;
 
-    try {
-      final position = await Geolocator.getCurrentPosition();
-      double distanceInMeters = _calculateDistanceInMeters(
-        parkLatitude,
-        parkLongitude,
-        position.latitude,
-        position.longitude,
-      );
-      return distanceInMeters < 174;
-    } catch (e) {
-      throw Exception('Error getting location: $e');
+  Future<bool> _isInPark() async {
+    print('Checking if user is in the park'); // Print statement here
+
+    PermissionStatus status = await Permission.location.status;
+    if (!status.isGranted) {
+      // We didn't have the location permission, request it.
+      status = await Permission.location.request();
+      if (!status.isGranted) {
+        // The user denied the permission request.
+        return false;
+      }
     }
+
+    Position position = await Geolocator.getCurrentPosition();
+    double distanceInMeters = _calculateDistanceInMeters(
+      parkLatitude,
+      parkLongitude,
+      position.latitude,
+      position.longitude,
+    );
+    return true; //distanceInMeters < 174;
   }
 
   double _calculateDistanceInMeters(
@@ -69,12 +72,17 @@ class MyHomePage extends StatelessWidget {
   }
 
   void _navigateToUserUploadPage(BuildContext context) async {
-    if (await _isInPark()) {
+    print('Navigating to user upload page');
+    bool inPark = await _isInPark();
+    print('In park: $inPark');
+    if (inPark) {
+      print('User is in the park');
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => UserUploadPage()),
       );
     } else {
+      print('User is not in the park');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('You are not in the park'),

@@ -1,14 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:html' as html;
 import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/services.dart';
 
 class UserUploadPage extends StatefulWidget {
   @override
@@ -17,7 +18,7 @@ class UserUploadPage extends StatefulWidget {
 
 class _UserUploadPageState extends State<UserUploadPage> {
   final _formKey = GlobalKey<FormState>();
-  String? _imageDataUrl;
+  PickedFile? _imageFile;
   late String _text;
   bool _isPrivacyPolicyAccepted = false;
   bool _isImageOrTextSubmitted = false;
@@ -57,41 +58,20 @@ class _UserUploadPageState extends State<UserUploadPage> {
     }
   }
 
-  void captureImage() {
-    html.InputElement input =
-        html.document.createElement('input') as html.InputElement;
-    input
-      ..type = 'file'
-      ..accept = 'image/*'
-      ..setAttribute('capture', 'environment'); // indicates capture from camera
+  Future<void> captureMedia() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
 
-    input.onChange.listen((e) {
-      if (input.files!.isNotEmpty) {
-        final file = input.files![0];
-        final reader = html.FileReader();
-        reader.readAsDataUrl(file);
-        reader.onLoadEnd.listen((event) {
-          // You can use reader.result as the image data url
-          print(reader.result);
-          // Convert the data URL to a PickedFile and set _image
-          setState(() {
-            _imageDataUrl = reader.result.toString();
-            _isImageOrTextSubmitted = true;
-          });
-        });
-      } else {
-        setState(() {
-          _isImageOrTextSubmitted = false;
-        });
-      }
-    });
-
-    input.click();
-  }
-
-  Future<Uint8List> _readImageData(PickedFile image) async {
-    final bytes = await image.readAsBytes();
-    return bytes;
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = pickedFile;
+        _isImageOrTextSubmitted = true;
+      });
+    } else {
+      setState(() {
+        _isImageOrTextSubmitted = false;
+      });
+    }
   }
 
   @override
@@ -144,29 +124,29 @@ class _UserUploadPageState extends State<UserUploadPage> {
   }
 
   Widget _buildForm(FirestoreService firestoreService) {
-    Map<String, String> initialValues = {};
-
     return Container(
       color: Colors.green,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            children: <Widget>[
-              ...controllers.keys
-                  .map((key) => _buildTextFormField(key))
-                  .toList(),
-              SizedBox(height: 10),
-              _buildImageAndMessageFields(),
-              SizedBox(height: 10),
-              if (_isImageOrTextSubmitted) ...[
-                _buildPrivacyPolicyCheckbox(),
-                _buildAgeConfirmationCheckbox(),
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                ...controllers.keys
+                    .map((key) => _buildTextFormField(key))
+                    .toList(),
+                SizedBox(height: 10),
+                _buildImageAndMessageFields(),
+                SizedBox(height: 10),
+                if (_isImageOrTextSubmitted) ...[
+                  _buildPrivacyPolicyCheckbox(),
+                  _buildAgeConfirmationCheckbox(),
+                ],
+                SizedBox(height: 10),
+                _buildSubmitButton(firestoreService),
               ],
-              SizedBox(height: 10),
-              _buildSubmitButton(firestoreService),
-            ],
+            ),
           ),
         ),
       ),
@@ -213,7 +193,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
       children: [
         _buildOptionalText(),
         SizedBox(height: 10),
-        _buildImageWidget(),
+        _buildMediaWidget(),
         SizedBox(height: 10),
         _buildButtonsRow(),
         SizedBox(height: 10),
@@ -234,22 +214,15 @@ class _UserUploadPageState extends State<UserUploadPage> {
     );
   }
 
-  Widget _buildImageWidget() {
-    return Center(
-      child: Container(
-        width: 300,
-        height: 300,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white),
-        ),
-        child: _imageDataUrl == null
-            ? Center(child: Text('Your image here (Optional)'))
-            : Image.network(
-                _imageDataUrl!,
-                fit: BoxFit.cover,
-              ),
-      ),
-    );
+  Widget _buildMediaWidget() {
+    if (_imageFile == null) {
+      return const Center(child: Text('Your image here (Optional)'));
+    } else {
+      return Image.file(
+        File(_imageFile!.path),
+        fit: BoxFit.cover,
+      );
+    }
   }
 
   Widget _buildButtonsRow() {
@@ -258,19 +231,17 @@ class _UserUploadPageState extends State<UserUploadPage> {
       children: [
         ElevatedButton(
           child: Text(
-            _imageDataUrl == null
-                ? 'Take Picture (Optional)'
-                : 'Change Picture',
+            _imageFile == null ? 'Take Picture (Optional)' : 'Change Picture',
           ),
-          onPressed: captureImage,
+          onPressed: captureMedia,
         ),
-        if (_imageDataUrl != null) ...[
+        if (_imageFile != null) ...[
           SizedBox(width: 10),
           ElevatedButton(
-            child: Text('Clear Image'),
+            child: Text('Clear Picture'),
             onPressed: () {
               setState(() {
-                _imageDataUrl = null;
+                _imageFile = null;
                 _isImageOrTextSubmitted = _text.isNotEmpty;
               });
             },
@@ -285,7 +256,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
       onChanged: (value) {
         setState(() {
           _text = value;
-          _isImageOrTextSubmitted = value.isNotEmpty || _imageDataUrl != null;
+          _isImageOrTextSubmitted = value.isNotEmpty || _imageFile != null;
         });
       },
       maxLength: 250,
@@ -373,8 +344,10 @@ class _UserUploadPageState extends State<UserUploadPage> {
                   });
                   try {
                     await firestoreService.updateAdminNumbers(numbers);
-                    if (_imageDataUrl != null) {
-                      await firestoreService.uploadImage(_imageDataUrl);
+                    if (_imageFile != null) {
+                      Uint8List imageBytes = await _imageFile!.readAsBytes();
+                      // Now you can use imageBytes to upload the image to Firestore
+                      await firestoreService.uploadMedia(imageBytes);
                     }
                     await firestoreService.uploadText(_text);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -394,11 +367,5 @@ class _UserUploadPageState extends State<UserUploadPage> {
             : null,
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    controllers.values.forEach((controller) => controller.dispose());
-    super.dispose();
   }
 }

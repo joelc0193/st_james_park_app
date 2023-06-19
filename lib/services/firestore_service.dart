@@ -5,7 +5,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_picker_for_web/image_picker_for_web.dart';
 
 class FirestoreService {
   final FirebaseFirestore firestore;
@@ -47,34 +46,26 @@ class FirestoreService {
   //   }
   // }
 
-  Future<String> uploadImage(String? imageDataUrl) async {
-    if (imageDataUrl != null) {
-      // Convert the data URL to bytes
-      final imageData = base64Decode(imageDataUrl.split(',').last);
+  Future<String> uploadMedia(Uint8List? mediaData) async {
+    if (mediaData != null) {
       String fileName =
           'uploads/${DateTime.now().toIso8601String()}'; // Generate a unique file name
       Reference firebaseStorageRef =
           FirebaseStorage.instance.ref().child(fileName);
-      UploadTask uploadTask = firebaseStorageRef.putData(imageData);
+      UploadTask uploadTask = firebaseStorageRef.putData(mediaData);
       TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
       final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
 
-      // Update Firestore with the new image URL
-      await firestore
-          .collection('spotlight')
-          .doc('spotlight')
-          .update({
-        'image_url': downloadUrl,
+      // Update Firestore with the new media URL
+      await firestore.collection('spotlight').doc('spotlight').update({
+        'media_url': downloadUrl,
       });
 
       return downloadUrl;
     } else {
-      // Update Firestore with an empty string if no image is selected
-      await firestore
-          .collection('spotlight')
-          .doc('spotlight')
-          .update({
-        'image_url': '',
+      // Update Firestore with an empty string if no media is selected
+      await firestore.collection('spotlight').doc('spotlight').update({
+        'media_url': '',
       });
 
       return '';
@@ -83,10 +74,7 @@ class FirestoreService {
 
   Future<void> uploadText(String text) async {
     try {
-      await firestore
-          .collection('spotlight')
-          .doc('spotlight')
-          .update({
+      await firestore.collection('spotlight').doc('spotlight').update({
         'message': text,
       });
     } catch (e) {
@@ -96,19 +84,15 @@ class FirestoreService {
   }
 
   Future<String?> getUploadedText() async {
-    DocumentSnapshot doc = await firestore
-        .collection('spotlight')
-        .doc('spotlight')
-        .get();
+    DocumentSnapshot doc =
+        await firestore.collection('spotlight').doc('spotlight').get();
     Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
     return data?['message'] as String?;
   }
 
   Future<String?> getSpotlightImageUrl() async {
-    DocumentSnapshot doc = await firestore
-        .collection('spotlight')
-        .doc('spotlight')
-        .get();
+    DocumentSnapshot doc =
+        await firestore.collection('spotlight').doc('spotlight').get();
     Map<String, dynamic>? data = doc.data()! as Map<String, dynamic>?;
     return data?['image_url'] as String?;
   }
