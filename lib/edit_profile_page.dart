@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -39,6 +40,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> pickImage() async {
     final ImagePicker _picker = ImagePicker();
 
+    // Get the FirebaseStorage instance from the Provider
+    final storage = Provider.of<FirebaseStorage>(context, listen: false);
+
     // Show a dialog to the user to choose between Camera and Gallery
     final String? source = await showDialog<String>(
       context: context,
@@ -71,7 +75,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final File file = File(image.path);
       // Upload the file to Firebase Storage and get the download URL
       try {
-        final ref = FirebaseStorage.instance.ref().child('user_images').child(
+        final ref = storage.ref().child('user_images').child(
             '${widget.loggedInUser.uid}.jpg'); // Use widget.loggedInUser here
         await ref.putFile(file);
         final String downloadUrl = await ref.getDownloadURL();
