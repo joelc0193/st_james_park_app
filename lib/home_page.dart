@@ -1,3 +1,9 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:st_james_park_app/food_order_page.dart';
+import 'package:st_james_park_app/services/firestore_service.dart';
+import 'package:provider/provider.dart';
+
 import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -7,14 +13,14 @@ import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:st_james_park_app/user_upload_page.dart';
 import 'package:provider/provider.dart';
 
-class DataAnalysisPage extends StatefulWidget {
-  const DataAnalysisPage({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  _DataAnalysisPageState createState() => _DataAnalysisPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _DataAnalysisPageState extends State<DataAnalysisPage> {
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final firestoreService = Provider.of<FirestoreService>(context);
@@ -23,6 +29,153 @@ class _DataAnalysisPageState extends State<DataAnalysisPage> {
 
   Widget _buildContent(
       BuildContext context, FirestoreService firestoreService) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints viewportConstraints) {
+        return Scrollbar(
+          isAlwaysShown: true,
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: viewportConstraints.maxHeight,
+              ),
+              child: IntrinsicHeight(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: Column(
+                      children: [
+                        _buildHeader(firestoreService),
+                        _buildDataAnalysis(firestoreService),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(FirestoreService firestoreService) {
+    return FutureBuilder<String?>(
+      future: firestoreService.getSpotlightImageUrl(),
+      builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else {
+          String? imageUrl = snapshot.data;
+          return Container(
+            height: 350,
+            width: 300,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(10), // Rounded corners
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 2,
+                  offset: Offset(0, 1), // Shadow position
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: 25),
+                _buildRichText(),
+                SizedBox(height: 20),
+                _buildImageOrText(imageUrl),
+                SizedBox(height: 10),
+                _buildFutureText(firestoreService),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildRichText() {
+    return RichText(
+      text: TextSpan(
+        text: 'Spotlight',
+        style: TextStyle(
+          color: Colors.yellow, // Changed color to yellow
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          shadows: [
+            Shadow(
+              offset: Offset(2.0, 2.0),
+              blurRadius: 3.0,
+              color: Color.fromARGB(255, 0, 0, 0),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageOrText(String? imageUrl) {
+    if (imageUrl != null) {
+      return _buildImageContainer(imageUrl);
+    } else {
+      return Text(
+        'No Spotlight image',
+        style: TextStyle(color: Colors.white, fontSize: 18),
+      );
+    }
+  }
+
+  Widget _buildImageContainer(String? imageUrl) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.yellow, width: 2), // Image border
+        borderRadius: BorderRadius.circular(10), // Rounded corners
+      ),
+      child: Container(
+        height: 200, // adjust the height as needed
+        width: 200, // adjust the width as needed
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.yellow, width: 2), // Image border
+          borderRadius: BorderRadius.circular(10), // Rounded corners
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.network(
+            imageUrl!,
+            fit: BoxFit.cover, // This will make the image cover the entire box
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFutureText(FirestoreService firestoreService) {
+    return FutureBuilder<String?>(
+      future: firestoreService.getUploadedText(),
+      builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else {
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            String? uploadedText = snapshot.data;
+            return Text(
+              uploadedText ?? 'No message uploaded',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+              textAlign: TextAlign.center,
+            );
+          }
+        }
+      },
+    );
+  }
+
+  Widget _buildDataAnalysis(FirestoreService firestoreService) {
     return StreamBuilder<DocumentSnapshot>(
       stream: firestoreService.getAdminNumbers(),
       builder:

@@ -91,7 +91,7 @@ void main() {
     });
   });
 
-  group('MyHomePage', () {
+  group('MainNavigationController', () {
     testWidgets('displays the updated numbers', (WidgetTester tester) async {
       // Arrange:
       TestWidgetsFlutterBinding.ensureInitialized();

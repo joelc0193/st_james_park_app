@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class PartyPage extends StatelessWidget {
+class VisitorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Replace this with your actual data fetching logic
