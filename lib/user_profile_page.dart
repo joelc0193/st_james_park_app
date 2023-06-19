@@ -249,6 +249,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         initialUserName: userName,
                         initialUserMessage: userMessage,
                         initialUserImage: userImage,
+                        loggedInUser: loggedInUser, // Pass loggedInUser here
                       ),
                     ),
                   );
@@ -265,5 +266,4 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ),
     );
   }
-  
 }

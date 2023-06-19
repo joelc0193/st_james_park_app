@@ -1,15 +1,22 @@
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String? initialUserName;
   final String? initialUserMessage;
   final String? initialUserImage;
+  final User loggedInUser; // Add this line
 
-  EditProfilePage(
-      {this.initialUserName, this.initialUserMessage, this.initialUserImage});
+  EditProfilePage({
+    this.initialUserName,
+    this.initialUserMessage,
+    this.initialUserImage,
+    required this.loggedInUser, // And this line
+  });
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -31,16 +38,41 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> pickImage() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    // Show a dialog to the user to choose between Camera and Gallery
+    final String? source = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Select Image Source'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, 'camera');
+              },
+              child: const Text('Camera'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, 'gallery');
+              },
+              child: const Text('Gallery'),
+            ),
+          ],
+        );
+      },
+    );
+
+    final XFile? image = await _picker.pickImage(
+      source: source == 'camera' ? ImageSource.camera : ImageSource.gallery,
+    );
 
     if (image != null) {
       final File file = File(image.path);
       // Upload the file to Firebase Storage and get the download URL
       try {
-        final ref = FirebaseStorage.instance
-            .ref()
-            .child('user_images')
-            .child('${loggedInUser.uid}.jpg');
+        final ref = FirebaseStorage.instance.ref().child('user_images').child(
+            '${widget.loggedInUser.uid}.jpg'); // Use widget.loggedInUser here
         await ref.putFile(file);
         final String downloadUrl = await ref.getDownloadURL();
         // Update the userImageController with the new download URL
@@ -74,10 +106,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
             ),
             ElevatedButton(
-  onPressed: pickImage,
-  child: Text('Select Image'),
-),
-
+              onPressed: pickImage,
+              child: Text('Select Image'),
+            ),
             ElevatedButton(
               onPressed: () {
                 // Save the changes to Firestore here
