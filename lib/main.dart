@@ -1,6 +1,9 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:st_james_park_app/services/auth_service.dart';
+import 'package:st_james_park_app/user_profile_page.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,6 +14,7 @@ import './services/firestore_service.dart';
 import 'main_navigation_controller.dart';
 
 void main() async {
+  MapboxGl.setAccessToken("sk.eyJ1Ijoiam9lbGMwMTkzIiwiYSI6ImNsajRtY2J1dTAzM3Mzam1yMmk4dTN0Z2YifQ.MztjK_HOiwDsTzhFh3fDAA");
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -23,8 +27,14 @@ void main() async {
     Provider<FirebaseAuth>(
       create: (_) => FirebaseAuth.instance,
     ),
+    Provider<FirebaseStorage>(
+      create: (_) => FirebaseStorage.instance,
+    ),
     ProxyProvider<FirebaseFirestore, FirestoreService>(
       update: (_, firestore, __) => FirestoreService(firestore: firestore),
+    ),
+    ProxyProvider<FirebaseAuth, AuthService>(
+      update: (_, auth, __) => AuthService(auth: auth),
     ),
   ], child: const MyApp()));
 }
@@ -35,15 +45,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      routes: {
+        '/profile': (context) => UserProfilePage(),
+      },
       debugShowCheckedModeBanner: false,
       title: 'St James Park',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: Typography.material2018(platform: TargetPlatform.android)
-            .white
+            .black
             .apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white,
+              bodyColor: Colors.black,
+              displayColor: Colors.black,
             ),
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Colors.white,

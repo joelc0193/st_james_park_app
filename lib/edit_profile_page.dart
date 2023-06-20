@@ -5,18 +5,19 @@ import 'package:provider/provider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:st_james_park_app/services/firestore_service.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String? initialUserName;
   final String? initialUserMessage;
   final String? initialUserImage;
-  final User loggedInUser; // Add this line
+  final User loggedInUser;
 
   EditProfilePage({
     this.initialUserName,
     this.initialUserMessage,
     this.initialUserImage,
-    required this.loggedInUser, // And this line
+    required this.loggedInUser,
   });
 
   @override
@@ -26,7 +27,7 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController? userNameController;
   TextEditingController? userMessageController;
-  TextEditingController? userImageController;
+  String? userImageUrl;
 
   @override
   void initState() {
@@ -34,16 +35,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
     userNameController = TextEditingController(text: widget.initialUserName);
     userMessageController =
         TextEditingController(text: widget.initialUserMessage);
-    userImageController = TextEditingController(text: widget.initialUserImage);
+    userImageUrl = widget.initialUserImage;
   }
 
   Future<void> pickImage() async {
     final ImagePicker _picker = ImagePicker();
-
-    // Get the FirebaseStorage instance from the Provider
     final storage = Provider.of<FirebaseStorage>(context, listen: false);
 
-    // Show a dialog to the user to choose between Camera and Gallery
     final String? source = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
@@ -54,13 +52,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
               onPressed: () {
                 Navigator.pop(context, 'camera');
               },
-              child: const Text('Camera'),
+              child: const Text('Camera',
+                  style: TextStyle(color: Colors.black)), // Change color here
             ),
             SimpleDialogOption(
               onPressed: () {
                 Navigator.pop(context, 'gallery');
               },
-              child: const Text('Gallery'),
+              child: const Text('Gallery',
+                  style: TextStyle(color: Colors.black)), // And here
             ),
           ],
         );
@@ -73,14 +73,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (image != null) {
       final File file = File(image.path);
-      // Upload the file to Firebase Storage and get the download URL
       try {
-        final ref = storage.ref().child('user_images').child(
-            '${widget.loggedInUser.uid}.jpg'); // Use widget.loggedInUser here
+        final ref = storage
+            .ref()
+            .child('user_images')
+            .child('${widget.loggedInUser.uid}.jpg');
         await ref.putFile(file);
         final String downloadUrl = await ref.getDownloadURL();
-        // Update the userImageController with the new download URL
-        userImageController!.text = downloadUrl;
+        setState(() {
+          userImageUrl = downloadUrl;
+        });
       } catch (e) {
         print('Error uploading image: $e');
       }
@@ -89,6 +91,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final firestoreService = Provider.of<FirestoreService>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Profile'),
@@ -109,15 +112,50 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 labelText: 'Message',
               ),
             ),
+            if (userImageUrl != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: ClipOval(
+                  child: Image.network(
+                    userImageUrl!,
+                    width: 150.0, // Specify the width
+                    height: 150.0, // Specify the height
+                    fit: BoxFit
+                        .cover, // Use BoxFit.cover to maintain the aspect ratio
+                  ),
+                ),
+              ),
             ElevatedButton(
               onPressed: pickImage,
               child: Text('Select Image'),
             ),
             ElevatedButton(
-              onPressed: () {
-                // Save the changes to Firestore here
-                // Then pop the page
-                Navigator.pop(context);
+              onPressed: () async {
+                if (userNameController!.text.isNotEmpty &&
+                    userMessageController!.text.isNotEmpty &&
+                    userImageUrl != null) {
+                  try {
+                    // Update the user's profile
+                    await firestoreService.updateUserProfile(
+                      widget.loggedInUser.uid,
+                      userNameController!.text,
+                      userMessageController!.text,
+                      userImageUrl!,
+                    );
+                    // Navigate back to the previous page
+                    Navigator.pop(context);
+                  } catch (e) {
+                    print('Error updating profile: $e');
+                  }
+                } else {
+                  // Show an error message if the form is not completely filled out
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          'Please fill out all fields and select an image.'),
+                    ),
+                  );
+                }
               },
               child: Text('Save'),
             ),

@@ -32,7 +32,6 @@ class _AdminPageState extends State<AdminPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
       appBar: AppBar(
         title: const Text('Admin Page'),
         actions: _authService.isUserSignedIn()

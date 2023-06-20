@@ -125,7 +125,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
 
   Widget _buildForm(FirestoreService firestoreService) {
     return Container(
-      color: Colors.green,
+      color: Colors.black,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

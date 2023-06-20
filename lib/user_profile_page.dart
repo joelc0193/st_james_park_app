@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:st_james_park_app/edit_profile_page.dart';
 
+import 'login_page.dart';
+
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
 
@@ -22,6 +24,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   String? password;
   bool isSigningUp = true;
   bool isLoggedIn = false;
+  bool isLoading = true; // Add this line
 
   @override
   void initState() {
@@ -41,14 +44,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void getCurrentUser() async {
-    String uid = FirebaseAuth.instance.currentUser!.uid;
-    FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'name': 'John Doe',
-      'image_url': 'https://via.placeholder.com/150',
-      'user_message':
-          'This is my profile!', // Replace with the actual user message
-    });
-
     try {
       final user = _auth.currentUser;
       if (user != null) {
@@ -62,40 +57,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
           userEmail = loggedInUser.email;
           userImage = doc.get('image_url');
           userMessage = doc.get('user_message'); // Fetch the user message
+          isLoggedIn = true; // Set isLoggedIn to true after fetching user data
         });
       }
     } catch (e) {
       print('Error fetching user data: $e');
-    }
-  }
-
-  Future<void> signUp() async {
-    final formState = _formKey.currentState;
-    if (formState != null && formState.validate()) {
-      formState.save();
-      try {
-        UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
-          email: email!,
-          password: password!,
-        );
-        loggedInUser = userCredential.user!;
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(loggedInUser.uid)
-            .set({
-          'name': userName,
-          'image_url': 'https://via.placeholder.com/150',
-          'user_message': 'This is my profile!',
-        });
-        getCurrentUser();
-        setState(() {
-          isSigningUp = false;
-          isLoggedIn = true; // Set isLoggedIn to true after successful signup
-        });
-      } catch (e) {
-        print('Error signing up: $e');
-      }
+    } finally {
+      setState(() {
+        isLoading =
+            false; // Set isLoading to false regardless of whether the user is logged in or not
+      });
     }
   }
 
@@ -122,146 +93,62 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     // Update the build method to display different UI based on the login status
-    if (isLoggedIn) {
+    if (isLoading) {
+      return Center(
+          child:
+              CircularProgressIndicator()); // Show loading spinner while isLoading is true
+    } else if (isLoggedIn) {
       return profilePage(); // Display the profile page if the user is logged in
     } else {
-      return isSigningUp
-          ? signUpForm()
-          : loginForm(); // Display the signup or login form if the user is not logged in
+      return LoginPage(); // Display the login form if the user is not logged in
     }
   }
 
-  Widget signUpForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            validator: (input) => input != null && input.contains('@')
-                ? null
-                : 'Please enter a valid email',
-            onSaved: (input) => email = input,
-            decoration: InputDecoration(
-              labelText: 'Email',
-            ),
-          ),
-          TextFormField(
-            validator: (input) => input != null && input.length >= 6
-                ? null
-                : 'Your password needs to be at least 6 characters',
-            onSaved: (input) => password = input,
-            decoration: InputDecoration(
-              labelText: 'Password',
-            ),
-            obscureText: true,
-          ),
-          TextFormField(
-            onSaved: (input) => userName = input,
-            decoration: InputDecoration(
-              labelText: 'Name',
-            ),
-          ),
-          ElevatedButton(
-            onPressed: signUp,
-            child: Text('Sign Up'),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                isSigningUp = false;
-              });
-            },
-            child: Text('Already have an account? Log In'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget loginForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            validator: (input) => input != null && input.contains('@')
-                ? null
-                : 'Please enter a valid email',
-            onSaved: (input) => email = input,
-            decoration: InputDecoration(
-              labelText: 'Email',
-            ),
-          ),
-          TextFormField(
-            validator: (input) => input != null && input.length >= 6
-                ? null
-                : 'Your password needs to be at least 6 characters',
-            onSaved: (input) => password = input,
-            decoration: InputDecoration(
-              labelText: 'Password',
-            ),
-            obscureText: true,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              signIn();
-              setState(() {
-                isSigningUp = false;
-              });
-            },
-            child: Text('Log In'),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                isSigningUp = true;
-              });
-            },
-            child: Text('Don\'t have an account? Sign Up'),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget profilePage() {
-    return Scaffold(
-      backgroundColor: Colors.green, // Set the background color to green
-      body: Center(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Welcome, ${userName ?? 'User'}!'),
-              userImage != null
-                  ? ClipOval(
-                      child:
-                          Image.network(userImage!)) // Make the image circular
-                  : Container(),
-              Text('${userMessage ?? 'Not available'}'),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditProfilePage(
-                        initialUserName: userName,
-                        initialUserMessage: userMessage,
-                        initialUserImage: userImage,
-                        loggedInUser: loggedInUser, // Pass loggedInUser here
+    return Center(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Welcome, ${userName ?? 'User'}!'),
+            ),
+            userImage != null
+                ? ClipOval(
+                    child: Container(
+                      width: 150, // Set width
+                      height: 150, // Set height
+                      child: Image.network(
+                        userImage!,
+                        fit: BoxFit
+                            .cover, // Use BoxFit.cover to maintain the aspect ratio
                       ),
                     ),
-                  );
-                },
-                child: Text('Edit Profile'),
-              ),
-              ElevatedButton(
-                onPressed: signOut,
-                child: Text('Sign Out'),
-              ),
-            ],
-          ),
+                  )
+                : Container(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('${userMessage ?? 'Not available'}'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfilePage(
+                      initialUserName: userName,
+                      initialUserMessage: userMessage,
+                      initialUserImage: userImage,
+                      loggedInUser: loggedInUser, // Pass loggedInUser here
+                    ),
+                  ),
+                );
+              },
+              child: Text('Edit Profile'),
+            ),
+          ],
         ),
       ),
     );

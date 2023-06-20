@@ -44,7 +44,8 @@ dependencies:
   firebase_storage: ^11.2.3
   image_picker: ^0.8.9
   geolocator: ^9.0.2
-  
+  mapbox_gl: ^0.16.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -113,3 +114,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+dependency_overrides:
+  image: any

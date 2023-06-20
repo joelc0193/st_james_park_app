@@ -26,25 +26,19 @@ class FirestoreService {
     });
   }
 
-  // Future<String> uploadImage(File imageFile) async {
-  //   try {
-  //     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-
-  //     FirebaseStorage storage = FirebaseStorage.instance;
-  //     Reference reference = storage.ref().child(fileName);
-  //     UploadTask uploadTask = reference.putFile(imageFile);
-  //     TaskSnapshot storageTaskSnapshot = await uploadTask;
-
-  //     var imageUrl = await storageTaskSnapshot.ref.getDownloadURL();
-  //     await firestore.collection('spotlight').doc('image').set({
-  //       'url': imageUrl,
-  //     });
-  //     return imageUrl;
-  //   } catch (e) {
-  //     print(e);
-  //     throw e;
-  //   }
-  // }
+  Future<void> updateUserProfile(
+      String userId, String name, String message, String imageUrl) async {
+    try {
+      await firestore.collection('users').doc(userId).update({
+        'name': name,
+        'user_message': message,
+        'image_url': imageUrl,
+      });
+    } catch (e) {
+      print('Error updating user profile: $e');
+      throw e;
+    }
+  }
 
   Future<String> uploadMedia(Uint8List? mediaData) async {
     if (mediaData != null) {

@@ -284,7 +284,6 @@ class _HomePageState extends State<HomePage> {
         ),
         Text(
           'Numbers too old?',
-          style: TextStyle(color: Colors.white),
         ),
         Column(
           children: [
