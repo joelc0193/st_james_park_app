@@ -1,18 +1,14 @@
-import 'dart:math' show cos, sqrt, asin, pi;
 import 'package:flutter/material.dart';
 import 'package:st_james_park_app/home_page.dart';
-import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/visitors_page.dart';
-import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:st_james_park_app/admin_page.dart';
 import 'package:st_james_park_app/settings_page.dart';
 import 'package:st_james_park_app/user_profile_page.dart';
-import 'package:provider/provider.dart';
 import 'food_order_page.dart';
 import 'map_page.dart';
 
 class MainNavigationController extends StatefulWidget {
-  MainNavigationController({Key? key}) : super(key: key);
+  const MainNavigationController({Key? key}) : super(key: key);
 
   @override
   State<MainNavigationController> createState() =>
@@ -21,11 +17,11 @@ class MainNavigationController extends StatefulWidget {
 
 class _MainNavigationControllerState extends State<MainNavigationController> {
   final List<Widget> _pages = [
-    HomePage(),
-    VisitorsPage(),
-    MapPage(),
-    FoodOrderPage(),
-    UserProfilePage(),
+    const HomePage(),
+    const VisitorsPage(),
+    const MapPage(),
+    const FoodOrderPage(),
+    const UserProfilePage(),
   ];
 
   int _selectedIndex = 0;
@@ -113,14 +109,14 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
   void _navigateToSettingsPage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => SettingsPage()),
+      MaterialPageRoute(builder: (context) => const SettingsPage()),
     );
   }
 
   void _navigateToAdminPage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AdminPage()),
+      MaterialPageRoute(builder: (context) => const AdminPage()),
     );
   }
 }

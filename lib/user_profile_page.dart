@@ -94,13 +94,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     // Update the build method to display different UI based on the login status
     if (isLoading) {
-      return Center(
+      return const Center(
           child:
               CircularProgressIndicator()); // Show loading spinner while isLoading is true
     } else if (isLoggedIn) {
       return profilePage(); // Display the profile page if the user is logged in
     } else {
-      return LoginPage(); // Display the login form if the user is not logged in
+      return const LoginPage(); // Display the login form if the user is not logged in
     }
   }
 
@@ -117,7 +117,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             userImage != null
                 ? ClipOval(
-                    child: Container(
+                    child: SizedBox(
                       width: 150, // Set width
                       height: 150, // Set height
                       child: Image.network(
@@ -130,7 +130,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 : Container(),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('${userMessage ?? 'Not available'}'),
+              child: Text(userMessage ?? 'Not available'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -146,7 +146,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ),
                 );
               },
-              child: Text('Edit Profile'),
+              child: const Text('Edit Profile'),
             ),
           ],
         ),

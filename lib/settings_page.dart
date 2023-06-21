@@ -4,7 +4,7 @@ import 'package:st_james_park_app/services/auth_service.dart';
 
 class SettingsPage extends StatelessWidget {
 
-  SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,12 +12,12 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
       body: Center(
         child: ElevatedButton(
           onPressed: authService.signOut,
-          child: Text('Sign Out'),
+          child: const Text('Sign Out'),
         ),
       ),
     );

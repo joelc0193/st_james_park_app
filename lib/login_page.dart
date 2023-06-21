@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                 ? null
                 : 'Please enter a valid email',
             onSaved: (input) => email = input,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Email',
             ),
           ),
@@ -73,20 +73,20 @@ class _LoginPageState extends State<LoginPage> {
                 ? null
                 : 'Your password needs to be at least 6 characters',
             onSaved: (input) => password = input,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Password',
             ),
             obscureText: true,
           ),
           TextFormField(
             onSaved: (input) => userName = input,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Name',
             ),
           ),
           ElevatedButton(
             onPressed: signUp,
-            child: Text('Sign Up'),
+            child: const Text('Sign Up'),
           ),
           TextButton(
             onPressed: () {
@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                 isSigningUp = false;
               });
             },
-            child: Text('Already have an account? Log In'),
+            child: const Text('Already have an account? Log In'),
           ),
         ],
       ),
@@ -111,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                 ? null
                 : 'Please enter a valid email',
             onSaved: (input) => email = input,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Email',
             ),
           ),
@@ -120,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                 ? null
                 : 'Your password needs to be at least 6 characters',
             onSaved: (input) => password = input,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Password',
             ),
             obscureText: true,
@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                 isSigningUp = false;
               });
             },
-            child: Text('Log In'),
+            child: const Text('Log In'),
           ),
           TextButton(
             onPressed: () {
@@ -140,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                 isSigningUp = true;
               });
             },
-            child: Text('Don\'t have an account? Sign Up'),
+            child: const Text('Don\'t have an account? Sign Up'),
           ),
         ],
       ),

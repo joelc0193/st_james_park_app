@@ -1,17 +1,16 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:provider/provider.dart';
 import 'dart:typed_data';
 
 class UserUploadPage extends StatefulWidget {
+  const UserUploadPage({super.key});
+
   @override
   _UserUploadPageState createState() => _UserUploadPageState();
 }
@@ -79,7 +78,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
     final firestoreService = Provider.of<FirestoreService>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Upload Page'),
+        title: const Text('User Upload Page'),
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: firestoreService.getAdminNumbers(),
@@ -116,7 +115,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
 
             return _buildForm(firestoreService);
           } else {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
         },
       ),
@@ -136,14 +135,14 @@ class _UserUploadPageState extends State<UserUploadPage> {
                 ...controllers.keys
                     .map((key) => _buildTextFormField(key))
                     .toList(),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _buildImageAndMessageFields(),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 if (_isImageOrTextSubmitted) ...[
                   _buildPrivacyPolicyCheckbox(),
                   _buildAgeConfirmationCheckbox(),
                 ],
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _buildSubmitButton(firestoreService),
               ],
             ),
@@ -159,11 +158,11 @@ class _UserUploadPageState extends State<UserUploadPage> {
       decoration: InputDecoration(
         labelText: key,
         hintText: controllers[key]!.text,
-        hintStyle: TextStyle(color: Colors.white54),
-        enabledBorder: UnderlineInputBorder(
+        hintStyle: const TextStyle(color: Colors.white54),
+        enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.white),
         ),
-        focusedBorder: UnderlineInputBorder(
+        focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.white),
         ),
       ),
@@ -192,18 +191,18 @@ class _UserUploadPageState extends State<UserUploadPage> {
     return Column(
       children: [
         _buildOptionalText(),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _buildMediaWidget(),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _buildButtonsRow(),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _buildMessageField(),
       ],
     );
   }
 
   Widget _buildOptionalText() {
-    return Text(
+    return const Text(
       'Optional: Add an image and a message',
       style: TextStyle(
         color: Colors.white,
@@ -230,15 +229,15 @@ class _UserUploadPageState extends State<UserUploadPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ElevatedButton(
+          onPressed: captureMedia,
           child: Text(
             _imageFile == null ? 'Take Picture (Optional)' : 'Change Picture',
           ),
-          onPressed: captureMedia,
         ),
         if (_imageFile != null) ...[
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           ElevatedButton(
-            child: Text('Clear Picture'),
+            child: const Text('Clear Picture'),
             onPressed: () {
               setState(() {
                 _imageFile = null;
@@ -266,10 +265,10 @@ class _UserUploadPageState extends State<UserUploadPage> {
           int? maxLength}) {
         return Text(
           '${maxLength! - currentLength} characters left',
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         );
       },
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: 'Add a message (Optional)',
         hintText: 'Come to St. James!',
         enabledBorder: UnderlineInputBorder(
@@ -289,10 +288,10 @@ class _UserUploadPageState extends State<UserUploadPage> {
 
   Widget _buildPrivacyPolicyCheckbox() {
     return Center(
-      child: Container(
+      child: SizedBox(
         width: 450, // Adjust this value as needed
         child: CheckboxListTile(
-          title: Text(
+          title: const Text(
             "I accept the Terms of Service and Privacy Policy",
             style: TextStyle(color: Colors.white),
           ),
@@ -310,10 +309,10 @@ class _UserUploadPageState extends State<UserUploadPage> {
 
   Widget _buildAgeConfirmationCheckbox() {
     return Center(
-      child: Container(
+      child: SizedBox(
         width: 450, // Adjust this value as needed
         child: CheckboxListTile(
-          title: Text(
+          title: const Text(
             "I confirm that I am 13 years old or older",
             style: TextStyle(color: Colors.white),
           ),
@@ -332,7 +331,6 @@ class _UserUploadPageState extends State<UserUploadPage> {
   Widget _buildSubmitButton(FirestoreService firestoreService) {
     return Center(
       child: ElevatedButton(
-        child: Text('Submit'),
         onPressed: (!_isImageOrTextSubmitted ||
                 (_isPrivacyPolicyAccepted && _isUserOldEnough))
             ? () async {
@@ -351,7 +349,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
                     }
                     await firestoreService.uploadText(_text);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text('Upload successful'),
                       ),
                     );
@@ -365,6 +363,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
                 }
               }
             : null,
+        child: const Text('Submit'),
       ),
     );
   }

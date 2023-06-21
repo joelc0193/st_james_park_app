@@ -1,17 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:st_james_park_app/food_order_page.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:provider/provider.dart';
 
 import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:st_james_park_app/user_upload_page.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,7 +27,7 @@ class _HomePageState extends State<HomePage> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints viewportConstraints) {
         return Scrollbar(
-          isAlwaysShown: true,
+          thumbVisibility: true,
           child: SingleChildScrollView(
             child: ConstrainedBox(
               constraints: BoxConstraints(
@@ -63,7 +58,7 @@ class _HomePageState extends State<HomePage> {
       future: firestoreService.getSpotlightImageUrl(),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else {
           String? imageUrl = snapshot.data;
           return Container(
@@ -77,18 +72,18 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.black.withOpacity(0.2),
                   spreadRadius: 1,
                   blurRadius: 2,
-                  offset: Offset(0, 1), // Shadow position
+                  offset: const Offset(0, 1), // Shadow position
                 ),
               ],
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: 25),
+                const SizedBox(height: 25),
                 _buildRichText(),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _buildImageOrText(imageUrl),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _buildFutureText(firestoreService),
               ],
             ),
@@ -100,7 +95,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildRichText() {
     return RichText(
-      text: TextSpan(
+      text: const TextSpan(
         text: 'Spotlight',
         style: TextStyle(
           color: Colors.yellow, // Changed color to yellow
@@ -122,7 +117,7 @@ class _HomePageState extends State<HomePage> {
     if (imageUrl != null) {
       return _buildImageContainer(imageUrl);
     } else {
-      return Text(
+      return const Text(
         'No Spotlight image',
         style: TextStyle(color: Colors.white, fontSize: 18),
       );
@@ -158,7 +153,7 @@ class _HomePageState extends State<HomePage> {
       future: firestoreService.getUploadedText(),
       builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
@@ -166,7 +161,7 @@ class _HomePageState extends State<HomePage> {
             String? uploadedText = snapshot.data;
             return Text(
               uploadedText ?? 'No message uploaded',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
               textAlign: TextAlign.center,
             );
           }
@@ -205,9 +200,9 @@ class _HomePageState extends State<HomePage> {
                 textAlign: TextAlign.center,
                 key: const Key('Total'),
               ),
-              Text(
+              const Text(
                 '🌍 Total',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -277,21 +272,21 @@ class _HomePageState extends State<HomePage> {
           style: const TextStyle(fontSize: 17),
         ),
         const SizedBox(height: 10),
-        Divider(
+        const Divider(
           color: Colors.white,
           thickness: 1.0,
           height: 20.0,
         ),
-        Text(
+        const Text(
           'Numbers too old?',
         ),
         Column(
           children: [
             TextButton(
               onPressed: () => _navigateToUserUploadPage(context),
-              child: Text(
+              child: const Text(
                 'Click here to update',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.blue,
                   decoration: TextDecoration.underline,
                 ),
@@ -313,11 +308,11 @@ class _HomePageState extends State<HomePage> {
       textAlign: TextAlign.center,
       text: TextSpan(
         style: DefaultTextStyle.of(context).style,
-        children: <TextSpan>[
-          const TextSpan(text: 'And share something in our '),
+        children: const <TextSpan>[
+          TextSpan(text: 'And share something in our '),
           TextSpan(
             text: 'Spotlight',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.yellow,
               fontWeight: FontWeight.bold,
               shadows: [
@@ -329,7 +324,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          const TextSpan(text: ' section'),
+          TextSpan(text: ' section'),
         ],
       ),
     );
@@ -343,12 +338,12 @@ class _HomePageState extends State<HomePage> {
       print('User is in the park');
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => UserUploadPage()),
+        MaterialPageRoute(builder: (context) => const UserUploadPage()),
       );
     } else {
       print('User is not in the park');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('You are not in the park'),
         ),
       );

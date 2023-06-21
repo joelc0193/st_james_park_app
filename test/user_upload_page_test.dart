@@ -1,5 +1,4 @@
 // Import the necessary packages
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -32,7 +31,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: Provider<FirestoreService>(
         create: (_) => mockFirestoreService,
-        child: UserUploadPage(),
+        child: const UserUploadPage(),
       ),
     ));
 

@@ -16,7 +16,7 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Food Order'),
+        title: const Text('Food Order'),
       ),
       body: ListView.builder(
         itemCount: foodItems.length,
@@ -24,7 +24,7 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
           return ListTile(
             title: Text(foodItems[index]),
             trailing: ElevatedButton(
-              child: Text('Order'),
+              child: const Text('Order'),
               onPressed: () {
                 // Handle order button press
                 // You would likely navigate to a new page here where the user can finalize their order

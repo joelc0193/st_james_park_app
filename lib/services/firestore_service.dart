@@ -1,10 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:image_picker/image_picker.dart';
 
 class FirestoreService {
   final FirebaseFirestore firestore;
@@ -36,7 +33,7 @@ class FirestoreService {
       });
     } catch (e) {
       print('Error updating user profile: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -73,7 +70,7 @@ class FirestoreService {
       });
     } catch (e) {
       print(e);
-      throw e;
+      rethrow;
     }
   }
 

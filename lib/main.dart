@@ -1,6 +1,4 @@
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:image_picker/image_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/user_profile_page.dart';
@@ -14,7 +12,6 @@ import './services/firestore_service.dart';
 import 'main_navigation_controller.dart';
 
 void main() async {
-  MapboxGl.setAccessToken("sk.eyJ1Ijoiam9lbGMwMTkzIiwiYSI6ImNsajRtY2J1dTAzM3Mzam1yMmk4dTN0Z2YifQ.MztjK_HOiwDsTzhFh3fDAA");
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -46,7 +43,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        '/profile': (context) => UserProfilePage(),
+        '/profile': (context) => const UserProfilePage(),
       },
       debugShowCheckedModeBanner: false,
       title: 'St James Park',
@@ -71,7 +68,7 @@ class MyApp extends StatelessWidget {
           style: TextButton.styleFrom(foregroundColor: Colors.white),
         ),
       ),
-      home: MainNavigationController(),
+      home: const MainNavigationController(),
     );
   }
 }

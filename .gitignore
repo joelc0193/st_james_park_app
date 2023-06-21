@@ -50,3 +50,5 @@ lib/firebase_options.dart
 
 # Signing key
 **/key.properties
+
+**/config.json

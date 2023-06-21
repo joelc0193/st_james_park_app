@@ -13,7 +13,7 @@ class EditProfilePage extends StatefulWidget {
   final String? initialUserImage;
   final User loggedInUser;
 
-  EditProfilePage({
+  const EditProfilePage({super.key, 
     this.initialUserName,
     this.initialUserMessage,
     this.initialUserImage,
@@ -39,7 +39,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> pickImage() async {
-    final ImagePicker _picker = ImagePicker();
+    final ImagePicker picker = ImagePicker();
     final storage = Provider.of<FirebaseStorage>(context, listen: false);
 
     final String? source = await showDialog<String>(
@@ -67,7 +67,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       },
     );
 
-    final XFile? image = await _picker.pickImage(
+    final XFile? image = await picker.pickImage(
       source: source == 'camera' ? ImageSource.camera : ImageSource.gallery,
     );
 
@@ -94,7 +94,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final firestoreService = Provider.of<FirestoreService>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile'),
+        title: const Text('Edit Profile'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -102,13 +102,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
           children: [
             TextField(
               controller: userNameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Name',
               ),
             ),
             TextField(
               controller: userMessageController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Message',
               ),
             ),
@@ -127,7 +127,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
             ElevatedButton(
               onPressed: pickImage,
-              child: Text('Select Image'),
+              child: const Text('Select Image'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -150,14 +150,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 } else {
                   // Show an error message if the form is not completely filled out
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text(
                           'Please fill out all fields and select an image.'),
                     ),
                   );
                 }
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         ),
