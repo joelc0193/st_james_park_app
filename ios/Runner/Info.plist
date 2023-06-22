@@ -50,6 +50,11 @@
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>This app needs access to location when open.</string>
 		<key>NSLocationAlwaysUsageDescription</key>
-		<string>This app needs access to location always.</string>
+		<string>This app needs access to location when in the background.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>This app needs access to location when open and in the background.</string>
+		<key>MGLMapboxAccessToken</key>
+		<string>
+			pk.eyJ1Ijoiam9lbGMwMTkzIiwiYSI6ImNrdXYwcWw1YTFoZ3kyb29kcjlzeDltZjkifQ.QsbAG2roGrT6wUYO7_krwg</string>
 	</dict>
 </plist>
