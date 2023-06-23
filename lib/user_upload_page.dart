@@ -158,12 +158,12 @@ class _UserUploadPageState extends State<UserUploadPage> {
       decoration: InputDecoration(
         labelText: key,
         hintText: controllers[key]!.text,
-        hintStyle: const TextStyle(color: Colors.white54),
+        hintStyle: const TextStyle(),
         enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: BorderSide(),
         ),
         focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: BorderSide(),
         ),
       ),
       keyboardType: TextInputType.number,
@@ -205,7 +205,6 @@ class _UserUploadPageState extends State<UserUploadPage> {
     return const Text(
       'Optional: Add an image and a message',
       style: TextStyle(
-        color: Colors.white,
         fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
@@ -265,17 +264,16 @@ class _UserUploadPageState extends State<UserUploadPage> {
           int? maxLength}) {
         return Text(
           '${maxLength! - currentLength} characters left',
-          style: const TextStyle(color: Colors.white),
         );
       },
       decoration: const InputDecoration(
         labelText: 'Add a message (Optional)',
         hintText: 'Come to St. James!',
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: BorderSide(),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: BorderSide(),
         ),
       ),
       onSaved: (value) {
@@ -293,7 +291,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
         child: CheckboxListTile(
           title: const Text(
             "I accept the Terms of Service and Privacy Policy",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(),
           ),
           value: _isPrivacyPolicyAccepted,
           onChanged: (newValue) {
@@ -314,7 +312,7 @@ class _UserUploadPageState extends State<UserUploadPage> {
         child: CheckboxListTile(
           title: const Text(
             "I confirm that I am 13 years old or older",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(),
           ),
           value: _isUserOldEnough,
           onChanged: (newValue) {

@@ -9,6 +9,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  ValueNotifier<bool> isUserLoggedIn = ValueNotifier<bool>(false);
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
   String? email;
@@ -26,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
           email: email!,
           password: password!,
         );
-        Navigator.pushReplacementNamed(context, '/profile');
+        isUserLoggedIn.value = true;
       } catch (e) {
         print('Error signing up: $e');
       }
@@ -42,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
           email: email!,
           password: password!,
         );
-        Navigator.pushReplacementNamed(context, '/profile');
+        isUserLoggedIn.value = true;
       } catch (e) {
         print('Error signing in: $e');
       }

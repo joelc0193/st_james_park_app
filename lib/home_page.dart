@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
     } else {
       return const Text(
         'No Spotlight image',
-        style: TextStyle(color: Colors.white, fontSize: 18),
+        style: TextStyle(fontSize: 18),
       );
     }
   }
@@ -161,7 +161,7 @@ class _HomePageState extends State<HomePage> {
             String? uploadedText = snapshot.data;
             return Text(
               uploadedText ?? 'No message uploaded',
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             );
           }
@@ -273,7 +273,6 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 10),
         const Divider(
-          color: Colors.white,
           thickness: 1.0,
           height: 20.0,
         ),

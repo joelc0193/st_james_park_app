@@ -8,7 +8,12 @@ import 'food_order_page.dart';
 import 'map_page.dart';
 
 class MainNavigationController extends StatefulWidget {
-  const MainNavigationController({Key? key}) : super(key: key);
+  final ValueNotifier<bool> isUserLoggedIn;
+
+  const MainNavigationController({
+    Key? key,
+    required this.isUserLoggedIn,
+  }) : super(key: key);
 
   @override
   State<MainNavigationController> createState() =>
@@ -24,6 +29,24 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
     const UserProfilePage(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    widget.isUserLoggedIn.addListener(() {
+      if (widget.isUserLoggedIn.value) {
+        setState(() {
+          _selectedIndex = 4; // Index of UserProfilePage
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.isUserLoggedIn.dispose();
+    super.dispose();
+  }
+
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -35,20 +58,7 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('St James Park'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.admin_panel_settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AdminPage()),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(context),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.blue,

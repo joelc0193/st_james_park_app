@@ -28,4 +28,9 @@ class AuthService {
   bool isUserSignedIn() {
     return _auth.currentUser != null;
   }
+
+  // Add this method
+  String? getCurrentUserId() {
+    return _auth.currentUser?.uid;
+  }
 }

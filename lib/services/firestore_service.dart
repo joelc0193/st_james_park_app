@@ -1,4 +1,3 @@
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -21,6 +20,26 @@ class FirestoreService {
       ...numbers,
       'Updated': getServerTimestamp(),
     });
+  }
+
+  Stream<QuerySnapshot> getUsersInPark() {
+    return firestore
+        .collection('users')
+        .where('isInPark', isEqualTo: true)
+        .snapshots();
+  }
+
+  Future<void> updateUserLocation(
+      String userId, GeoPoint location, bool isInPark) async {
+    try {
+      await firestore.collection('users').doc(userId).update({
+        'location': location,
+        'isInPark': isInPark,
+      });
+    } catch (e) {
+      print('Error updating user location: $e');
+      rethrow;
+    }
   }
 
   Future<void> updateUserProfile(

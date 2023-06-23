@@ -41,34 +41,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ValueNotifier<bool> isUserLoggedIn = ValueNotifier<bool>(false);
+
     return MaterialApp(
-      routes: {
-        '/profile': (context) => const UserProfilePage(),
-      },
       debugShowCheckedModeBanner: false,
       title: 'St James Park',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        textTheme: Typography.material2018(platform: TargetPlatform.android)
-            .black
-            .apply(
-              bodyColor: Colors.black,
-              displayColor: Colors.black,
-            ),
-        textSelectionTheme: const TextSelectionThemeData(
-          cursorColor: Colors.white,
-          selectionColor: Colors.white,
-          selectionHandleColor: Colors.white,
-        ),
-        inputDecorationTheme: const InputDecorationTheme(
-          hintStyle: TextStyle(color: Colors.white),
-          labelStyle: TextStyle(color: Colors.white),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(foregroundColor: Colors.white),
-        ),
       ),
-      home: const MainNavigationController(),
+      home: MainNavigationController(isUserLoggedIn: isUserLoggedIn),
     );
   }
 }
