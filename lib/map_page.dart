@@ -27,16 +27,6 @@ class _MapPageState extends State<MapPage> {
     if (!status.isGranted) {
       await Permission.locationWhenInUse.request();
     }
-
-    if (Platform.isAndroid) {
-      var androidInfo = await DeviceInfoPlugin().androidInfo;
-      if (androidInfo.version.sdkInt >= 29) {
-        var backgroundStatus = await Permission.locationAlways.status;
-        if (!backgroundStatus.isGranted) {
-          await Permission.locationAlways.request();
-        }
-      }
-    }
   }
 
   @override

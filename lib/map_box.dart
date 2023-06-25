@@ -31,6 +31,8 @@ class _MapBoxState extends State<MapBox> {
   Timer? locationUpdateTimer;
   StreamSubscription<QuerySnapshot>? firestoreSubscription;
   StreamSubscription<Position>? _positionStream;
+  late FirestoreService firestoreService;
+  late AuthService authService;
 
   @override
   void initState() {
@@ -46,9 +48,8 @@ class _MapBoxState extends State<MapBox> {
       });
     });
 
-    // Get FirestoreService from the context
-    FirestoreService firestoreService =
-        Provider.of<FirestoreService>(context, listen: false);
+    firestoreService = Provider.of<FirestoreService>(context, listen: false);
+    authService = Provider.of<AuthService>(context, listen: false);
   }
 
   @override
@@ -65,8 +66,10 @@ class _MapBoxState extends State<MapBox> {
         'Number of documents received: ${docs.length}'); // Print the number of documents
 
     // Remove all existing symbols
-    mapController!.clearSymbols();
-    userSymbols.clear();
+    if (userSymbols.length > 0) {
+      userSymbols.clear();
+      mapController!.clearSymbols();
+    }
 
     // Add new symbols
     int addedSymbolsCount = 0;
@@ -115,11 +118,6 @@ class _MapBoxState extends State<MapBox> {
     print('Updating user location...');
     bool isInPark = await _isInPark(position);
     GeoPoint location = GeoPoint(position.latitude, position.longitude);
-
-    // Get FirestoreService and AuthService from the context
-    FirestoreService firestoreService =
-        Provider.of<FirestoreService>(context, listen: false);
-    AuthService authService = Provider.of<AuthService>(context, listen: false);
 
     // Get the user ID
     String? userId = authService.getCurrentUserId();
@@ -173,9 +171,6 @@ class _MapBoxState extends State<MapBox> {
   void _onMapCreated(MapboxMapController controller) async {
     mapController = controller;
 
-    // Get FirestoreService from the context
-    FirestoreService firestoreService =
-        Provider.of<FirestoreService>(context, listen: false);
     firestoreSubscription = firestoreService.getUsersInPark().listen(
       (snapshot) {
         print(
@@ -232,6 +227,7 @@ class _MapBoxState extends State<MapBox> {
                           // If the camera is now following the user, move it to the user's current location
                           Position position =
                               await Geolocator.getCurrentPosition();
+                          print('User position: $position');
                           mapController?.animateCamera(
                             CameraUpdate.newLatLngZoom(
                               LatLng(position.latitude, position.longitude),

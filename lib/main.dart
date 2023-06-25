@@ -30,8 +30,9 @@ void main() async {
     ProxyProvider<FirebaseFirestore, FirestoreService>(
       update: (_, firestore, __) => FirestoreService(firestore: firestore),
     ),
-    ProxyProvider<FirebaseAuth, AuthService>(
-      update: (_, auth, __) => AuthService(auth: auth),
+    ChangeNotifierProxyProvider<FirebaseAuth, AuthService>(
+      create: (context) => AuthService(auth: FirebaseAuth.instance),
+      update: (context, auth, authService) => authService!..update(auth: auth),
     ),
   ], child: const MyApp()));
 }

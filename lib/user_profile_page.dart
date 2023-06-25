@@ -1,7 +1,9 @@
+import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:st_james_park_app/edit_profile_page.dart';
+import 'package:st_james_park_app/services/auth_service.dart';
 
 import 'login_page.dart';
 
@@ -13,9 +15,9 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late AuthService _authService;
   final _formKey = GlobalKey<FormState>();
-  late User loggedInUser;
+  late User? loggedInUser;
   String? userName;
   String? userEmail;
   String? userImage;
@@ -27,71 +29,37 @@ class _UserProfilePageState extends State<UserProfilePage> {
   bool isLoading = true; // Add this line
 
   @override
-  void initState() {
-    super.initState();
-    getCurrentUser();
+  Future<void> didChangeDependencies() async {
+    super.didChangeDependencies();
+    _authService =
+        _authService = Provider.of<AuthService>(context, listen: false);
+    await getCurrentUserAndData();
   }
 
-  Future<void> signOut() async {
-    await _auth.signOut();
-    setState(() {
+  Future<void> getCurrentUserAndData() async {
+    loggedInUser = _authService.getCurrentUser();
+    if (loggedInUser != null) {
+      isLoggedIn = true;
+      final userData = await _authService.getCurrentUserData();
+      userName = userData['name'];
+      userEmail = userData['email'];
+      userImage = userData['image_url'];
+      userMessage = userData['user_message'];
+    } else {
+      isLoggedIn = false;
       userName = null;
       userEmail = null;
       userImage = null;
       userMessage = null;
-      isLoggedIn = false; // Set isLoggedIn to false after signing out
+    }
+    setState(() {
+      isLoading = false;
     });
-  }
-
-  void getCurrentUser() async {
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        loggedInUser = user;
-        final DocumentSnapshot doc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(loggedInUser.uid)
-            .get();
-        setState(() {
-          userName = doc.get('name');
-          userEmail = loggedInUser.email;
-          userImage = doc.get('image_url');
-          userMessage = doc.get('user_message'); // Fetch the user message
-          isLoggedIn = true; // Set isLoggedIn to true after fetching user data
-        });
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
-    } finally {
-      setState(() {
-        isLoading =
-            false; // Set isLoading to false regardless of whether the user is logged in or not
-      });
-    }
-  }
-
-  Future<void> signIn() async {
-    final formState = _formKey.currentState;
-    if (formState != null && formState.validate()) {
-      formState.save();
-      try {
-        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: email!,
-          password: password!,
-        );
-        loggedInUser = userCredential.user!;
-        getCurrentUser();
-        setState(() {
-          isLoggedIn = true; // Set isLoggedIn to true after successful login
-        });
-      } catch (e) {
-        print('Error signing in: $e');
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AuthService>();
     // Update the build method to display different UI based on the login status
     if (isLoading) {
       return const Center(
@@ -138,10 +106,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => EditProfilePage(
-                      initialUserName: userName,
-                      initialUserMessage: userMessage,
-                      initialUserImage: userImage,
-                      loggedInUser: loggedInUser, // Pass loggedInUser here
+                      loggedInUser: loggedInUser!, // Pass loggedInUser here
                     ),
                   ),
                 );

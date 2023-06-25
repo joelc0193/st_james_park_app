@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:st_james_park_app/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -10,12 +12,18 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   ValueNotifier<bool> isUserLoggedIn = ValueNotifier<bool>(false);
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
   String? email;
   String? password;
   String? userName;
   bool isSigningUp = true;
+  late AuthService _authService;
+
+  @override
+  void initState() {
+    super.initState();
+    _authService = Provider.of<AuthService>(context, listen: false);
+  }
 
   Future<void> signUp() async {
     final formState = _formKey.currentState;
@@ -23,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
       formState.save();
       try {
         UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
+            await _authService.createUserWithEmailAndPassword(
           email: email!,
           password: password!,
         );
@@ -39,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
     if (formState != null && formState.validate()) {
       formState.save();
       try {
-        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        await _authService.signInWithEmailAndPassword(
           email: email!,
           password: password!,
         );
@@ -129,18 +137,11 @@ class _LoginPageState extends State<LoginPage> {
           ElevatedButton(
             onPressed: () {
               signIn();
-              setState(() {
-                isSigningUp = false;
-              });
             },
             child: const Text('Log In'),
           ),
           TextButton(
-            onPressed: () {
-              setState(() {
-                isSigningUp = true;
-              });
-            },
+            onPressed: () {},
             child: const Text('Don\'t have an account? Sign Up'),
           ),
         ],

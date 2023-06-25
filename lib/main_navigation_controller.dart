@@ -1,5 +1,7 @@
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:st_james_park_app/home_page.dart';
+import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/visitors_page.dart';
 import 'package:st_james_park_app/admin_page.dart';
 import 'package:st_james_park_app/settings_page.dart';
@@ -106,27 +108,30 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
     } else {
       return AppBar(
         title: const Text('St James Park'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.admin_panel_settings),
-            onPressed: () => _navigateToAdminPage(context),
-          ),
-        ],
+        // actions: <Widget>[
+        //   IconButton(
+        //     icon: const Icon(Icons.admin_panel_settings),
+        //     onPressed: () => _navigateToAdminPage(context),
+        //   ),
+        // ],
       );
     }
   }
 
   void _navigateToSettingsPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const SettingsPage()),
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SettingsPage(authService),
+      ),
     );
   }
 
-  void _navigateToAdminPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AdminPage()),
-    );
-  }
+  // void _navigateToAdminPage(BuildContext context) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => const AdminPage()),
+  //   );
+  // }
 }
