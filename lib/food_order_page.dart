@@ -14,25 +14,20 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Food Order'),
-      ),
-      body: ListView.builder(
-        itemCount: foodItems.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(foodItems[index]),
-            trailing: ElevatedButton(
-              child: const Text('Order'),
-              onPressed: () {
-                // Handle order button press
-                // You would likely navigate to a new page here where the user can finalize their order
-              },
-            ),
-          );
-        },
-      ),
+    return ListView.builder(
+      itemCount: foodItems.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(foodItems[index]),
+          trailing: ElevatedButton(
+            child: const Text('Order'),
+            onPressed: () {
+              // Handle order button press
+              // You would likely navigate to a new page here where the user can finalize their order
+            },
+          ),
+        );
+      },
     );
   }
 }

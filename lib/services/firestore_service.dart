@@ -1,6 +1,7 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:st_james_park_app/user_data.dart';
 
 class FirestoreService {
   final FirebaseFirestore firestore;
@@ -105,5 +106,20 @@ class FirestoreService {
         await firestore.collection('spotlight').doc('spotlight').get();
     Map<String, dynamic>? data = doc.data()! as Map<String, dynamic>?;
     return data?['image_url'] as String?;
+  }
+
+  Stream<DocumentSnapshot> getUserLocationStream(String userId) {
+    return firestore.collection('users').doc(userId).snapshots();
+  }
+
+  Future<UserData> getUserData(String userId) async {
+    DocumentSnapshot doc =
+        await firestore.collection('users').doc(userId).get();
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return UserData(
+      name: data['name'],
+      message: data['user_message'],
+      imageUrl: data['image_url'],
+    );
   }
 }

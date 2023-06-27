@@ -1,83 +1,90 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:st_james_park_app/services/firestore_service.dart';
+import 'package:provider/provider.dart';
 
-class VisitorsPage extends StatelessWidget {
-  // Sample data
-  static const visitors = [
-    {
-      'name': 'John Doe',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'Jane Smith',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'Robert Johnson',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'Emily Davis',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'Michael Brown',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'Sarah Miller',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'James Wilson',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'Jessica Moore',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'William Taylor',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'Emma Anderson',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'David Thomas',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-    {
-      'name': 'Sophia Jackson',
-      'imageUrl':
-          'https://firebasestorage.googleapis.com/v0/b/st-james-park-89a2b.appspot.com/o/user_images%2FL1qrAkeLKZQlRI7JW2lV8kVw8GD3.jpg?alt=media&token=838a8397-e2ea-435a-93e7-133248873e95'
-    },
-  ];
+import 'other_user_profile_page.dart';
+import 'services/app_bar_manager.dart';
 
-  const VisitorsPage({super.key});
+class VisitorsPage extends StatefulWidget {
+  final Function(int, String) onLocationIconClicked;
+
+  const VisitorsPage({Key? key, required this.onLocationIconClicked})
+      : super(key: key);
+
+  @override
+  State<VisitorsPage> createState() => _VisitorsPageState();
+}
+
+class _VisitorsPageState extends State<VisitorsPage> {
+  late final FirestoreService firestoreService;
+
+  @override
+  void initState() {
+    super.initState();
+    firestoreService = Provider.of<FirestoreService>(context, listen: false);
+  }
+
+  List<dynamic> _getVisitors(QuerySnapshot? snapshot) {
+    return snapshot?.docs.map((doc) => doc.data()).toList() ?? [];
+  }
+
+  void _navigateToProfile(BuildContext context, String userId) {
+    final appBarManager = Provider.of<AppBarManager>(context, listen: false);
+    appBarManager.show();
+    Navigator.of(context)
+        .push(
+      MaterialPageRoute(
+        builder: (context) => OtherUserProfilePage(userId: userId),
+      ),
+    )
+        .then((_) {
+      // Hide the back button when the user navigates back
+      appBarManager.hide();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: visitors.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(visitors[index]['imageUrl']!),
-          ),
-          title: Text(visitors[index]['name']!),
-        );
+    return StreamBuilder(
+      stream: firestoreService.getUsersInPark(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final visitors = _getVisitors(snapshot.data);
+          return ListView.builder(
+            itemCount: visitors.length,
+            itemBuilder: (context, index) {
+              final doc = visitors[index];
+              final userId = snapshot.data!.docs[index].id;
+              return ListTile(
+                onTap: () {
+                  _navigateToProfile(context, userId);
+                },
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(doc['image_url']),
+                ),
+                title: Text(doc['name']),
+                subtitle: Text(doc['user_message']),
+                trailing: IconButton(
+                  icon: Icon(
+                    Icons.location_on,
+                    color: Colors.green,
+                  ),
+                  onPressed: () {
+                    widget.onLocationIconClicked(
+                      2,
+                      userId,
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        }
+        return CircularProgressIndicator();
       },
     );
   }

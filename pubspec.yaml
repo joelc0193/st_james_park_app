@@ -47,7 +47,8 @@ dependencies:
   latlng: ^1.0.0
   mapbox_gl: ^0.16.0
   device_info_plus: ^9.0.2
-
+  provider: ^6.0.5
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

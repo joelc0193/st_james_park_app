@@ -8,20 +8,25 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:st_james_park_app/mapbox_controller.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 
 class MapBox extends StatefulWidget {
   final Future<void> Function() requestLocationPermission;
 
-  MapBox({required this.requestLocationPermission});
+  MapBox({Key? key, required this.requestLocationPermission}) : super(key: key);
 
   @override
   _MapBoxState createState() => _MapBoxState();
+
+  static _MapBoxState of(BuildContext context) {
+    return context.findAncestorStateOfType<_MapBoxState>()!;
+  }
 }
 
 class _MapBoxState extends State<MapBox> {
-  MapboxMapController? mapController;
+  late MapBoxControllerProvider? mapBoxControllerProvider;
   final double parkLatitude = 40.86512716517621;
   final double parkLongitude = -73.89779740874255;
   Symbol? userLocationSymbol;
@@ -33,6 +38,7 @@ class _MapBoxState extends State<MapBox> {
   StreamSubscription<Position>? _positionStream;
   late FirestoreService firestoreService;
   late AuthService authService;
+  StreamSubscription<DocumentSnapshot>? _userLocationSubscription;
 
   @override
   void initState() {
@@ -56,6 +62,7 @@ class _MapBoxState extends State<MapBox> {
   void dispose() {
     _positionStream?.cancel();
     firestoreSubscription?.cancel();
+    _userLocationSubscription?.cancel();
     super.dispose();
   }
 
@@ -68,7 +75,7 @@ class _MapBoxState extends State<MapBox> {
     // Remove all existing symbols
     if (userSymbols.length > 0) {
       userSymbols.clear();
-      mapController!.clearSymbols();
+      mapBoxControllerProvider?.clearSymbols();
     }
 
     // Add new symbols
@@ -87,17 +94,13 @@ class _MapBoxState extends State<MapBox> {
             iconImage: 'marker-15',
           );
           print('SymbolOptions: $symbolOptions'); // Print the SymbolOptions
-          if (mapController != null) {
-            Symbol? symbol;
-            symbol = await mapController?.addSymbol(symbolOptions);
-            if (symbol != null) {
-              userSymbols.add(symbol);
-              addedSymbolsCount++;
-              print(
-                  'Added symbol for user at location: $location'); // Print after adding each symbol
-            } else {
-              print('Failed to add symbol'); // Print if failed to add symbol
-            }
+          if (mapBoxControllerProvider != null) {
+            Symbol symbol =
+                await mapBoxControllerProvider!.addSymbol(symbolOptions);
+            userSymbols.add(symbol);
+            addedSymbolsCount++;
+            print(
+                'Added symbol for user at location: $location'); // Print after adding each symbol
           } else {
             print('mapController is null'); // Print if mapController is null
           }
@@ -124,13 +127,16 @@ class _MapBoxState extends State<MapBox> {
     if (userId != null) {
       await firestoreService.updateUserLocation(userId, location, isInPark);
     }
+
     if (isFollowingUser) {
-      mapController?.animateCamera(
-        CameraUpdate.newLatLngZoom(
+      MapBoxControllerProvider? mapBoxControllerProvider =
+          Provider.of<MapBoxControllerProvider>(context, listen: false);
+      if (mapBoxControllerProvider != null) {
+        mapBoxControllerProvider.animateCamera(
           LatLng(position.latitude, position.longitude),
           18.0,
-        ),
-      );
+        );
+      }
     }
   }
 
@@ -169,7 +175,9 @@ class _MapBoxState extends State<MapBox> {
   }
 
   void _onMapCreated(MapboxMapController controller) async {
-    mapController = controller;
+    mapBoxControllerProvider =
+        Provider.of<MapBoxControllerProvider>(context, listen: false)
+          ..setMapBoxController(controller);
 
     firestoreSubscription = firestoreService.getUsersInPark().listen(
       (snapshot) {
@@ -214,26 +222,18 @@ class _MapBoxState extends State<MapBox> {
                         isFollowingUser = !isFollowingUser;
                         if (!isFollowingUser) {
                           // If the camera is now not following the user, move it back to its initial position
-                          mapController?.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: LatLng(parkLatitude, parkLongitude),
-                                zoom: 17.0,
-                                bearing: 30,
-                              ),
-                            ),
+                          mapBoxControllerProvider?.animateCamera(
+                            LatLng(parkLatitude, parkLongitude),
+                            17.0,
                           );
+                          // Cancel the user location subscription
+                          _userLocationSubscription?.cancel();
                         } else {
                           // If the camera is now following the user, move it to the user's current location
-                          Position position =
-                              await Geolocator.getCurrentPosition();
-                          print('User position: $position');
-                          mapController?.animateCamera(
-                            CameraUpdate.newLatLngZoom(
-                              LatLng(position.latitude, position.longitude),
-                              18.0,
-                            ),
-                          );
+                          String? userId = authService.getCurrentUserId();
+                          if (userId != null) {
+                            mapBoxControllerProvider?.moveCameraToUser(userId);
+                          }
                         }
                         // Call setState in the MapBox widget to update the UI
                         setState(() {});
