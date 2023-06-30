@@ -52,5 +52,14 @@
 		<key>MGLMapboxAccessToken</key>
 		<string>
 			pk.eyJ1Ijoiam9lbGMwMTkzIiwiYSI6ImNrdXYwcWw1YTFoZ3kyb29kcjlzeDltZjkifQ.QsbAG2roGrT6wUYO7_krwg</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>stjamespark</string>
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>

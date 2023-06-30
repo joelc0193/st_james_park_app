@@ -1,6 +1,6 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:st_james_park_app/mapbox_controller.dart';
+import 'package:st_james_park_app/services/mapbox_controller.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/user_profile_page.dart';
 import 'firebase_options.dart';
@@ -10,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 import 'services/firestore_service.dart';
-import 'services/main_navigation_controller.dart';
+import 'main_navigation_controller.dart';
 import 'other_user_profile_page.dart';
 import 'services/app_bar_manager.dart';
 

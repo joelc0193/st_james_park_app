@@ -2,17 +2,17 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:st_james_park_app/home_page.dart';
-import 'package:st_james_park_app/map_box.dart';
-import 'package:st_james_park_app/mapbox_controller.dart';
+import 'package:st_james_park_app/map_page.dart';
+import 'package:st_james_park_app/services/mapbox_controller.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/visitors_page.dart';
 import 'package:st_james_park_app/admin_page.dart';
 import 'package:st_james_park_app/settings_page.dart';
 import 'package:st_james_park_app/user_profile_page.dart';
-import '../food_order_page.dart';
-import '../map_page.dart';
-import '../other_user_profile_page.dart';
-import 'app_bar_manager.dart';
+import 'music_page.dart';
+import 'map_page.dart';
+import 'other_user_profile_page.dart';
+import 'services/app_bar_manager.dart';
 
 class MainNavigationController extends StatefulWidget {
   final ValueNotifier<bool> isUserLoggedIn;
@@ -48,14 +48,15 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
   }
 
   List<Widget> _getPages() {
-    return [
-      const HomePage(),
-      VisitorsPage(onLocationIconClicked: _onLocationIconClicked),
-      MapPage(),
-      const FoodOrderPage(),
-      const UserProfilePage(),
-    ];
-  }
+  return [
+    const HomePage(),
+    VisitorsPage(onLocationIconClicked: _onLocationIconClicked),
+    MapPage(navigatorKey: _navigatorKeys[2]),
+    const MusicPage(),
+    const UserProfilePage(),
+  ];
+}
+
 
   @override
   void initState() {
@@ -68,8 +69,12 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
       }
     });
     _pages = _getPages();
-    mapBoxControllerProvider = Provider.of<MapBoxControllerProvider>(context, listen: false);
+    mapBoxControllerProvider =
+        Provider.of<MapBoxControllerProvider>(context, listen: false);
+    authService =
+        Provider.of<AuthService>(context, listen: false);
   }
+
 
   @override
   void dispose() {
@@ -101,6 +106,10 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
 
   bool canPopVisitorsPage() {
     return _navigatorKeys[1].currentState?.canPop() ?? false;
+  }
+
+  bool canPopMapPage() {
+    return _navigatorKeys[2].currentState?.canPop() ?? false;
   }
 
   @override
@@ -169,6 +178,18 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
                   _navigatorKeys[1].currentState?.pop();
+                },
+              )
+            : null,
+      );
+    } else if (_selectedIndex == 2) {
+      return AppBar(
+        title: const Text('St James Park'),
+        leading: canPopMapPage()
+            ? IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  _navigatorKeys[2].currentState?.pop();
                 },
               )
             : null,

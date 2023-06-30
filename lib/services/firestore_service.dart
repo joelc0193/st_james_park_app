@@ -23,6 +23,76 @@ class FirestoreService {
     });
   }
 
+  Future<void> voteForSong(
+      String songUri, String songName, String userId) async {
+    DocumentReference songRef =
+        firestore.collection('nominated_songs').doc(songUri);
+    DocumentReference userRef = firestore.collection('users').doc(userId);
+
+    await firestore.runTransaction((transaction) async {
+      DocumentSnapshot songSnapshot = await transaction.get(songRef);
+      DocumentSnapshot userSnapshot = await transaction.get(userRef);
+
+      List<dynamic> voters =
+          (songSnapshot.data() as Map<String, dynamic>)?['voters'] ?? [];
+      List<dynamic> votedSongs =
+          (userSnapshot.data() as Map<String, dynamic>)?['votedSongs'] ?? [];
+
+      if (votedSongs.contains(songUri) && voters.contains(userId)) {
+        // The user has already voted for this song, so remove their vote
+        voters.remove(userId);
+        votedSongs.remove(songUri);
+        transaction.update(
+            songRef, {'votes': FieldValue.increment(-1), 'voters': voters});
+        transaction.update(userRef, {'votedSongs': votedSongs});
+      } else if (!votedSongs.contains(songUri) && !voters.contains(userId)) {
+        // The user has not voted for this song yet, so they can vote
+        voters.add(userId);
+        votedSongs.add(songUri);
+        transaction.update(
+            songRef, {'votes': FieldValue.increment(1), 'voters': voters});
+        transaction.update(userRef, {'votedSongs': votedSongs});
+      }
+    });
+  }
+
+  Stream<QuerySnapshot> getNominatedSongs() {
+    return firestore.collection('nominated_songs').snapshots();
+  }
+
+  Future<String> getSongWithMostVotes() async {
+    QuerySnapshot snapshot = await firestore
+        .collection('nominated_songs')
+        .orderBy('votes', descending: true)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      throw Exception('No songs nominated');
+    }
+
+    // The song with the most votes is the first document in the snapshot
+    DocumentSnapshot songWithMostVotes = snapshot.docs.first;
+    return songWithMostVotes
+        .id; // The ID of the document is the URI of the song
+  }
+
+  Future<void> deleteAllNominatedSongsExceptSecondHighest() async {
+    QuerySnapshot snapshot = await firestore
+        .collection('nominated_songs')
+        .orderBy('votes', descending: true)
+        .get();
+    if (snapshot.docs.length > 1) {
+      for (var i = 0; i < snapshot.docs.length; i++) {
+        if (i != 1) {
+          await snapshot.docs[i].reference.delete();
+        }
+      }
+    } else if (snapshot.docs.length == 1) {
+      await snapshot.docs[0].reference.delete();
+    }
+  }
+
   Stream<QuerySnapshot> getUsersInPark() {
     return firestore
         .collection('users')
