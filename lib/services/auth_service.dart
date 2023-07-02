@@ -16,6 +16,8 @@ class AuthService extends ChangeNotifier {
     return _auth.currentUser;
   }
 
+  Stream<User?> get userState => _auth.userChanges();
+
   Future<void> signInWithEmailAndPassword(
       {required String email, required String password}) async {
     await _auth.signInWithEmailAndPassword(
@@ -43,11 +45,27 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<UserCredential> createUserWithEmailAndPassword(
-      {required String email, required String password}) async {
-    return _auth.createUserWithEmailAndPassword(
+      {required String email,
+      required String password,
+      required String name}) async {
+    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
+
+    // Create a new document in Firestore for the new user
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userCredential.user!.uid)
+        .set({
+      'name': name,
+      'image_url': 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
+      'user_message': '',
+    });
+
+    notifyListeners();
+
+    return userCredential;
   }
 
   bool isUserSignedIn() {

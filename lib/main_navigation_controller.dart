@@ -48,15 +48,14 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
   }
 
   List<Widget> _getPages() {
-  return [
-    const HomePage(),
-    VisitorsPage(onLocationIconClicked: _onLocationIconClicked),
-    MapPage(navigatorKey: _navigatorKeys[2]),
-    const MusicPage(),
-    const UserProfilePage(),
-  ];
-}
-
+    return [
+      const HomePage(),
+      VisitorsPage(onLocationIconClicked: _onLocationIconClicked),
+      MapPage(navigatorKey: _navigatorKeys[2]),
+      const MusicPage(),
+      const UserProfilePage(),
+    ];
+  }
 
   @override
   void initState() {
@@ -71,10 +70,8 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
     _pages = _getPages();
     mapBoxControllerProvider =
         Provider.of<MapBoxControllerProvider>(context, listen: false);
-    authService =
-        Provider.of<AuthService>(context, listen: false);
+    authService = Provider.of<AuthService>(context, listen: false);
   }
-
 
   @override
   void dispose() {
@@ -142,8 +139,8 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
             label: 'Map',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fastfood),
-            label: 'Food',
+            icon: Icon(Icons.music_note),
+            label: 'Music',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

@@ -57,8 +57,32 @@ class FirestoreService {
   }
 
   Stream<QuerySnapshot> getNominatedSongs() {
-    return firestore.collection('nominated_songs').snapshots();
+    return firestore
+        .collection('nominated_songs')
+        .orderBy('votes', descending: true)
+        .snapshots();
   }
+
+  Future<void> storeMostVotedSongDetails(
+      Map<String, dynamic> songDetails) async {
+    await firestore
+        .collection('most_voted_song')
+        .doc('current')
+        .set(songDetails);
+  }
+
+  Stream<Map<String, dynamic>?> getMostVotedSongDetails() {
+  return firestore.collection('most_voted_song').doc('current').snapshots().map(
+    (snapshot) {
+      if (snapshot.exists) {
+        return snapshot.data() as Map<String, dynamic>;
+      } else {
+        return null;
+      }
+    },
+  );
+}
+
 
   Future<String> getSongWithMostVotes() async {
     QuerySnapshot snapshot = await firestore

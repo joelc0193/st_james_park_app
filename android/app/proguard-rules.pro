@@ -1,0 +1,1 @@
+-keep class com.gmail.joelc0193.st_james_park_app.MainActivity { *; }

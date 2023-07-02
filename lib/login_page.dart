@@ -11,7 +11,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  ValueNotifier<bool> isUserLoggedIn = ValueNotifier<bool>(false);
   final _formKey = GlobalKey<FormState>();
   String? email;
   String? password;
@@ -34,8 +33,11 @@ class _LoginPageState extends State<LoginPage> {
             await _authService.createUserWithEmailAndPassword(
           email: email!,
           password: password!,
+          name: userName!,
         );
-        isUserLoggedIn.value = true;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Signup successful')),
+        );
       } catch (e) {
         print('Error signing up: $e');
       }
@@ -51,7 +53,9 @@ class _LoginPageState extends State<LoginPage> {
           email: email!,
           password: password!,
         );
-        isUserLoggedIn.value = true;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login successful')),
+        );
       } catch (e) {
         print('Error signing in: $e');
       }
