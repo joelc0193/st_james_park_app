@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
           name: userName!,
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Signup successful')),
+          const SnackBar(content: Text('Signup successful')),
         );
       } catch (e) {
         print('Error signing up: $e');
@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
           password: password!,
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login successful')),
+          const SnackBar(content: Text('Login successful')),
         );
       } catch (e) {
         print('Error signing in: $e');

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 
@@ -11,7 +10,7 @@ class MapBoxControllerProvider with ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? _userLocationSubscription;
   MapboxMapController? get mapBoxController => _mapBoxController;
   FirestoreService? firestoreService;
-  StreamController<Symbol> _symbolTapController = StreamController.broadcast();
+  final StreamController<Symbol> _symbolTapController = StreamController.broadcast();
   Stream<Symbol> get onSymbolTapped => _symbolTapController.stream;
 
   void _handleSymbolTapped(Symbol symbol) {

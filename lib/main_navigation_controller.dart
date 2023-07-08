@@ -1,4 +1,3 @@
-import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:st_james_park_app/home_page.dart';
@@ -6,12 +5,9 @@ import 'package:st_james_park_app/map_page.dart';
 import 'package:st_james_park_app/services/mapbox_controller.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/visitors_page.dart';
-import 'package:st_james_park_app/admin_page.dart';
 import 'package:st_james_park_app/settings_page.dart';
 import 'package:st_james_park_app/user_profile_page.dart';
 import 'music_page.dart';
-import 'map_page.dart';
-import 'other_user_profile_page.dart';
 import 'services/app_bar_manager.dart';
 
 class MainNavigationController extends StatefulWidget {
@@ -172,7 +168,7 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
         title: const Text('St James Park'),
         leading: canPopVisitorsPage()
             ? IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   _navigatorKeys[1].currentState?.pop();
                 },
@@ -184,7 +180,7 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
         title: const Text('St James Park'),
         leading: canPopMapPage()
             ? IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   _navigatorKeys[2].currentState?.pop();
                 },

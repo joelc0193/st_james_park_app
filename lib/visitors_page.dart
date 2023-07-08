@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:provider/provider.dart';
 
@@ -67,7 +66,7 @@ class _VisitorsPageState extends State<VisitorsPage> {
                 title: Text(doc['name']),
                 subtitle: Text(doc['user_message']),
                 trailing: IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.location_on,
                     color: Colors.green,
                   ),
@@ -84,7 +83,7 @@ class _VisitorsPageState extends State<VisitorsPage> {
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');
         }
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       },
     );
   }

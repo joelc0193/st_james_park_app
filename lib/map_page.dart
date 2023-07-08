@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ui' as ui;
 import 'dart:math' as math;
 import 'dart:io';
 
@@ -25,7 +24,7 @@ import 'package:st_james_park_app/user_data.dart';
 class MapPage extends StatefulWidget {
   final GlobalKey<NavigatorState> navigatorKey;
 
-  MapPage({Key? key, required this.navigatorKey}) : super(key: key);
+  const MapPage({Key? key, required this.navigatorKey}) : super(key: key);
 
   @override
   _MapPageState createState() => _MapPageState();
@@ -58,7 +57,7 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     requestLocationPermission().then((_) {
       _positionStream = Geolocator.getPositionStream(
-        locationSettings: LocationSettings(
+        locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.best,
           distanceFilter: 5, // Set distance filter to 5 meters
         ),
@@ -111,7 +110,7 @@ class _MapPageState extends State<MapPage> {
     Set<String> usedImages = {};
 
     // Remove all existing symbols
-    if (userSymbols.length > 0) {
+    if (userSymbols.isNotEmpty) {
       userSymbols.clear();
       mapBoxControllerProvider?.clearSymbols();
     }
@@ -153,7 +152,7 @@ class _MapPageState extends State<MapPage> {
             geometry: latLngLocation,
             iconImage: iconId,
             textField: areDialogBoxesVisible ? data['name'] : '',
-            textOffset: Offset(0, -1.5),
+            textOffset: const Offset(0, -1.5),
           );
 
           if (mapBoxControllerProvider != null) {
@@ -187,12 +186,10 @@ class _MapPageState extends State<MapPage> {
     if (isFollowingUser) {
       MapBoxControllerProvider? mapBoxControllerProvider =
           Provider.of<MapBoxControllerProvider>(context, listen: false);
-      if (mapBoxControllerProvider != null) {
-        mapBoxControllerProvider.animateCamera(
-          LatLng(position.latitude, position.longitude),
-          18.0,
-        );
-      }
+      mapBoxControllerProvider.animateCamera(
+        LatLng(position.latitude, position.longitude),
+        18.0,
+      );
     }
   }
 
@@ -213,7 +210,7 @@ class _MapPageState extends State<MapPage> {
       return accessToken;
     } catch (e) {
       print('Error getting Mapbox access token: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -247,12 +244,12 @@ class _MapPageState extends State<MapPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
+          title: const Text(
             'User Profile Preview',
             style: TextStyle(color: Colors.blue, fontSize: 20),
           ),
           content: userData == null
-              ? CircularProgressIndicator()
+              ? const CircularProgressIndicator()
               : Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -281,7 +278,7 @@ class _MapPageState extends State<MapPage> {
                 ),
           actions: <Widget>[
             TextButton(
-              child: Text(
+              child: const Text(
                 'Go to profile',
                 style: TextStyle(color: Colors.blue, fontSize: 16),
               ),
@@ -293,7 +290,7 @@ class _MapPageState extends State<MapPage> {
               },
             ),
             TextButton(
-              child: Text(
+              child: const Text(
                 'Close',
                 style: TextStyle(color: Colors.red, fontSize: 16),
               ),
@@ -350,7 +347,7 @@ class _MapPageState extends State<MapPage> {
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data == null) {
-            return Text('Mapbox access token is null');
+            return const Text('Mapbox access token is null');
           } else {
             print('in build\'s FutureBuilder');
             return Stack(
@@ -395,7 +392,7 @@ class _MapPageState extends State<MapPage> {
                           },
                           isFollowingUser: isFollowingUser,
                         ),
-                        SizedBox(
+                        const SizedBox(
                             height: 10), // Add some space between the buttons
                         ToggleDialogBoxesButton(
                           heroTag: 'fab2',
@@ -417,7 +414,7 @@ class _MapPageState extends State<MapPage> {
             );
           }
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
@@ -429,8 +426,9 @@ class FollowUserButton extends StatelessWidget {
   final Function onPressed;
   final bool isFollowingUser;
 
-  FollowUserButton(
-      {required this.heroTag,
+  const FollowUserButton(
+      {super.key,
+      required this.heroTag,
       required this.onPressed,
       required this.isFollowingUser});
 
@@ -450,8 +448,9 @@ class ToggleDialogBoxesButton extends StatelessWidget {
   final Function onPressed;
   final bool areDialogBoxesVisible;
 
-  ToggleDialogBoxesButton(
-      {required this.heroTag,
+  const ToggleDialogBoxesButton(
+      {super.key,
+      required this.heroTag,
       required this.onPressed,
       required this.areDialogBoxesVisible});
 

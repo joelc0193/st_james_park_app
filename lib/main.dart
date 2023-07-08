@@ -2,7 +2,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:st_james_park_app/services/mapbox_controller.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
-import 'package:st_james_park_app/user_profile_page.dart';
+import 'package:st_james_park_app/services/spotify_service.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,6 +45,9 @@ void main() async {
       update: (context, firestoreService, mapBoxControllerProvider) =>
           mapBoxControllerProvider!..firestoreService = firestoreService,
     ),
+    ChangeNotifierProvider<SpotifyService>(
+      create: (context) => SpotifyService(),
+    )
   ], child: const MyApp()));
 }
 
@@ -64,6 +67,7 @@ class MyApp extends StatelessWidget {
             ),
           );
         }
+        return null;
       },
       debugShowCheckedModeBanner: false,
       title: 'St James Park',

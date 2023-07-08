@@ -36,7 +36,7 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
   @override
   Widget build(BuildContext context) {
     if (otherUserData == null) {
-      return CircularProgressIndicator();
+      return const CircularProgressIndicator();
     } else {
       return Center(
         child: Column(

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -23,37 +26,97 @@ class FirestoreService {
     });
   }
 
-  Future<void> voteForSong(
+  Future<Map<String, dynamic>> getUserData(String userId) async {
+    DocumentSnapshot userSnapshot =
+        await firestore.collection('users').doc(userId).get();
+    return userSnapshot.data() as Map<String, dynamic>;
+  }
+
+  Stream<DocumentSnapshot> getUserSnapshot(String userId) {
+    return firestore.collection('users').doc(userId).snapshots();
+  }
+
+  Stream<DocumentSnapshot> getCurrentSongDuration() {
+    return firestore.collection('current_song').doc('duration').snapshots();
+  }
+
+  Future<void> deleteCurrentSongDuration() async {
+    await firestore.collection('current_song').doc('duration').delete();
+  }
+
+  Future<List<String>> voteForSong(
       String songUri, String songName, String userId) async {
     DocumentReference songRef =
         firestore.collection('nominated_songs').doc(songUri);
     DocumentReference userRef = firestore.collection('users').doc(userId);
+    List<String> votedSongs = [];
 
     await firestore.runTransaction((transaction) async {
       DocumentSnapshot songSnapshot = await transaction.get(songRef);
       DocumentSnapshot userSnapshot = await transaction.get(userRef);
 
-      List<dynamic> voters =
-          (songSnapshot.data() as Map<String, dynamic>)?['voters'] ?? [];
-      List<dynamic> votedSongs =
-          (userSnapshot.data() as Map<String, dynamic>)?['votedSongs'] ?? [];
+      List<dynamic> voters = getVoters(songSnapshot);
+      votedSongs =
+          getVotedSongs(userSnapshot).map((song) => song as String).toList();
 
-      if (votedSongs.contains(songUri) && voters.contains(userId)) {
-        // The user has already voted for this song, so remove their vote
-        voters.remove(userId);
-        votedSongs.remove(songUri);
-        transaction.update(
-            songRef, {'votes': FieldValue.increment(-1), 'voters': voters});
-        transaction.update(userRef, {'votedSongs': votedSongs});
-      } else if (!votedSongs.contains(songUri) && !voters.contains(userId)) {
-        // The user has not voted for this song yet, so they can vote
-        voters.add(userId);
-        votedSongs.add(songUri);
-        transaction.update(
-            songRef, {'votes': FieldValue.increment(1), 'voters': voters});
-        transaction.update(userRef, {'votedSongs': votedSongs});
+      if (userHasVotedForSong(votedSongs, songUri, voters, userId)) {
+        removeVote(
+            voters, userId, votedSongs, songUri, transaction, songRef, userRef);
+      } else if (userHasNotVotedForSong(votedSongs, songUri, voters, userId)) {
+        addVote(
+            voters, userId, votedSongs, songUri, transaction, songRef, userRef);
       }
     });
+
+    return votedSongs.map((song) => song as String).toList();
+  }
+
+  List<dynamic> getVoters(DocumentSnapshot songSnapshot) {
+    return (songSnapshot.data() as Map<String, dynamic>)['voters'] ?? [];
+  }
+
+  List<dynamic> getVotedSongs(DocumentSnapshot userSnapshot) {
+    return (userSnapshot.data() as Map<String, dynamic>)['votedSongs'] ?? [];
+  }
+
+  bool userHasVotedForSong(List<dynamic> votedSongs, String songUri,
+      List<dynamic> voters, String userId) {
+    return votedSongs.contains(songUri) && voters.contains(userId);
+  }
+
+  bool userHasNotVotedForSong(List<dynamic> votedSongs, String songUri,
+      List<dynamic> voters, String userId) {
+    return !votedSongs.contains(songUri) && !voters.contains(userId);
+  }
+
+  void removeVote(
+      List<dynamic> voters,
+      String userId,
+      List<dynamic> votedSongs,
+      String songUri,
+      Transaction transaction,
+      DocumentReference songRef,
+      DocumentReference userRef) {
+    voters.remove(userId);
+    votedSongs.remove(songUri);
+    transaction
+        .update(songRef, {'votes': FieldValue.increment(-1), 'voters': voters});
+    transaction.update(userRef, {'votedSongs': votedSongs});
+  }
+
+  void addVote(
+      List<dynamic> voters,
+      String userId,
+      List<dynamic> votedSongs,
+      String songUri,
+      Transaction transaction,
+      DocumentReference songRef,
+      DocumentReference userRef) {
+    voters.add(userId);
+    votedSongs.add(songUri);
+    transaction
+        .update(songRef, {'votes': FieldValue.increment(1), 'voters': voters});
+    transaction.update(userRef, {'votedSongs': votedSongs});
   }
 
   Stream<QuerySnapshot> getNominatedSongs() {
@@ -72,17 +135,20 @@ class FirestoreService {
   }
 
   Stream<Map<String, dynamic>?> getMostVotedSongDetails() {
-  return firestore.collection('most_voted_song').doc('current').snapshots().map(
-    (snapshot) {
-      if (snapshot.exists) {
-        return snapshot.data() as Map<String, dynamic>;
-      } else {
-        return null;
-      }
-    },
-  );
-}
-
+    return firestore
+        .collection('most_voted_song')
+        .doc('current')
+        .snapshots()
+        .map(
+      (snapshot) {
+        if (snapshot.exists) {
+          return snapshot.data() as Map<String, dynamic>;
+        } else {
+          return null;
+        }
+      },
+    );
+  }
 
   Future<String> getSongWithMostVotes() async {
     QuerySnapshot snapshot = await firestore
@@ -206,14 +272,62 @@ class FirestoreService {
     return firestore.collection('users').doc(userId).snapshots();
   }
 
-  Future<UserData> getUserData(String userId) async {
-    DocumentSnapshot doc =
+  Future<void> updateSongDuration(String songUri, int duration) async {
+    await firestore
+        .collection('current_song')
+        .doc('duration')
+        .set({'duration': duration}, SetOptions(merge: true));
+  }
+
+  Future<void> clearNominations() async {
+    await deleteAllNominatedSongsExceptSecondHighest();
+    QuerySnapshot userSnapshot = await firestore.collection('users').get();
+    for (var doc in userSnapshot.docs) {
+      await doc.reference.update({'votedSongs': [], 'hasNominated': false});
+    }
+  }
+
+  Future<String> getNextSongUri() async {
+    String songUri = await getSongWithMostVotes();
+    DocumentSnapshot songSnapshot =
+        await firestore.collection('nominated_songs').doc(songUri).get();
+    Map<String, dynamic> songDetails =
+        songSnapshot.data() as Map<String, dynamic>;
+    await storeMostVotedSongDetails(songDetails);
+    return songUri;
+  }
+
+  Future<bool> userHasNominated(String userId) async {
+    DocumentSnapshot userSnapshot =
         await firestore.collection('users').doc(userId).get();
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return UserData(
-      name: data['name'],
-      message: data['user_message'],
-      imageUrl: data['image_url'],
-    );
+    return (userSnapshot.data() as Map<String, dynamic>)['hasNominated'] ??
+        false;
+  }
+
+  Future<void> setUserNominated(String userId, bool hasNominated) {
+    return firestore
+        .collection('users')
+        .doc(userId)
+        .update({'hasNominated': hasNominated});
+  }
+
+  Future<bool> songExists(String songUri) {
+    return firestore
+        .collection('nominated_songs')
+        .doc(songUri)
+        .get()
+        .then((snapshot) => snapshot.exists);
+  }
+
+  Future<void> incrementSongVotes(String songUri) {
+    return firestore
+        .collection('nominated_songs')
+        .doc(songUri)
+        .update({'votes': FieldValue.increment(1)});
+  }
+
+  Future<void> createSong(String songUri, String songName, String imageUrl) {
+    return firestore.collection('nominated_songs').doc(songUri).set(
+        {'votes': 0, 'name': songName, 'voters': [], 'imageUrl': imageUrl});
   }
 }

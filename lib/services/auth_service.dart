@@ -59,7 +59,8 @@ class AuthService extends ChangeNotifier {
         .doc(userCredential.user!.uid)
         .set({
       'name': name,
-      'image_url': 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
+      'image_url':
+          'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
       'user_message': '',
     });
 
