@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../user_data.dart';
+
 class AuthService extends ChangeNotifier {
   FirebaseAuth _auth;
 
@@ -34,11 +36,24 @@ class AuthService extends ChangeNotifier {
           .collection('users')
           .doc(user.uid)
           .get();
+
+      final QuerySnapshot serviceSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('services')
+          .get();
+
+      // Convert each service document to a Service object
+      final services = serviceSnapshot.docs.map((serviceDoc) {
+        return Service.fromMap(
+            serviceDoc.id, serviceDoc.data() as Map<String, dynamic>);
+      }).toList();
+
       return {
         'name': doc.get('name'),
-        'email': user.email,
-        'image_url': doc.get('image_url'),
-        'user_message': doc.get('user_message'),
+        'imageUrl': doc.get('imageUrl'),
+        'message': doc.get('message'),
+        'services': services,
       };
     }
     return {};
@@ -59,9 +74,9 @@ class AuthService extends ChangeNotifier {
         .doc(userCredential.user!.uid)
         .set({
       'name': name,
-      'image_url':
+      'imageUrl':
           'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
-      'user_message': '',
+      'message': '',
     });
 
     notifyListeners();

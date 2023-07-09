@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_appauth/flutter_appauth.dart';
-import 'package:st_james_park_app/services/firestore_service.dart';
 
 class SpotifyService extends ChangeNotifier {
   final FlutterAppAuth appAuth = const FlutterAppAuth();

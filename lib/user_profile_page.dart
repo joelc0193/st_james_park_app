@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:st_james_park_app/edit_profile_page.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
+import 'package:st_james_park_app/services/firestore_service.dart';
+import 'package:st_james_park_app/user_data.dart';
 
 import 'login_page.dart';
 
@@ -18,20 +21,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final _formKey = GlobalKey<FormState>();
   late User? loggedInUser;
   String? userName;
-  String? userEmail;
   String? userImage;
   String? userMessage;
   String? email;
   String? password;
   bool isSigningUp = true;
   bool isLoggedIn = false;
-  bool isLoading = true; // Add this line
+  bool isLoading = true;
+  List<Service> services = [];
+  late FirestoreService _firestoreService;
 
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
-    _authService =
-        _authService = Provider.of<AuthService>(context, listen: false);
+    _authService = Provider.of<AuthService>(context, listen: false);
+    _firestoreService = FirestoreService(firestore: FirebaseFirestore.instance);
     await getCurrentUserAndData();
   }
 
@@ -41,15 +45,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
       isLoggedIn = true;
       final userData = await _authService.getCurrentUserData();
       userName = userData['name'];
-      userEmail = userData['email'];
-      userImage = userData['image_url'];
-      userMessage = userData['user_message'];
+      userImage = userData['imageUrl'];
+      userMessage = userData['message'];
+      services = List<Service>.from(userData['services'] as List);
     } else {
       isLoggedIn = false;
       userName = null;
-      userEmail = null;
       userImage = null;
       userMessage = null;
+      services = [];
     }
     setState(() {
       isLoading = false;
@@ -59,15 +63,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     context.watch<AuthService>();
-    // Update the build method to display different UI based on the login status
     if (isLoading) {
       return const Center(
-          child:
-              CircularProgressIndicator()); // Show loading spinner while isLoading is true
+        child: CircularProgressIndicator(),
+      );
     } else if (isLoggedIn) {
-      return profilePage(); // Display the profile page if the user is logged in
+      return profilePage();
     } else {
-      return const LoginPage(); // Display the login form if the user is not logged in
+      return const LoginPage();
     }
   }
 
@@ -85,12 +88,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
             userImage != null
                 ? ClipOval(
                     child: SizedBox(
-                      width: 150, // Set width
-                      height: 150, // Set height
+                      width: 150,
+                      height: 150,
                       child: Image.network(
                         userImage!,
-                        fit: BoxFit
-                            .cover, // Use BoxFit.cover to maintain the aspect ratio
+                        fit: BoxFit.cover,
                       ),
                     ),
                   )
@@ -99,16 +101,28 @@ class _UserProfilePageState extends State<UserProfilePage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(userMessage ?? 'Not available'),
             ),
+            for (var service in services)
+              ListTile(
+                leading: service.imageUrl != null
+                    ? Image.network(service.imageUrl)
+                    : null, // Display an image if the imageUrl is not null
+                title: Text(service.type),
+                subtitle: Text(service.description),
+                trailing: Text(service.price.toString()),
+              ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => EditProfilePage(
-                      loggedInUser: loggedInUser!, // Pass loggedInUser here
+                      loggedInUser: loggedInUser!,
+                      initialUserName: userName,
+                      initialUserMessage: userMessage,
+                      initialUserImage: userImage,
                     ),
                   ),
-                );
+                ).then((_) => getCurrentUserAndData());
               },
               child: const Text('Edit Profile'),
             ),

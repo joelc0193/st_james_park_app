@@ -125,7 +125,7 @@ class _MapPageState extends State<MapPage> {
           LatLng latLngLocation = LatLng(location.latitude, location.longitude);
 
           // Download the image and convert it to a bitmap
-          String imageUrl = data['image_url'];
+          String imageUrl = data['imageUrl'];
           String iconId = 'icon-${doc.id}';
 
           // Add the filename of the used image to the Set

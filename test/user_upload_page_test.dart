@@ -25,7 +25,7 @@ void main() {
     when(mockFirestoreService.updateAdminNumbers(any))
         .thenAnswer((_) async => true);
     when(mockFirestoreService.uploadImage(any))
-        .thenAnswer((_) async => 'image_url');
+        .thenAnswer((_) async => 'imageUrl');
 
     // Act: Create the UserUploadPage and pump it into the widget tester
     await tester.pumpWidget(MaterialApp(

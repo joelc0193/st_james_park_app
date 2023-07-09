@@ -114,7 +114,7 @@ class MusicPageViewModel {
       await _spotifyService.startNextSong(songUri);
       await updateSongDuration(songUri);
       await _firestoreService.clearNominations();
-      await _firestoreService.firestore;
+      _firestoreService.firestore;
       await _firestoreService.deleteCurrentSongDuration();
     } catch (e) {
       if (e is Exception && e.toString() == 'Exception:No songs nominated') {

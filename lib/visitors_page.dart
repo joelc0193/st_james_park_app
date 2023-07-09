@@ -61,10 +61,10 @@ class _VisitorsPageState extends State<VisitorsPage> {
                   _navigateToProfile(context, userId);
                 },
                 leading: CircleAvatar(
-                  backgroundImage: NetworkImage(doc['image_url']),
+                  backgroundImage: NetworkImage(doc['imageUrl']),
                 ),
                 title: Text(doc['name']),
-                subtitle: Text(doc['user_message']),
+                subtitle: Text(doc['message']),
                 trailing: IconButton(
                   icon: const Icon(
                     Icons.location_on,

@@ -1,10 +1,10 @@
-import 'dart:convert';
+import 'dart:io';
 
-import 'package:http/http.dart' as http;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:st_james_park_app/user_data.dart';
+
+import '../user_data.dart';
 
 class FirestoreService {
   final FirebaseFirestore firestore;
@@ -26,10 +26,25 @@ class FirestoreService {
     });
   }
 
-  Future<Map<String, dynamic>> getUserData(String userId) async {
-    DocumentSnapshot userSnapshot =
-        await firestore.collection('users').doc(userId).get();
-    return userSnapshot.data() as Map<String, dynamic>;
+  Future<UserData?> getUserData(String userId) async {
+    DocumentSnapshot doc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    if (doc.exists) {
+      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+      if (data != null) {
+        QuerySnapshot serviceSnapshot =
+            await doc.reference.collection('services').get();
+        List<Service> services = serviceSnapshot.docs.map((serviceDoc) {
+          final serviceData = serviceDoc.data();
+          if (serviceData != null) {
+            return Service.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+          } else {
+            throw Exception('Failed to load service data');
+          }
+        }).toList();
+      }
+    }
+    return null;
   }
 
   Stream<DocumentSnapshot> getUserSnapshot(String userId) {
@@ -68,7 +83,7 @@ class FirestoreService {
       }
     });
 
-    return votedSongs.map((song) => song as String).toList();
+    return votedSongs.map((song) => song).toList();
   }
 
   List<dynamic> getVoters(DocumentSnapshot songSnapshot) {
@@ -203,17 +218,19 @@ class FirestoreService {
     }
   }
 
-  Future<void> updateUserProfile(
-      String userId, String name, String message, String imageUrl) async {
-    try {
-      await firestore.collection('users').doc(userId).update({
-        'name': name,
-        'user_message': message,
-        'image_url': imageUrl,
-      });
-    } catch (e) {
-      print('Error updating user profile: $e');
-      rethrow;
+  Future<void> updateUserProfile(String uid, String name, String message,
+      String imageUrl, List<Service> services) async {
+    await firestore.collection('users').doc(uid).set({
+      'name': name,
+      'message': message,
+      'imageUrl': imageUrl,
+    });
+
+    CollectionReference serviceCollection =
+        firestore.collection('users').doc(uid).collection('services');
+
+    for (Service service in services) {
+      await serviceCollection.doc(service.id).set(service.toJson());
     }
   }
 
@@ -265,7 +282,7 @@ class FirestoreService {
     DocumentSnapshot doc =
         await firestore.collection('spotlight').doc('spotlight').get();
     Map<String, dynamic>? data = doc.data()! as Map<String, dynamic>?;
-    return data?['image_url'] as String?;
+    return data?['imageUrl'] as String?;
   }
 
   Stream<DocumentSnapshot> getUserLocationStream(String userId) {
@@ -329,5 +346,78 @@ class FirestoreService {
   Future<void> createSong(String songUri, String songName, String imageUrl) {
     return firestore.collection('nominated_songs').doc(songUri).set(
         {'votes': 0, 'name': songName, 'voters': [], 'imageUrl': imageUrl});
+  }
+
+  Future<List<Service>> getServicesForUser(String userId) async {
+    final QuerySnapshot querySnapshot = await firestore
+        .collection('users')
+        .doc(userId)
+        .collection('services')
+        .get();
+
+    return querySnapshot.docs.map((doc) {
+      return Service.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+    }).toList();
+  }
+
+  Future<void> updateService(
+      String userId, Service service, File? newImageFile) async {
+    await firestore
+        .collection('users')
+        .doc(userId)
+        .collection('services')
+        .doc(service.id)
+        .set(service.toJson());
+
+    if (newImageFile != null) {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('service_images')
+          .child('${service.id}.jpg');
+      await ref.putFile(newImageFile);
+
+      // Get the download URL for the new image and update it in Firestore
+      final newImageUrl = await ref.getDownloadURL();
+      await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('services')
+          .doc(service.id)
+          .update({'imageUrl': newImageUrl});
+    }
+  }
+
+  Future<void> deleteService(
+      String userId, String serviceId, String imageUrl) async {
+    await firestore
+        .collection('users')
+        .doc(userId)
+        .collection('services')
+        .doc(serviceId)
+        .delete();
+
+    if (imageUrl.isNotEmpty) {
+      final ref = FirebaseStorage.instance.refFromURL(imageUrl);
+      await ref.delete();
+    }
+  }
+
+  Future<String> addService(String userId, Service service) async {
+    DocumentReference docRef = await firestore
+        .collection('users')
+        .doc(userId)
+        .collection('services')
+        .add(service.toMap());
+    return docRef.id;
+  }
+
+  Future<String> uploadImage(File imageFile) async {
+    final storage = FirebaseStorage.instance;
+    final ref = storage
+        .ref()
+        .child('service_images')
+        .child('${DateTime.now().toIso8601String()}.jpg');
+    await ref.putFile(imageFile);
+    return await ref.getDownloadURL();
   }
 }
