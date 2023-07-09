@@ -47,7 +47,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
       userName = userData['name'];
       userImage = userData['imageUrl'];
       userMessage = userData['message'];
-      services = List<Service>.from(userData['services'] as List);
+
+      // Fetch services from 'services' collection where 'userId' matches the current user's ID
+      final serviceSnapshot = await FirebaseFirestore.instance
+          .collection('services')
+          .where('userId', isEqualTo: loggedInUser!.uid)
+          .get();
+
+      // Convert each service document to a Service object
+      services = serviceSnapshot.docs.map((serviceDoc) {
+        return Service.fromMap(
+            serviceDoc.id, serviceDoc.data());
+      }).toList();
     } else {
       isLoggedIn = false;
       userName = null;

@@ -173,6 +173,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       description: descriptionController.text,
                       price: double.parse(priceController.text),
                       imageUrl: imageUrl ?? '',
+                      userId: widget.loggedInUser
+                          .uid, // Add this line. Replace `userId` with the actual user ID
                     );
                     String newServiceId = await firestoreService.addService(
                       widget.loggedInUser.uid,
@@ -271,6 +273,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       description: descriptionController.text,
                       price: double.parse(priceController.text),
                       imageUrl: imageUrl ?? '',
+                      userId: widget.loggedInUser.uid,
                     );
                     setState(() {
                       services[index] = updatedService;
@@ -359,7 +362,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 userNameController!.text,
                                 userMessageController!.text,
                                 userImageUrl!,
-                                services,
                               );
                               Navigator.pop(context);
                             } catch (e) {

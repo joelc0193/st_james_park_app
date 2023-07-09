@@ -3,21 +3,25 @@ class Service {
   final String type;
   final String description;
   final double price;
-  final String imageUrl; // Add this line
+  final String imageUrl;
+  final String userId; // Add this line
 
   Service({
     required this.id,
     required this.type,
     required this.description,
     required this.price,
-    required this.imageUrl, // And this line
+    required this.imageUrl,
+    required this.userId, // And this line
   });
+
   Service copyWith({
     String? id,
     String? type,
     String? description,
     double? price,
     String? imageUrl,
+    String? userId, // Add this line
   }) {
     return Service(
       id: id ?? this.id,
@@ -25,29 +29,31 @@ class Service {
       description: description ?? this.description,
       price: price ?? this.price,
       imageUrl: imageUrl ?? this.imageUrl,
+      userId: userId ?? this.userId, // And this line
     );
   }
 
-  // Modify your toJson and fromMap methods to include the imageUrl
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'type': type,
-        'description': description,
-        'price': price,
-        'imageUrl': imageUrl, // And this line
-      };
-
-  factory Service.fromMap(String id, Map<String, dynamic> map) {
+  factory Service.fromMap(String id, Map<String, dynamic> data) {
     return Service(
       id: id,
-      type: map['type'],
-      description: map['description'],
-      price: map['price'],
-      imageUrl: map['imageUrl'],
+      type: data['type'],
+      description: data['description'],
+      price: data['price'],
+      imageUrl: data['imageUrl'],
+      userId: data['userId'], // And this line
     );
   }
 
-  // If you have a toMap method, it should look like this
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl,
+      'userId': userId, // And this line
+    };
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'type': type,
@@ -80,6 +86,7 @@ class UserData {
               description: item['description'],
               price: item['price'],
               imageUrl: item['imageUrl'],
+              userId: item['userId'], // Add this line
             ))
         .toList();
 
