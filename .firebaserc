@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "st-james-park-89a2b"
-  }
+    "default": "st-james-park-89a2b",
+    "stjamespark": "st-james-park-89a2b"
+  },
+  "targets": {},
+  "etags": {}
 }

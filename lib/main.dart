@@ -1,18 +1,18 @@
-import 'package:location_web/location_web.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:image_picker/image_picker.dart';
-import 'package:image_picker_for_web/image_picker_for_web.dart'
-    if (dart.library.html) 'package:image_picker/image_picker.dart';
-
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:st_james_park_app/services/mapbox_controller.dart';
+import 'package:st_james_park_app/services/auth_service.dart';
+import 'package:st_james_park_app/services/spotify_service.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
-import './services/firestore_service.dart';
-import 'my_home_page.dart';
+import 'services/firestore_service.dart';
+import 'main_navigation_controller.dart';
+import 'other_user_profile_page.dart';
+import 'services/app_bar_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,9 +27,27 @@ void main() async {
     Provider<FirebaseAuth>(
       create: (_) => FirebaseAuth.instance,
     ),
+    Provider<FirebaseStorage>(
+      create: (_) => FirebaseStorage.instance,
+    ),
     ProxyProvider<FirebaseFirestore, FirestoreService>(
       update: (_, firestore, __) => FirestoreService(firestore: firestore),
     ),
+    ChangeNotifierProvider<AppBarManager>(
+      create: (context) => AppBarManager(),
+    ),
+    ChangeNotifierProxyProvider<FirebaseAuth, AuthService>(
+      create: (context) => AuthService(auth: FirebaseAuth.instance),
+      update: (context, auth, authService) => authService!..update(auth: auth),
+    ),
+    ChangeNotifierProxyProvider<FirestoreService, MapBoxControllerProvider>(
+      create: (context) => MapBoxControllerProvider(),
+      update: (context, firestoreService, mapBoxControllerProvider) =>
+          mapBoxControllerProvider!..firestoreService = firestoreService,
+    ),
+    ChangeNotifierProvider<SpotifyService>(
+      create: (context) => SpotifyService(),
+    )
   ], child: const MyApp()));
 }
 
@@ -38,31 +56,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ValueNotifier<bool> isUserLoggedIn = ValueNotifier<bool>(false);
+
     return MaterialApp(
+      onGenerateRoute: (RouteSettings settings) {
+        if (settings.name == OtherUserProfilePage.routeName) {
+          return MaterialPageRoute(
+            builder: (context) => OtherUserProfilePage(
+              userId: settings.arguments as String,
+            ),
+          );
+        }
+        return null;
+      },
       debugShowCheckedModeBanner: false,
       title: 'St James Park',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        textTheme: Typography.material2018(platform: TargetPlatform.android)
-            .white
-            .apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white,
-            ),
-        textSelectionTheme: const TextSelectionThemeData(
-          cursorColor: Colors.white,
-          selectionColor: Colors.white,
-          selectionHandleColor: Colors.white,
-        ),
-        inputDecorationTheme: const InputDecorationTheme(
-          hintStyle: TextStyle(color: Colors.white),
-          labelStyle: TextStyle(color: Colors.white),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(foregroundColor: Colors.white),
-        ),
       ),
-      home: MyHomePage(),
+      home: MainNavigationController(isUserLoggedIn: isUserLoggedIn),
     );
   }
 }

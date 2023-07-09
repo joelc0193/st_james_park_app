@@ -60,6 +60,9 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        manifestPlaceholders = [
+            'appAuthRedirectScheme': 'stjamespark',
+        ]
     }
 
     signingConfigs {
@@ -84,7 +87,5 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
 }
-
-
- 

@@ -1084,14 +1084,6 @@ class MockFirestoreService extends _i1.Mock implements _i10.FirestoreService {
         ),
       ) as _i4.FieldValue);
   @override
-  _i5.Stream<_i4.DocumentSnapshot<Object?>> getNumber() => (super.noSuchMethod(
-        Invocation.method(
-          #getNumber,
-          [],
-        ),
-        returnValue: _i5.Stream<_i4.DocumentSnapshot<Object?>>.empty(),
-      ) as _i5.Stream<_i4.DocumentSnapshot<Object?>>);
-  @override
   _i5.Stream<_i4.DocumentSnapshot<Object?>> getAdminNumbers() =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1100,15 +1092,6 @@ class MockFirestoreService extends _i1.Mock implements _i10.FirestoreService {
         ),
         returnValue: _i5.Stream<_i4.DocumentSnapshot<Object?>>.empty(),
       ) as _i5.Stream<_i4.DocumentSnapshot<Object?>>);
-  @override
-  _i5.Future<void> incrementNumber() => (super.noSuchMethod(
-        Invocation.method(
-          #incrementNumber,
-          [],
-        ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
   @override
   _i5.Future<void> updateAdminNumbers(Map<String, int>? numbers) =>
       (super.noSuchMethod(
@@ -1119,6 +1102,39 @@ class MockFirestoreService extends _i1.Mock implements _i10.FirestoreService {
         returnValue: _i5.Future<void>.value(),
         returnValueForMissingStub: _i5.Future<void>.value(),
       ) as _i5.Future<void>);
+  @override
+  _i5.Future<String> uploadImage(String? imageDataUrl) => (super.noSuchMethod(
+        Invocation.method(
+          #uploadImage,
+          [imageDataUrl],
+        ),
+        returnValue: _i5.Future<String>.value(''),
+      ) as _i5.Future<String>);
+  @override
+  _i5.Future<void> uploadText(String? text) => (super.noSuchMethod(
+        Invocation.method(
+          #uploadText,
+          [text],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+  @override
+  _i5.Future<String?> getUploadedText() => (super.noSuchMethod(
+        Invocation.method(
+          #getUploadedText,
+          [],
+        ),
+        returnValue: _i5.Future<String?>.value(),
+      ) as _i5.Future<String?>);
+  @override
+  _i5.Future<String?> getSpotlightImageUrl() => (super.noSuchMethod(
+        Invocation.method(
+          #getSpotlightImageUrl,
+          [],
+        ),
+        returnValue: _i5.Future<String?>.value(),
+      ) as _i5.Future<String?>);
 }
 
 /// A class which mocks [DocumentSnapshot].
