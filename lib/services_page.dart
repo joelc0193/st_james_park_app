@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:st_james_park_app/user_data.dart';
+import 'package:st_james_park_app/services/service.dart';
 
 class ServicesPage extends StatelessWidget {
   final Function(int, String) onLocationIconClicked;

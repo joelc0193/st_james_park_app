@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:st_james_park_app/edit_profile_page.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:st_james_park_app/user_data.dart';
+import 'package:st_james_park_app/services/service.dart';
 
 import 'login_page.dart';
 
@@ -56,8 +56,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
       // Convert each service document to a Service object
       services = serviceSnapshot.docs.map((serviceDoc) {
-        return Service.fromMap(
-            serviceDoc.id, serviceDoc.data());
+        return Service.fromMap(serviceDoc.id, serviceDoc.data());
       }).toList();
     } else {
       isLoggedIn = false;
