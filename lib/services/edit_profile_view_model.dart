@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:st_james_park_app/service.dart';
+import 'package:st_james_park_app/listing.dart';
 
 class EditProfileViewModel with ChangeNotifier {
   final FirestoreService _firestoreService;
@@ -16,12 +16,12 @@ class EditProfileViewModel with ChangeNotifier {
 
   String? userImageUrl;
   File? imageFile;
-  List<Service> services = [];
+  List<Listing> services = [];
   String? error;
 
   Future<void> fetchServices() async {
     try {
-      List<Service> fetchedServices =
+      List<Listing> fetchedServices =
           await _firestoreService.getServicesForUser(_loggedInUser.uid);
       services = fetchedServices;
       notifyListeners(); // Notify the View of the change
@@ -42,7 +42,7 @@ class EditProfileViewModel with ChangeNotifier {
     }
   }
 
-  Future<Service> addService(Service newService) async {
+  Future<Listing> addService(Listing newService) async {
     String newServiceId = await _firestoreService.addService(
       _loggedInUser.uid,
       newService,
@@ -58,7 +58,7 @@ class EditProfileViewModel with ChangeNotifier {
     return await _firestoreService.uploadImage(imageFile);
   }
 
-  Future<void> editService(Service updatedService) async {
+  Future<void> editService(Listing updatedService) async {
     int index =
         services.indexWhere((service) => service.id == updatedService.id);
     if (index != -1) {

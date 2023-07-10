@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:st_james_park_app/edit_profile_page.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:st_james_park_app/service.dart';
+import 'package:st_james_park_app/listing.dart';
 
 import 'login_page.dart';
 
@@ -28,7 +28,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   bool isSigningUp = true;
   bool isLoggedIn = false;
   bool isLoading = true;
-  List<Service> services = [];
+  List<Listing> services = [];
   late FirestoreService _firestoreService;
 
   @override

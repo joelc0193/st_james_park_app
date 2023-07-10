@@ -10,7 +10,8 @@ class MapBoxControllerProvider with ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? _userLocationSubscription;
   MapboxMapController? get mapBoxController => _mapBoxController;
   FirestoreService? firestoreService;
-  final StreamController<Symbol> _symbolTapController = StreamController.broadcast();
+  final StreamController<Symbol> _symbolTapController =
+      StreamController.broadcast();
   Stream<Symbol> get onSymbolTapped => _symbolTapController.stream;
 
   void _handleSymbolTapped(Symbol symbol) {
@@ -55,7 +56,11 @@ class MapBoxControllerProvider with ChangeNotifier {
   }
 
   Future<void> clearSymbols() {
-    return mapBoxController!.clearSymbols();
+    if (mapBoxController != null) {
+      return mapBoxController!.clearSymbols();
+    } else {
+      throw Exception('mapBoxController is null');
+    }
   }
 
   Future<void> moveCameraToUser(String userId) async {

@@ -1,4 +1,4 @@
-class Service {
+class Listing {
   final String id;
   final String type;
   final String description;
@@ -6,7 +6,7 @@ class Service {
   final String imageUrl;
   final String userId; // Add this line
 
-  Service({
+  Listing({
     required this.id,
     required this.type,
     required this.description,
@@ -15,7 +15,7 @@ class Service {
     required this.userId, // And this line
   });
 
-  Service copyWith({
+  Listing copyWith({
     String? id,
     String? type,
     String? description,
@@ -23,7 +23,7 @@ class Service {
     String? imageUrl,
     String? userId, // Add this line
   }) {
-    return Service(
+    return Listing(
       id: id ?? this.id,
       type: type ?? this.type,
       description: description ?? this.description,
@@ -33,8 +33,8 @@ class Service {
     );
   }
 
-  factory Service.fromMap(String id, Map<String, dynamic> data) {
-    return Service(
+  factory Listing.fromMap(String id, Map<String, dynamic> data) {
+    return Listing(
       id: id,
       type: data['type'],
       description: data['description'],

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:st_james_park_app/service.dart';
+import 'package:st_james_park_app/listing.dart';
 
 class AuthService extends ChangeNotifier {
   FirebaseAuth _auth;
@@ -44,7 +44,7 @@ class AuthService extends ChangeNotifier {
 
       // Convert each service document to a Service object
       final services = serviceSnapshot.docs.map((serviceDoc) {
-        return Service.fromMap(
+        return Listing.fromMap(
             serviceDoc.id, serviceDoc.data() as Map<String, dynamic>);
       }).toList();
 

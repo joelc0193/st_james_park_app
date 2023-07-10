@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:st_james_park_app/services/edit_profile_view_model.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:st_james_park_app/service.dart';
+import 'package:st_james_park_app/listing.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String? initialUserName;
@@ -86,7 +86,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void fetchServices() async {
     // Replace this with the actual code to fetch the services from Firebase
-    List<Service> fetchedServices =
+    List<Listing> fetchedServices =
         await firestoreService.getServicesForUser(widget.loggedInUser.uid);
 
     setState(() {
@@ -204,7 +204,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     if (imageFile != null) {
                       imageUrl = await viewModel!.uploadImage(imageFile!);
                     }
-                    Service newService = Service(
+                    Listing newService = Listing(
                       id: '',
                       type: typeController.text,
                       description: descriptionController.text,
@@ -212,7 +212,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       imageUrl: imageUrl ?? '',
                       userId: widget.loggedInUser.uid,
                     );
-                    Service addedService =
+                    Listing addedService =
                         await viewModel!.addService(newService);
                     Navigator.of(context).pop(addedService);
                   },
@@ -298,7 +298,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     if (imageFile != null) {
                       imageUrl = await firestoreService.uploadImage(imageFile!);
                     }
-                    Service updatedService = Service(
+                    Listing updatedService = Listing(
                       id: viewModel!.services[index].id,
                       type: typeController.text,
                       description: descriptionController.text,

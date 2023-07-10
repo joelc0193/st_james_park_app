@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:st_james_park_app/service.dart';
+import 'package:st_james_park_app/listing.dart';
 
-class ServicesPage extends StatelessWidget {
+class MarketPage extends StatelessWidget {
   final Function(int, String) onLocationIconClicked;
 
-  const ServicesPage({super.key, required this.onLocationIconClicked});
+  const MarketPage({super.key, required this.onLocationIconClicked});
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +17,9 @@ class ServicesPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Services'),
       ),
-      body: StreamBuilder<List<Service>>(
+      body: StreamBuilder<List<Listing>>(
         stream: firestoreService.getServicesStream(),
-        builder: (BuildContext context, AsyncSnapshot<List<Service>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<Listing>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -28,7 +28,7 @@ class ServicesPage extends StatelessWidget {
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                Service service = snapshot.data![index];
+                Listing service = snapshot.data![index];
                 return ListTile(
                   leading: Image.network(service.imageUrl),
                   title: Text(service.type),

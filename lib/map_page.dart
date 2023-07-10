@@ -112,7 +112,16 @@ class _MapPageState extends State<MapPage> {
     // Remove all existing symbols
     if (userSymbols.isNotEmpty) {
       userSymbols.clear();
-      mapBoxControllerProvider?.clearSymbols();
+
+      // Remove all existing symbols
+      if (userSymbols.isNotEmpty) {
+        userSymbols.clear();
+        try {
+          mapBoxControllerProvider?.clearSymbols();
+        } catch (e) {
+          print('Exception thrown while clearing symbols: $e');
+        }
+      }
     }
 
     // Add new symbols

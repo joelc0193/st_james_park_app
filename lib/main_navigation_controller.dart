@@ -4,7 +4,7 @@ import 'package:st_james_park_app/home_page.dart';
 import 'package:st_james_park_app/map_page.dart';
 import 'package:st_james_park_app/services/mapbox_controller.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
-import 'package:st_james_park_app/services_page.dart';
+import 'package:st_james_park_app/market_page.dart';
 import 'package:st_james_park_app/visitors_page.dart';
 import 'package:st_james_park_app/settings_page.dart';
 import 'package:st_james_park_app/user_profile_page.dart';
@@ -51,7 +51,7 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
       VisitorsPage(onLocationIconClicked: _onLocationIconClicked),
       MapPage(navigatorKey: _navigatorKeys[2]),
       const MusicPage(),
-      ServicesPage(onLocationIconClicked: _onLocationIconClicked),
+      MarketPage(onLocationIconClicked: _onLocationIconClicked),
       const UserProfilePage(),
     ];
   }
@@ -143,8 +143,8 @@ class _MainNavigationControllerState extends State<MainNavigationController> {
             label: 'Music',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.work),
-            label: 'Services',
+            icon: Icon(Icons.attach_money),
+            label: 'Market',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

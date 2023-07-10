@@ -1,4 +1,4 @@
-import 'package:st_james_park_app/service.dart';
+import 'package:st_james_park_app/listing.dart';
 
 class UserData {
   final String name;
@@ -6,7 +6,7 @@ class UserData {
   final String message;
   final List<String> interests; // add this
   final List<String> goals; // add this
-  final List<Service>? services;
+  final List<Listing>? services;
 
   UserData({
     required this.name,
@@ -19,8 +19,8 @@ class UserData {
 
   factory UserData.fromMap(Map<String, dynamic> map) {
     var serviceList = map['services'] as List?;
-    List<Service>? services = serviceList
-        ?.map((item) => Service(
+    List<Listing>? services = serviceList
+        ?.map((item) => Listing(
               id: item['id'],
               type: item['type'],
               description: item['description'],

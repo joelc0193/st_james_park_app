@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:st_james_park_app/service.dart';
+import 'package:st_james_park_app/listing.dart';
 
 import '../user_data.dart';
 
@@ -34,7 +34,7 @@ class FirestoreService {
     if (doc.exists) {
       Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
       if (data != null) {
-        List<Service> services =
+        List<Listing> services =
             await getServicesForUser(userId); // get services for the user
 
         List<String> interests =
@@ -63,13 +63,13 @@ class FirestoreService {
     return firestore.collection('current_song').doc('duration').snapshots();
   }
 
-  Stream<List<Service>> getServicesStream() {
+  Stream<List<Listing>> getServicesStream() {
     return FirebaseFirestore.instance
         .collection('users')
         .where('isInPark', isEqualTo: true)
         .snapshots()
         .asyncMap((querySnapshot) async {
-      List<Service> services = [];
+      List<Listing> services = [];
       for (var userDoc in querySnapshot.docs) {
         List<String> serviceIds = List<String>.from(userDoc['serviceIds']);
         for (var serviceId in serviceIds) {
@@ -77,7 +77,7 @@ class FirestoreService {
               .collection('services')
               .doc(serviceId)
               .get();
-          services.add(Service.fromMap(
+          services.add(Listing.fromMap(
             serviceDoc.id,
             serviceDoc.data() as Map<String, dynamic>,
           ));
@@ -364,18 +364,18 @@ class FirestoreService {
         {'votes': 0, 'name': songName, 'voters': [], 'imageUrl': imageUrl});
   }
 
-  Future<List<Service>> getServicesForUser(String userId) async {
+  Future<List<Listing>> getServicesForUser(String userId) async {
     final QuerySnapshot querySnapshot = await firestore
         .collection('services')
         .where('userId', isEqualTo: userId) // Query services by user ID
         .get();
     return querySnapshot.docs.map((doc) {
-      return Service.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+      return Listing.fromMap(doc.id, doc.data() as Map<String, dynamic>);
     }).toList();
   }
 
   Future<void> updateService(
-      String userId, Service service, File? newImageFile) async {
+      String userId, Listing service, File? newImageFile) async {
     await firestore.collection('services').doc(service.id).set({
       ...service.toJson(),
       'userId':
@@ -413,7 +413,7 @@ class FirestoreService {
     });
   }
 
-  Future<String> addService(String userId, Service service) async {
+  Future<String> addService(String userId, Listing service) async {
     DocumentReference docRef = await firestore.collection('services').add({
       ...service.toMap(),
       'userId': userId, // Add the user ID to the service document
