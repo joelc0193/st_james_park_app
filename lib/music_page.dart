@@ -110,7 +110,9 @@ class _MusicPageState extends State<MusicPage> {
         children: [
           Expanded(
             child: TextField(
-              controller: _controller.searchController,
+              onChanged: (value) {
+                _controller.updateSearchText(value);
+              },
               enabled: !_controller.hasNominatedNotifier.value,
               decoration: InputDecoration(
                 labelText: 'Search for a track',
@@ -123,10 +125,9 @@ class _MusicPageState extends State<MusicPage> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () async {
-              if (_controller.searchController.text.isNotEmpty) {
+              if (_controller.searchText.isNotEmpty) {
                 try {
-                  await _controller
-                      .searchTrack(_controller.searchController.text);
+                  await _controller.searchTrack(_controller.searchText);
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

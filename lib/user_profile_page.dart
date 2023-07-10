@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:st_james_park_app/edit_profile_page.dart';
 import 'package:st_james_park_app/services/auth_service.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:st_james_park_app/services/service.dart';
+import 'package:st_james_park_app/service.dart';
 
 import 'login_page.dart';
 
@@ -43,21 +43,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     loggedInUser = _authService.getCurrentUser();
     if (loggedInUser != null) {
       isLoggedIn = true;
-      final userData = await _authService.getCurrentUserData();
-      userName = userData['name'];
-      userImage = userData['imageUrl'];
-      userMessage = userData['message'];
-
-      // Fetch services from 'services' collection where 'userId' matches the current user's ID
-      final serviceSnapshot = await FirebaseFirestore.instance
-          .collection('services')
-          .where('userId', isEqualTo: loggedInUser!.uid)
-          .get();
-
-      // Convert each service document to a Service object
-      services = serviceSnapshot.docs.map((serviceDoc) {
-        return Service.fromMap(serviceDoc.id, serviceDoc.data());
-      }).toList();
+      final userData = await _firestoreService.getUserData(loggedInUser!.uid);
+      userName = userData?.name;
+      userImage = userData?.imageUrl;
+      userMessage = userData?.message;
+      services = await _firestoreService.getServicesForUser(loggedInUser!.uid);
     } else {
       isLoggedIn = false;
       userName = null;
@@ -113,9 +103,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             for (var service in services)
               ListTile(
-                leading: service.imageUrl != null
-                    ? Image.network(service.imageUrl)
-                    : null, // Display an image if the imageUrl is not null
+                leading: Image.network(service.imageUrl),
                 title: Text(service.type),
                 subtitle: Text(service.description),
                 trailing: Text(service.price.toString()),

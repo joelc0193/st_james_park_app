@@ -4,8 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:st_james_park_app/services/edit_profile_view_model.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:st_james_park_app/services/service.dart';
+import 'package:st_james_park_app/service.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String? initialUserName;
@@ -26,11 +27,12 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  TextEditingController? userNameController;
-  TextEditingController? userMessageController;
+  TextEditingController userNameController = TextEditingController();
+  TextEditingController userMessageController = TextEditingController();
   String? userImageUrl;
   late FirestoreService firestoreService;
   File? imageFile;
+  late EditProfileViewModel? viewModel;
 
   @override
   void initState() {
@@ -39,10 +41,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
     userMessageController =
         TextEditingController(text: widget.initialUserMessage);
     userImageUrl = widget.initialUserImage;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (viewModel == null) {
       firestoreService = Provider.of<FirestoreService>(context, listen: false);
-      fetchServices();
-    });
+      viewModel = EditProfileViewModel(
+        firestoreService: firestoreService,
+        loggedInUser: widget.loggedInUser,
+      );
+      try {
+        viewModel!.fetchServices();
+        viewModel!.addListener(_updateState);
+      } catch (e) {
+        // Handle the error here. You could show a Snackbar with the error message.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to fetch services: $e')),
+        );
+      }
+    }
+  }
+
+  void _updateState() {
+    if (viewModel!.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(viewModel!.error!)),
+      );
+    } else {
+      // Update the UI with the new state
+    }
   }
 
   void fetchServices() async {
@@ -51,7 +80,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         await firestoreService.getServicesForUser(widget.loggedInUser.uid);
 
     setState(() {
-      services = fetchedServices;
+      viewModel!.services = fetchedServices;
     });
   }
 
@@ -97,7 +126,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  List<Service> services = [];
   void addService() {
     showDialog(
       context: context,
@@ -106,7 +134,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         TextEditingController descriptionController = TextEditingController();
         TextEditingController priceController = TextEditingController();
         String? imageUrl;
-
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter dialogSetState) {
             return AlertDialog(
@@ -135,7 +162,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ElevatedButton(
                     onPressed: () async {
                       try {
-                        File? newImageFile = await pickImage();
+                        File? newImageFile = await viewModel!.pickImage();
                         dialogSetState(() {
                           imageFile = newImageFile;
                         });
@@ -165,24 +192,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   child: const Text('Add'),
                   onPressed: () async {
                     if (imageFile != null) {
-                      imageUrl = await firestoreService.uploadImage(imageFile!);
+                      imageUrl = await viewModel!.uploadImage(imageFile!);
                     }
                     Service newService = Service(
-                      id: '', // Temporarily set id as an empty string
+                      id: '',
                       type: typeController.text,
                       description: descriptionController.text,
                       price: double.parse(priceController.text),
                       imageUrl: imageUrl ?? '',
-                      userId: widget.loggedInUser
-                          .uid, // Add this line. Replace `userId` with the actual user ID
+                      userId: widget.loggedInUser.uid,
                     );
-                    String newServiceId = await firestoreService.addService(
-                      widget.loggedInUser.uid,
-                      newService,
-                    );
-                    newService = newService.copyWith(
-                        id: newServiceId); // Update the id of newService
-                    Navigator.of(context).pop(newService);
+                    Service addedService =
+                        await viewModel!.addService(newService);
+                    Navigator.of(context).pop(addedService);
                   },
                 ),
               ],
@@ -192,9 +214,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       },
     ).then((newService) {
       if (newService != null) {
-        // Update the services list in _EditProfilePageState
         setState(() {
-          services.add(newService);
+          viewModel!.services.add(newService);
         });
       }
     });
@@ -202,12 +223,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void editService(int index) {
     TextEditingController typeController =
-        TextEditingController(text: services[index].type);
+        TextEditingController(text: viewModel!.services[index].type);
     TextEditingController descriptionController =
-        TextEditingController(text: services[index].description);
-    TextEditingController priceController =
-        TextEditingController(text: services[index].price.toString());
-    String? imageUrl = services[index].imageUrl;
+        TextEditingController(text: viewModel!.services[index].description);
+    TextEditingController priceController = TextEditingController(
+        text: viewModel!.services[index].price.toString());
+    String? imageUrl = viewModel!.services[index].imageUrl;
     File? imageFile;
 
     showDialog(
@@ -268,18 +289,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       imageUrl = await firestoreService.uploadImage(imageFile!);
                     }
                     Service updatedService = Service(
-                      id: services[index].id,
+                      id: viewModel!.services[index].id,
                       type: typeController.text,
                       description: descriptionController.text,
                       price: double.parse(priceController.text),
                       imageUrl: imageUrl ?? '',
                       userId: widget.loggedInUser.uid,
                     );
-                    setState(() {
-                      services[index] = updatedService;
-                    });
-                    await firestoreService.updateService(
-                        widget.loggedInUser.uid, updatedService, imageFile);
+                    await viewModel!.editService(updatedService);
                     Navigator.of(context).pop(updatedService);
                   },
                 ),
@@ -296,10 +313,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void deleteService(int index) {
-    String serviceId = services[index].id;
-    String imageUrl = services[index].imageUrl;
+    String serviceId = viewModel!.services[index].id;
+    String imageUrl = viewModel!.services[index].imageUrl;
     setState(() {
-      services.removeAt(index);
+      viewModel!.services.removeAt(index);
     });
     firestoreService.deleteService(
         widget.loggedInUser.uid, serviceId, imageUrl);
@@ -307,7 +324,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final firestoreService = Provider.of<FirestoreService>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
@@ -353,28 +369,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                       ElevatedButton(
                         onPressed: () async {
-                          if (userNameController!.text.isNotEmpty &&
-                              userMessageController!.text.isNotEmpty &&
-                              userImageUrl != null) {
-                            try {
-                              await firestoreService.updateUserProfile(
-                                widget.loggedInUser.uid,
-                                userNameController!.text,
-                                userMessageController!.text,
-                                userImageUrl!,
-                              );
-                              Navigator.pop(context);
-                            } catch (e) {
-                              print('Error updating profile: $e');
-                            }
-                          } else {
+                          String? error = await viewModel!.updateUserProfile(
+                            userNameController.text,
+                            userMessageController.text,
+                            userImageUrl!,
+                          );
+
+                          if (error != null) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Please fill out all fields and select an image.',
-                                ),
-                              ),
+                              SnackBar(content: Text(error)),
                             );
+                          } else {
+                            Navigator.pop(context);
                           }
                         },
                         child: const Text('Save'),
@@ -392,20 +398,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: services.length,
+                        itemCount: viewModel!.services.length,
                         itemBuilder: (context, index) {
                           return ListTile(
                             leading: Image.network(
-                              services[index].imageUrl,
+                              viewModel!.services[index].imageUrl,
                               width: 50,
                               height: 50,
                             ),
-                            title: Text(services[index].type),
-                            subtitle: Text(services[index].description),
+                            title: Text(viewModel!.services[index].type),
+                            subtitle:
+                                Text(viewModel!.services[index].description),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(services[index].price.toString()),
+                                Text(viewModel!.services[index].price
+                                    .toString()),
                                 const SizedBox(width: 10),
                                 IconButton(
                                   icon: const Icon(Icons.edit),
@@ -438,5 +446,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    viewModel!.removeListener(_updateState);
+    super.dispose();
   }
 }

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:st_james_park_app/services/service.dart';
+import 'package:st_james_park_app/service.dart';
 
 import '../user_data.dart';
 
@@ -35,7 +35,7 @@ class FirestoreService {
       if (data != null) {
         QuerySnapshot serviceSnapshot =
             await doc.reference.collection('services').get();
-        List<Service> services = serviceSnapshot.docs.map((serviceDoc) {
+        serviceSnapshot.docs.map((serviceDoc) {
           final serviceData = serviceDoc.data();
           if (serviceData != null) {
             return Service.fromMap(doc.id, doc.data() as Map<String, dynamic>);

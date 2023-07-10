@@ -10,6 +10,7 @@ import 'package:st_james_park_app/services/firestore_service.dart';
 import 'package:st_james_park_app/services/spotify_service.dart';
 
 class MusicPageViewModel {
+  String _searchText = '';
   ValueNotifier<bool> hasNominatedNotifier = ValueNotifier<bool>(false);
   ValueNotifier<List<String>> votedSongsNotifier =
       ValueNotifier<List<String>>([]);
@@ -26,7 +27,7 @@ class MusicPageViewModel {
   final VoidCallback notifyParent;
   ValueNotifier<String> _countdownTimer = ValueNotifier<String>("");
 
-  // Expose an error state that the UI can listen to
+  String get searchText => _searchText;
   final ValueNotifier<String?> errorNotifier = ValueNotifier<String?>(null);
 
   bool get songIsPlaying => _countdownTimerInstance.isActive;
@@ -65,6 +66,10 @@ class MusicPageViewModel {
   TextEditingController get searchController => _searchController;
   void _updateState() {
     notifyParent();
+  }
+
+  void updateSearchText(String value) {
+    _searchText = value;
   }
 
   Stream<User?> get userState => _authService.userState;

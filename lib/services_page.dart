@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:st_james_park_app/services/firestore_service.dart';
-import 'package:st_james_park_app/services/service.dart';
+import 'package:st_james_park_app/service.dart';
 
 class ServicesPage extends StatelessWidget {
   final Function(int, String) onLocationIconClicked;
@@ -30,9 +30,7 @@ class ServicesPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 Service service = snapshot.data![index];
                 return ListTile(
-                  leading: (service.imageUrl != null)
-                      ? Image.network(service.imageUrl)
-                      : null,
+                  leading: Image.network(service.imageUrl),
                   title: Text(service.type),
                   subtitle: Text(service.description),
                   trailing: Row(

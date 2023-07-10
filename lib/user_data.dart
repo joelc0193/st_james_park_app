@@ -1,4 +1,4 @@
-import 'package:st_james_park_app/services/service.dart';
+import 'package:st_james_park_app/service.dart';
 
 class UserData {
   final String name;
