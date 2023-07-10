@@ -15,7 +15,7 @@ class MarketPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Services'),
+        title: const Text('Market'),
       ),
       body: StreamBuilder<List<Listing>>(
         stream: firestoreService.getServicesStream(),
