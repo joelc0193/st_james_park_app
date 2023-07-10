@@ -44,24 +44,22 @@ class _OtherUserProfilePageState extends State<OtherUserProfilePage> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Welcome, ${otherUserData!.name}!'),
+              child: Text('${otherUserData!.name}!'),
             ),
-            otherUserData!.imageUrl != null
-                ? ClipOval(
-                    child: SizedBox(
-                      width: 150, // Set width
-                      height: 150, // Set height
-                      child: Image.network(
-                        otherUserData!.imageUrl,
-                        fit: BoxFit
-                            .cover, // Use BoxFit.cover to maintain the aspect ratio
-                      ),
-                    ),
-                  )
-                : Container(),
+            ClipOval(
+              child: SizedBox(
+                width: 150, // Set width
+                height: 150, // Set height
+                child: Image.network(
+                  otherUserData!.imageUrl,
+                  fit: BoxFit
+                      .cover, // Use BoxFit.cover to maintain the aspect ratio
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(otherUserData!.message ?? 'Not available'),
+              child: Text(otherUserData!.message),
             ),
             // Add any other buttons or widgets you need here
           ],

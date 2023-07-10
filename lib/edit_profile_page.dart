@@ -36,7 +36,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String? userImageUrl;
   late FirestoreService firestoreService;
   File? imageFile;
-  late EditProfileViewModel? viewModel;
+  EditProfileViewModel? viewModel;
   TextEditingController userInterestsController = TextEditingController();
   TextEditingController userGoalsController = TextEditingController();
 
@@ -66,7 +66,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         viewModel!.fetchServices();
         viewModel!.addListener(_updateState);
       } catch (e) {
-        // Handle the error here. You could show a Snackbar with the error message.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to fetch services: $e')),
         );
@@ -80,18 +79,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         SnackBar(content: Text(viewModel!.error!)),
       );
     } else {
-      // Update the UI with the new state
+      setState(() {});
     }
-  }
-
-  void fetchServices() async {
-    // Replace this with the actual code to fetch the services from Firebase
-    List<Listing> fetchedServices =
-        await firestoreService.getServicesForUser(widget.loggedInUser.uid);
-
-    setState(() {
-      viewModel!.services = fetchedServices;
-    });
   }
 
   Future<File?> pickImage() async {
@@ -474,7 +463,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   void dispose() {
-    viewModel!.removeListener(_updateState);
+    if (viewModel != null) {
+      viewModel!.removeListener(_updateState);
+    }
     super.dispose();
   }
 }
