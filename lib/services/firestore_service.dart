@@ -34,19 +34,17 @@ class FirestoreService {
     if (doc.exists) {
       Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
       if (data != null) {
-        List<Listing> services =
-            await getServicesForUser(userId); // get services for the user
+        List<Listing> services = await getServicesForUser(userId);
 
-        List<String> interests =
-            List<String>.from(data['interests'] ?? []); // add this
-        List<String> goals = List<String>.from(data['goals'] ?? []); // add this
+        List<String> interests = List<String>.from(data['interests'] ?? []);
+        List<String> goals = List<String>.from(data['goals'] ?? []);
 
         return UserData(
           name: data['name'],
           imageUrl: data['imageUrl'],
           message: data['message'],
-          interests: interests, // add this
-          goals: goals, // add this
+          interests: interests,
+          goals: goals,
           services: services,
         );
       }

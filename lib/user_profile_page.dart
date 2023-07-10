@@ -47,7 +47,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       userName = userData?.name;
       userImage = userData?.imageUrl;
       userMessage = userData?.message;
-      services = userData?.services ?? [];
     } else {
       isLoggedIn = false;
       userName = null;
@@ -101,13 +100,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(userMessage ?? 'Not available'),
             ),
-            for (var service in services)
-              ListTile(
-                leading: Image.network(service.imageUrl),
-                title: Text(service.type),
-                subtitle: Text(service.description),
-                trailing: Text(service.price.toString()),
-              ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
