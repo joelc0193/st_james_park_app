@@ -79,7 +79,12 @@ class EditProfileViewModel with ChangeNotifier {
   }
 
   Future<String?> updateUserProfile(
-      String name, String message, String imageUrl) async {
+      String name,
+      String message,
+      String imageUrl,
+      List<String> interests, // new parameter
+      List<String> goals // new parameter
+      ) async {
     if (name.isEmpty) {
       return 'Name cannot be empty.';
     }
@@ -91,7 +96,13 @@ class EditProfileViewModel with ChangeNotifier {
     }
 
     await _firestoreService.updateUserProfile(
-        _loggedInUser.uid, name, message, imageUrl);
+        _loggedInUser.uid,
+        name,
+        message,
+        imageUrl,
+        interests, // pass the interests
+        goals // pass the goals
+        );
     return null; // return null if there's no error
   }
 }

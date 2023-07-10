@@ -47,7 +47,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       userName = userData?.name;
       userImage = userData?.imageUrl;
       userMessage = userData?.message;
-      services = await _firestoreService.getServicesForUser(loggedInUser!.uid);
+      services = userData?.services ?? [];
     } else {
       isLoggedIn = false;
       userName = null;

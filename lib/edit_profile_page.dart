@@ -12,6 +12,8 @@ class EditProfilePage extends StatefulWidget {
   final String? initialUserName;
   final String? initialUserMessage;
   final String? initialUserImage;
+  final String? initialUserInterests;
+  final String? initialUserGoals;
   final User loggedInUser;
 
   const EditProfilePage({
@@ -19,6 +21,8 @@ class EditProfilePage extends StatefulWidget {
     this.initialUserName,
     this.initialUserMessage,
     this.initialUserImage,
+    this.initialUserInterests,
+    this.initialUserGoals,
     required this.loggedInUser,
   }) : super(key: key);
 
@@ -33,6 +37,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late FirestoreService firestoreService;
   File? imageFile;
   late EditProfileViewModel? viewModel;
+  TextEditingController userInterestsController = TextEditingController();
+  TextEditingController userGoalsController = TextEditingController();
 
   @override
   void initState() {
@@ -40,6 +46,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     userNameController = TextEditingController(text: widget.initialUserName);
     userMessageController =
         TextEditingController(text: widget.initialUserMessage);
+    userInterestsController = TextEditingController(
+        text: widget.initialUserInterests); // if you have initialUserInterests
+    userGoalsController = TextEditingController(
+        text: widget.initialUserGoals); // if you have initialUserGoals
     userImageUrl = widget.initialUserImage;
   }
 
@@ -367,12 +377,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           labelText: 'Message',
                         ),
                       ),
+                      TextField(
+                        controller: userInterestsController,
+                        decoration: const InputDecoration(
+                          labelText: 'Interests',
+                        ),
+                      ),
+                      TextField(
+                        controller: userGoalsController,
+                        decoration: const InputDecoration(
+                          labelText: 'Goals',
+                        ),
+                      ),
                       ElevatedButton(
                         onPressed: () async {
                           String? error = await viewModel!.updateUserProfile(
                             userNameController.text,
                             userMessageController.text,
                             userImageUrl!,
+                            userInterestsController.text.split(','),
+                            userGoalsController.text.split(','),
                           );
 
                           if (error != null) {

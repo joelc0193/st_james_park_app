@@ -30,21 +30,28 @@ class FirestoreService {
   Future<UserData?> getUserData(String userId) async {
     DocumentSnapshot doc =
         await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
     if (doc.exists) {
       Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
       if (data != null) {
-        QuerySnapshot serviceSnapshot =
-            await doc.reference.collection('services').get();
-        serviceSnapshot.docs.map((serviceDoc) {
-          final serviceData = serviceDoc.data();
-          if (serviceData != null) {
-            return Service.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-          } else {
-            throw Exception('Failed to load service data');
-          }
-        }).toList();
+        List<Service> services =
+            await getServicesForUser(userId); // get services for the user
+
+        List<String> interests =
+            List<String>.from(data['interests'] ?? []); // add this
+        List<String> goals = List<String>.from(data['goals'] ?? []); // add this
+
+        return UserData(
+          name: data['name'],
+          imageUrl: data['imageUrl'],
+          message: data['message'],
+          interests: interests, // add this
+          goals: goals, // add this
+          services: services,
+        );
       }
     }
+
     return null;
   }
 
@@ -390,11 +397,19 @@ class FirestoreService {
   }
 
   Future<void> updateUserProfile(
-      String uid, String name, String message, String imageUrl) async {
+      String uid,
+      String name,
+      String message,
+      String imageUrl,
+      List<String> interests, // new parameter
+      List<String> goals // new parameter
+      ) async {
     await firestore.collection('users').doc(uid).update({
       'name': name,
       'message': message,
       'imageUrl': imageUrl,
+      'interests': interests, // update the interests
+      'goals': goals // update the goals
     });
   }
 
